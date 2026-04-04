@@ -1,0 +1,42 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@400;500;600;700&display=swap');
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-arabic: "Amiri", serif;
+}
+
+@layer base {
+  .font-arabic {
+    font-family: var(--font-arabic);
+    direction: rtl;
+  }
+}
+
+.markdown-body {
+  @apply text-slate-600 leading-relaxed;
+}
+
+.markdown-body h1, .markdown-body h2, .markdown-body h3 {
+  @apply text-slate-800 font-bold mt-6 mb-4;
+}
+
+.markdown-body p {
+  @apply mb-4;
+}
+
+.quran-info-content h2 {
+  @apply text-xl font-bold text-emerald-700 mt-8 mb-4 border-b border-emerald-100 pb-2;
+}
+
+.quran-info-content p {
+  @apply text-slate-600 leading-relaxed mb-4;
+}
+
+.quran-info-content ul {
+  @apply list-disc list-inside mb-4 space-y-2;
+}
+
+.quran-info-content strong {
+  @apply text-slate-800 font-semibold;
+}

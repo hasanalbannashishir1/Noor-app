@@ -1,0 +1,5 @@
+{
+  "name": "Noor App",
+  "description": "Light of the Qur’an in Your Hands",
+  "requestFramePermissions": ["geolocation"]
+}

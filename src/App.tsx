@@ -35,12 +35,14 @@ import {
   Bookmark,
   Send,
   RefreshCw,
+  Quote,
   User,
   History,
   Sunrise,
   Sun,
   Sunset,
-  Moon
+  Moon,
+  X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GoogleGenAI } from "@google/genai";
@@ -186,12 +188,45 @@ const TasbihCounter = () => {
     { text: 'La-ilaha ilallah', limit: 33 },
     { text: 'La hawla wala Kuwata illa bilah', limit: 33 },
     { text: 'Subhanallahi wa bihamdihi', limit: 33 },
-    { text: 'Subhanallahil Azeem', limit: 33 }
+    { text: 'Subhanallahil Azeem', limit: 33 },
+    { text: 'Allahu - Akbar', limit: 33 }
   ];
 
   const currentPhrase = phrases[phraseIndex];
 
+  const playClickSound = () => {
+    try {
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+
+      // Mouse click sound: very short, high-frequency pulse
+      oscillator.type = 'square';
+      oscillator.frequency.setValueAtTime(1600, audioCtx.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.015);
+
+      gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.015);
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      oscillator.start();
+      oscillator.stop(audioCtx.currentTime + 0.015);
+    } catch (e) {
+      console.error('Audio context error:', e);
+    }
+  };
+
   const handleIncrement = () => {
+    // Haptic feedback
+    if (navigator.vibrate) {
+      navigator.vibrate(15);
+    }
+    
+    // Sound feedback
+    playClickSound();
+
     if (count + 1 >= currentPhrase.limit) {
       setCount(0);
       setPhraseIndex((prev) => (prev + 1) % phrases.length);
@@ -762,6 +797,16 @@ export default function App() {
     return saved ? parseInt(saved) : 0;
   });
 
+  const [bookmarkedDuas, setBookmarkedDuas] = useState<string[]>(() => {
+    const saved = localStorage.getItem('bookmarked_duas');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const [bookmarkedSurahs, setBookmarkedSurahs] = useState<number[]>(() => {
+    const saved = localStorage.getItem('bookmarked_surahs');
+    return saved ? JSON.parse(saved) : [];
+  });
+
   const [recentActivity, setRecentActivity] = useState<{ id: string, type: 'salah' | 'quran', title: string, time: string }[]>(() => {
     const saved = localStorage.getItem('recent_activity');
     return saved ? JSON.parse(saved) : [];
@@ -776,6 +821,14 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('surahs_listened_count', surahsListenedCount.toString());
   }, [surahsListenedCount]);
+
+  useEffect(() => {
+    localStorage.setItem('bookmarked_duas', JSON.stringify(bookmarkedDuas));
+  }, [bookmarkedDuas]);
+
+  useEffect(() => {
+    localStorage.setItem('bookmarked_surahs', JSON.stringify(bookmarkedSurahs));
+  }, [bookmarkedSurahs]);
 
   useEffect(() => {
     localStorage.setItem('recent_activity', JSON.stringify(recentActivity));
@@ -991,6 +1044,23 @@ export default function App() {
     }
   };
 
+  const toggleDuaBookmark = (duaId: string) => {
+    setBookmarkedDuas(prev => 
+      prev.includes(duaId) 
+        ? prev.filter(id => id !== duaId) 
+        : [...prev, duaId]
+    );
+  };
+
+  const toggleSurahBookmark = (e: React.MouseEvent, surahId: number) => {
+    e.stopPropagation();
+    setBookmarkedSurahs(prev => 
+      prev.includes(surahId) 
+        ? prev.filter(id => id !== surahId) 
+        : [...prev, surahId]
+    );
+  };
+
   const getCategoryColor = (category: string) => {
     switch (category) {
       case 'Fardh': return 'bg-emerald-100 text-emerald-700 border-emerald-200';
@@ -1052,20 +1122,43 @@ export default function App() {
   }, [searchQuery, surahs]);
 
   const handleSurahClick = async (surah: Surah) => {
+    const isSameSurah = selectedSurah?.id === surah.id;
+    const wasPlayingSameSurah = listPlayingId === surah.id && isPlaying;
+    
+    if (isSameSurah) {
+      setSurahTab('verses');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
     setSelectedSurah(surah);
     setDetailLoading(true);
     setSurahTab('verses');
-    setIsPlaying(false);
+    // Don't reset isPlaying if we're already playing this surah
+    if (!wasPlayingSameSurah) {
+      setIsPlaying(false);
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
     
     try {
-      const [translation, audioData, tafsirData, arabicData, infoData] = await Promise.all([
+      // If we're already playing this surah from the list, we don't need to re-fetch audio
+      const fetchPromises: any[] = [
         quranService.getSurahTranslation(surah.id),
-        quranService.getSurahAudio(surah.id),
         quranService.getSurahTafsir(surah.id),
         quranService.getArabicText(surah.id),
         quranService.getSurahInfo(surah.id)
-      ]);
+      ];
+      
+      if (!wasPlayingSameSurah) {
+        fetchPromises.push(quranService.getSurahAudio(surah.id));
+      }
+      
+      const results = await Promise.all(fetchPromises);
+      const translation = results[0];
+      const tafsirData = results[1];
+      const arabicData = results[2];
+      const infoData = results[3];
+      const audioData = wasPlayingSameSurah ? audio : results[4];
       
       // Merge arabic text into translation data for easier display
       const mergedAyahs = translation.ayahs.map((ayah: any, index: number) => ({
@@ -1074,7 +1167,7 @@ export default function App() {
       }));
       
       setSurahDetail({ ...translation, ayahs: mergedAyahs });
-      setAudio(audioData);
+      if (audioData) setAudio(audioData);
       setTafsir(tafsirData);
       setSurahInfo(infoData);
     } catch (error) {
@@ -1091,6 +1184,7 @@ export default function App() {
       } else {
         audioRef.current.play();
         if (selectedSurah) {
+          setListPlayingId(selectedSurah.id);
           setSurahsListenedCount(prev => prev + 1);
           logActivity('quran', `Started listening to Surah ${selectedSurah.name_simple}`);
         }
@@ -1134,7 +1228,15 @@ export default function App() {
       // We need to wait for the audio source to update
       if (audioRef.current) {
         audioRef.current.src = audioData.audio_url;
-        audioRef.current.play();
+        audioRef.current.load(); // Force load the new source
+        const playPromise = audioRef.current.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(error => {
+            console.error("Auto-play was prevented:", error);
+            // If auto-play was prevented, we still want to show the play button
+            setIsPlaying(false);
+          });
+        }
       }
     } catch (error) {
       console.error('Error playing list audio:', error);
@@ -1184,19 +1286,6 @@ export default function App() {
             </div>
           </div>
 
-          <div className="hidden lg:flex items-center gap-6">
-            <div className="text-right border-r border-slate-100 pr-6">
-              <p className="text-lg font-mono font-black text-slate-900 leading-none">{timeString}</p>
-              <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mt-1">Current Time</p>
-            </div>
-            <div className="text-right">
-              <p className="text-xs font-bold text-slate-800 leading-tight">
-                {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-              </p>
-              <p className="text-[10px] font-bold text-amber-600 uppercase tracking-widest mt-0.5">{hijriDate || 'Loading...'}</p>
-            </div>
-          </div>
-
           <div className="hidden md:flex items-center gap-2 bg-slate-100 p-1 rounded-xl">
             {[
               { id: 'home', icon: Home, label: 'Home' },
@@ -1232,36 +1321,43 @@ export default function App() {
               className="space-y-6"
             >
               {/* Time and Calendars Combined */}
-              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                  <div className="flex flex-col items-center md:items-start">
-                    <div className="flex items-center gap-2 text-emerald-600 mb-1">
-                      <Clock size={20} />
-                      <span className="text-xs font-bold uppercase tracking-widest">Current Time</span>
+              <div className="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div className="flex flex-row items-center justify-between gap-2 md:gap-6">
+                  {/* Gregorian Calendar */}
+                  <div className="flex flex-col items-center md:items-start flex-1 min-w-0">
+                    <div className="flex items-center gap-1 md:gap-2 text-blue-600 mb-1">
+                      <Calendar size={14} className="md:w-[18px] md:h-[18px]" />
+                      <span className="text-[8px] md:text-xs font-bold uppercase tracking-widest truncate">Gregorian</span>
                     </div>
-                    <h2 className="text-5xl font-black text-slate-900 tracking-tighter">{timeString}</h2>
-                  </div>
-                  
-                  <div className="h-px w-full md:h-12 md:w-px bg-slate-100" />
-                  
-                  <div className="flex flex-col items-center md:items-start">
-                    <div className="flex items-center gap-2 text-blue-600 mb-1">
-                      <Calendar size={18} />
-                      <span className="text-xs font-bold uppercase tracking-widest">Gregorian</span>
-                    </div>
-                    <h3 className="text-lg font-bold text-slate-900">
-                      {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                    <h3 className="text-[10px] md:text-lg font-bold text-slate-900 truncate w-full text-center md:text-left">
+                      {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      <span className="hidden md:inline">, {new Date().getFullYear()}</span>
                     </h3>
                   </div>
-
-                  <div className="h-px w-full md:h-12 md:w-px bg-slate-100" />
-
-                  <div className="flex flex-col items-center md:items-start">
-                    <div className="flex items-center gap-2 text-amber-600 mb-1">
-                      <History size={18} />
-                      <span className="text-xs font-bold uppercase tracking-widest">Hijri</span>
+                  
+                  <div className="h-8 md:h-12 w-px bg-slate-100 flex-shrink-0" />
+                  
+                  {/* Current Time */}
+                  <div className="flex flex-col items-center flex-1 min-w-0">
+                    <div className="flex items-center gap-1 md:gap-2 text-emerald-600 mb-1">
+                      <Clock size={14} className="md:w-[20px] md:h-[20px]" />
+                      <span className="text-[8px] md:text-xs font-bold uppercase tracking-widest truncate">Time</span>
                     </div>
-                    <h3 className="text-lg font-bold text-slate-900">{hijriDate || 'Loading...'}</h3>
+                    <h2 className="text-lg md:text-5xl font-black text-slate-900 tracking-tighter truncate">{timeString}</h2>
+                  </div>
+
+                  <div className="h-8 md:h-12 w-px bg-slate-100 flex-shrink-0" />
+
+                  {/* Hijri Calendar */}
+                  <div className="flex flex-col items-center md:items-end flex-1 min-w-0">
+                    <div className="flex items-center gap-1 md:gap-2 text-amber-600 mb-1">
+                      <History size={14} className="md:w-[18px] md:h-[18px]" />
+                      <span className="text-[8px] md:text-xs font-bold uppercase tracking-widest truncate">Hijri</span>
+                    </div>
+                    <h3 className="text-[10px] md:text-lg font-bold text-slate-900 truncate w-full text-center md:text-right">
+                      {hijriDate ? hijriDate.split(' ').slice(0, 2).join(' ') : '...'}
+                      <span className="hidden md:inline"> {hijriDate ? hijriDate.split(' ').slice(2).join(' ') : ''}</span>
+                    </h3>
                   </div>
                 </div>
               </div>
@@ -1321,6 +1417,25 @@ export default function App() {
                         </p>
                       </div>
                     ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Quranic Verse about Salah */}
+              <div className="relative py-4">
+                <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                  <div className="w-full border-t border-slate-100"></div>
+                </div>
+                <div className="relative flex justify-center">
+                  <div className="bg-slate-50 px-6 py-4 rounded-2xl border border-slate-100 shadow-sm max-w-2xl text-center">
+                    <Quote className="text-emerald-200 absolute -top-2 -left-2 rotate-180" size={24} />
+                    <p className="text-lg font-arabic text-emerald-800 mb-2 leading-relaxed">
+                      وَأَقِمِ الصَّلَاةَ ۖ إِنَّ الصَّلَاةَ تَنْهَىٰ عَنِ الْفَحْشَاءِ وَالْمُنكَرِ
+                    </p>
+                    <p className="text-xs text-slate-600 font-medium italic leading-relaxed">
+                      "And establish prayer. Indeed, prayer prohibits immorality and wrongdoing, and the remembrance of Allah is greater."
+                    </p>
+                    <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-2">— Surah Al-Ankabut [29:45]</p>
                   </div>
                 </div>
               </div>
@@ -1471,7 +1586,10 @@ export default function App() {
                           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                             <div>
                               <h3 className="text-2xl font-black text-slate-900">The Holy Quran</h3>
-                              <p className="text-sm text-slate-500 font-medium">114 Chapters (Surahs)</p>
+                              <p className="text-sm text-slate-500 font-medium italic mt-1">
+                                "The best of you are those who learn the Quran and teach it" — Prophet Muhammad (PBUH)
+                              </p>
+                              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-2">114 Chapters (Surahs)</p>
                             </div>
                             <div className="relative">
                               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
@@ -1490,20 +1608,49 @@ export default function App() {
                                 key={surah.id}
                                 whileHover={{ y: -4 }}
                                 onClick={() => handleSurahClick(surah)}
-                                className="bg-white p-5 rounded-2xl border border-slate-200 hover:border-emerald-200 hover:shadow-lg transition-all cursor-pointer flex items-center justify-between"
+                                className="bg-white p-5 rounded-2xl border border-slate-200 hover:border-emerald-200 hover:shadow-lg transition-all cursor-pointer flex items-center justify-between group"
                               >
                                 <div className="flex items-center gap-4">
-                                  <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-xs font-black text-slate-400">
-                                    {surah.id}
+                                  <div className="relative w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-xs font-black text-slate-400 group-hover:bg-emerald-50 group-hover:border-emerald-100 group-hover:text-emerald-600 transition-colors">
+                                    <span className="group-hover:hidden">{surah.id}</span>
+                                    <Play size={16} className="hidden group-hover:block" fill="currentColor" />
                                   </div>
                                   <div>
                                     <h4 className="font-bold text-slate-800">{surah.name_simple}</h4>
                                     <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{surah.translated_name.name}</p>
                                   </div>
                                 </div>
-                                <div className="text-right">
-                                  <p className="text-xl font-arabic text-emerald-700">{surah.name_arabic}</p>
-                                  <p className="text-[8px] text-slate-400 font-bold uppercase tracking-widest">{surah.verses_count} Verses</p>
+                                <div className="flex items-center gap-4">
+                                  <div className="text-right">
+                                    <p className="text-xl font-arabic text-emerald-700">{surah.name_arabic}</p>
+                                    <p className="text-[8px] text-slate-400 font-bold uppercase tracking-widest">{surah.verses_count} Verses</p>
+                                  </div>
+                                  <div className="flex flex-col gap-2">
+                                    <button 
+                                      onClick={(e) => toggleSurahBookmark(e, surah.id)}
+                                      className={cn(
+                                        "w-8 h-8 rounded-full flex items-center justify-center transition-all",
+                                        bookmarkedSurahs.includes(surah.id) ? "bg-amber-50 text-amber-600" : "bg-slate-50 text-slate-300 hover:text-amber-600 hover:bg-amber-50"
+                                      )}
+                                    >
+                                      <Bookmark size={14} fill={bookmarkedSurahs.includes(surah.id) ? "currentColor" : "none"} />
+                                    </button>
+                                    <button 
+                                      onClick={(e) => handleListPlay(e, surah)}
+                                      className={cn(
+                                        "w-8 h-8 rounded-full flex items-center justify-center transition-all",
+                                        listPlayingId === surah.id ? "bg-emerald-600 text-white" : "bg-slate-100 text-slate-400 hover:bg-emerald-100 hover:text-emerald-600"
+                                      )}
+                                    >
+                                      {listAudioLoading === surah.id ? (
+                                        <Loader2 size={14} className="animate-spin" />
+                                      ) : listPlayingId === surah.id && isPlaying ? (
+                                        <Pause size={14} fill="currentColor" />
+                                      ) : (
+                                        <Play size={14} fill="currentColor" className="ml-0.5" />
+                                      )}
+                                    </button>
+                                  </div>
                                 </div>
                               </motion.div>
                             ))}
@@ -1546,9 +1693,31 @@ export default function App() {
                             onChange={handleSeek}
                             className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-white"
                           />
-                          <div className="flex items-center gap-4">
-                            <button onClick={togglePlay} className="w-12 h-12 bg-white text-emerald-700 rounded-full flex items-center justify-center shadow-lg">
-                              {isPlaying ? <Pause size={24} fill="currentColor" /> : <Play size={24} fill="currentColor" className="ml-1" />}
+                          <div className="flex items-center gap-6">
+                            <button 
+                              onClick={() => {
+                                if (audioRef.current) {
+                                  audioRef.current.currentTime = Math.max(0, audioRef.current.currentTime - 10);
+                                }
+                              }}
+                              className="w-10 h-10 bg-white/10 text-white rounded-full flex items-center justify-center hover:bg-white/20 transition-all"
+                              title="Skip back 10s"
+                            >
+                              <RefreshCw size={20} className="-scale-x-100" />
+                            </button>
+                            <button onClick={togglePlay} className="w-16 h-16 bg-white text-emerald-700 rounded-full flex items-center justify-center shadow-xl hover:scale-105 active:scale-95 transition-all">
+                              {isPlaying ? <Pause size={32} fill="currentColor" /> : <Play size={32} fill="currentColor" className="ml-1" />}
+                            </button>
+                            <button 
+                              onClick={() => {
+                                if (audioRef.current) {
+                                  audioRef.current.currentTime = Math.min(duration, audioRef.current.currentTime + 10);
+                                }
+                              }}
+                              className="w-10 h-10 bg-white/10 text-white rounded-full flex items-center justify-center hover:bg-white/20 transition-all"
+                              title="Skip forward 10s"
+                            >
+                              <RefreshCw size={20} />
                             </button>
                           </div>
                         </div>
@@ -1736,10 +1905,18 @@ export default function App() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {DUAS.map(dua => (
-                    <div key={dua.id} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all">
+                    <div key={dua.id} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all relative group">
                       <div className="flex items-center justify-between mb-4">
                         <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">{dua.category}</span>
-                        <Bookmark size={16} className="text-slate-300" />
+                        <button 
+                          onClick={() => toggleDuaBookmark(dua.id)}
+                          className={cn(
+                            "p-2 rounded-lg transition-all",
+                            bookmarkedDuas.includes(dua.id) ? "bg-emerald-50 text-emerald-600" : "text-slate-300 hover:text-emerald-600 hover:bg-emerald-50"
+                          )}
+                        >
+                          <Bookmark size={18} fill={bookmarkedDuas.includes(dua.id) ? "currentColor" : "none"} />
+                        </button>
                       </div>
                       <h4 className="font-bold text-slate-900 mb-2">{dua.title}</h4>
                       <p className="text-right text-lg font-arabic mb-4 leading-relaxed">{dua.arabic}</p>
@@ -1860,6 +2037,77 @@ export default function App() {
                   )}
                 </div>
               </div>
+
+              {/* Saved Section */}
+              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+                  <h3 className="font-bold text-slate-900 flex items-center gap-2">
+                    <Bookmark className="text-amber-600" size={20} />
+                    Saved Items
+                  </h3>
+                </div>
+                <div className="p-6 space-y-8">
+                  <div>
+                    <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">Saved Surahs</h4>
+                    {bookmarkedSurahs.length === 0 ? (
+                      <p className="text-sm text-slate-400 italic">No saved surahs yet.</p>
+                    ) : (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {surahs.filter(s => bookmarkedSurahs.includes(s.id)).map(surah => (
+                          <motion.div
+                            key={surah.id}
+                            onClick={() => {
+                              setActiveTab('deen');
+                              setDeenSubTab('quran');
+                              handleSurahClick(surah);
+                            }}
+                            className="bg-slate-50 p-4 rounded-xl border border-slate-100 hover:border-emerald-200 transition-all cursor-pointer flex items-center justify-between group"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-[10px] font-black text-slate-400">
+                                {surah.id}
+                              </div>
+                              <div>
+                                <h4 className="font-bold text-slate-800 text-xs">{surah.name_simple}</h4>
+                                <p className="text-[8px] text-slate-500">{surah.translated_name.name}</p>
+                              </div>
+                            </div>
+                            <button 
+                              onClick={(e) => toggleSurahBookmark(e, surah.id)}
+                              className="text-amber-600 p-1.5"
+                            >
+                              <Bookmark size={14} fill="currentColor" />
+                            </button>
+                          </motion.div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div>
+                    <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">Saved Duas</h4>
+                    {bookmarkedDuas.length === 0 ? (
+                      <p className="text-sm text-slate-400 italic">No saved duas yet.</p>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {DUAS.filter(d => bookmarkedDuas.includes(d.id)).map(dua => (
+                          <div key={dua.id} className="bg-slate-50 p-5 rounded-xl border border-slate-100">
+                            <div className="flex items-center justify-between mb-3">
+                              <span className="text-[8px] font-bold text-emerald-600 uppercase tracking-widest">{dua.category}</span>
+                              <button onClick={() => toggleDuaBookmark(dua.id)} className="text-emerald-600">
+                                <Bookmark size={16} fill="currentColor" />
+                              </button>
+                            </div>
+                            <h4 className="font-bold text-slate-900 text-sm mb-2">{dua.title}</h4>
+                            <p className="text-right text-base font-arabic mb-3 leading-relaxed">{dua.arabic}</p>
+                            <p className="text-[10px] text-slate-500 leading-relaxed">{dua.translation}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -1915,61 +2163,110 @@ export default function App() {
         className="hidden"
       />
 
-      {/* Now Playing Bar for List View */}
+      {/* Global Mini Player */}
       <AnimatePresence>
-        {!selectedSurah && listPlayingId && (
+        {listPlayingId && !selectedSurah && (
           <motion.div
-            initial={{ y: 100 }}
-            animate={{ y: 0 }}
-            exit={{ y: 100 }}
-            className="fixed bottom-6 left-4 right-4 md:left-auto md:right-6 md:w-96 z-50"
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            className={cn(
+              "fixed left-4 right-4 z-50 transition-all duration-300",
+              "bottom-20 md:bottom-6 md:right-6 md:left-auto md:w-[400px]"
+            )}
           >
-            <div className="bg-emerald-700 text-white p-4 rounded-2xl shadow-2xl space-y-3">
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3 overflow-hidden">
-                  <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0 animate-pulse">
-                    <Music size={20} />
+            <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden">
+              {/* Progress Bar at the top of mini player */}
+              <div className="h-1 bg-slate-100 w-full overflow-hidden">
+                <motion.div 
+                  className="h-full bg-emerald-600"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${(audioCurrentTime / duration) * 100}%` }}
+                  transition={{ duration: 0.1 }}
+                />
+              </div>
+              
+              <div className="p-3 md:p-4 flex items-center justify-between gap-2 md:gap-4">
+                <div className="flex items-center gap-2 md:gap-3 overflow-hidden min-w-0">
+                  <div className={cn(
+                    "w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-all",
+                    isPlaying ? "bg-emerald-600 text-white animate-pulse" : "bg-slate-100 text-slate-400"
+                  )}>
+                    <Music size={20} className="md:hidden" />
+                    <Music size={24} className="hidden md:block" />
                   </div>
-                  <div className="overflow-hidden">
-                    <p className="text-[10px] text-emerald-200 font-bold uppercase tracking-wider truncate">Now Playing</p>
-                    <h4 className="font-bold truncate">{surahs.find(s => s.id === listPlayingId)?.name_simple}</h4>
+                  <div className="overflow-hidden min-w-0">
+                    <p className="text-[8px] md:text-[10px] text-emerald-600 font-black uppercase tracking-widest truncate">Now Playing</p>
+                    <h4 className="font-bold text-slate-900 truncate text-xs md:text-sm">
+                      {surahs.find(s => s.id === listPlayingId)?.name_simple || "Quran Recitation"}
+                    </h4>
+                    <p className="text-[8px] md:text-[10px] text-slate-400 font-bold">
+                      {formatTime(audioCurrentTime)} / {formatTime(duration)}
+                    </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                
+                <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
+                  <button 
+                    onClick={() => {
+                      if (audioRef.current) {
+                        audioRef.current.currentTime = Math.max(0, audioRef.current.currentTime - 10);
+                      }
+                    }}
+                    className="w-8 h-8 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg flex items-center justify-center transition-all"
+                    title="Skip back 10s"
+                  >
+                    <RefreshCw size={14} className="-scale-x-100" />
+                  </button>
                   <button 
                     onClick={togglePlay}
-                    className="w-10 h-10 bg-white text-emerald-700 rounded-full flex items-center justify-center shadow-lg"
+                    className="w-10 h-10 md:w-12 md:h-12 bg-emerald-600 text-white rounded-full flex items-center justify-center shadow-lg shadow-emerald-200 hover:scale-105 active:scale-95 transition-all"
                   >
-                    {isPlaying ? <Pause size={20} fill="currentColor" /> : <Play size={20} fill="currentColor" className="ml-0.5" />}
+                    {isPlaying ? (
+                      <Pause size={20} className="md:hidden" fill="currentColor" />
+                    ) : (
+                      <Play size={20} className="md:hidden ml-0.5" fill="currentColor" />
+                    )}
+                    {isPlaying ? (
+                      <Pause size={24} className="hidden md:block" fill="currentColor" />
+                    ) : (
+                      <Play size={24} className="hidden md:block ml-1" fill="currentColor" />
+                    )}
                   </button>
+                  <button 
+                    onClick={() => {
+                      if (audioRef.current) {
+                        audioRef.current.currentTime = Math.min(duration, audioRef.current.currentTime + 10);
+                      }
+                    }}
+                    className="w-8 h-8 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg flex items-center justify-center transition-all"
+                    title="Skip forward 10s"
+                  >
+                    <RefreshCw size={14} />
+                  </button>
+                  <div className="w-px h-6 md:h-8 bg-slate-100 mx-0.5 md:mx-1" />
                   <button 
                     onClick={() => {
                       if (audioRef.current) audioRef.current.pause();
                       setIsPlaying(false);
                       setListPlayingId(null);
                     }}
-                    className="w-8 h-8 text-emerald-200 hover:text-white transition-colors"
+                    className="w-8 h-8 md:w-10 md:h-10 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl flex items-center justify-center transition-all"
                   >
-                    <VolumeX size={20} />
+                    <X size={18} />
                   </button>
                 </div>
               </div>
 
-              {/* Mini Timeline */}
-              <div className="space-y-1">
-                <input
-                  type="range"
-                  min="0"
-                  max={duration || 0}
-                  value={audioCurrentTime}
-                  onChange={handleSeek}
-                  className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-white"
-                />
-                <div className="flex justify-between text-[8px] text-emerald-200 font-bold">
-                  <span>{formatTime(audioCurrentTime)}</span>
-                  <span>{formatTime(duration)}</span>
-                </div>
-              </div>
+              {/* Hidden range input for seeking in mini player */}
+              <input
+                type="range"
+                min="0"
+                max={duration || 0}
+                value={audioCurrentTime}
+                onChange={handleSeek}
+                className="absolute inset-x-0 top-0 h-1 opacity-0 cursor-pointer z-10"
+              />
             </div>
           </motion.div>
         )}

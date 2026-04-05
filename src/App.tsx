@@ -42,7 +42,8 @@ import {
   Sun,
   Sunset,
   Moon,
-  X
+  X,
+  MessageSquare
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GoogleGenAI } from "@google/genai";
@@ -437,12 +438,12 @@ const NamesOfAllah = () => {
         </div>
       </div>
       
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {names.map(name => (
-          <div key={name.en} className="p-4 bg-slate-50 rounded-xl border border-slate-100 text-center hover:border-amber-200 hover:bg-amber-50 transition-all group">
-            <p className="text-xl font-arabic text-amber-700 mb-1 group-hover:scale-110 transition-transform">{name.ar}</p>
-            <p className="text-[10px] font-bold text-slate-800">{name.en}</p>
-            <p className="text-[8px] text-slate-500 leading-tight mt-1">{name.tr}</p>
+          <div key={name.en} className="p-6 bg-white rounded-2xl border border-slate-200 text-center hover:border-amber-400 hover:shadow-lg transition-all group">
+            <p className="text-4xl font-arabic text-amber-700 mb-3 group-hover:scale-105 transition-transform">{name.ar}</p>
+            <p className="text-sm font-bold text-slate-900 mb-1">{name.en}</p>
+            <p className="text-xs text-slate-500 leading-relaxed italic">{name.tr}</p>
           </div>
         ))}
       </div>
@@ -2159,20 +2160,20 @@ export default function App() {
           {[
             { id: 'home', icon: Home, label: 'Home' },
             { id: 'deen', icon: Compass, label: 'Deen' },
-            { id: 'ai', icon: Bot, label: 'AI' },
-            { id: 'amal', icon: Sparkles, label: 'Amal' },
-            { id: 'dashboard', icon: BarChart3, label: 'Stats' }
+            { id: 'ai', icon: MessageSquare, label: 'AI Assistant' },
+            { id: 'amal', icon: Sparkles, label: 'Daily Amal' },
+            { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' }
           ].map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
               className={cn(
-                "flex flex-col items-center gap-1 transition-all",
+                "flex flex-col items-center gap-1 transition-all min-w-[60px]",
                 activeTab === tab.id ? "text-emerald-600" : "text-slate-400"
               )}
             >
-              <tab.icon size={20} className={cn(activeTab === tab.id && "scale-110")} />
-              <span className="text-[10px] font-bold">{tab.label}</span>
+              <tab.icon size={24} className={cn(activeTab === tab.id && "scale-110")} />
+              <span className="text-[9px] font-bold whitespace-nowrap">{tab.label}</span>
             </button>
           ))}
         </div>

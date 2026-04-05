@@ -43,7 +43,8 @@ import {
   Sunset,
   Moon,
   X,
-  MessageSquare
+  MessageSquare,
+  Mail
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GoogleGenAI } from "@google/genai";
@@ -715,6 +716,8 @@ export default function App() {
   const [listAudioLoading, setListAudioLoading] = useState<number | null>(null);
   const [audioCurrentTime, setAudioCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showEmail, setShowEmail] = useState(false);
 
   // Salah Tracker States
   const [salahProgress, setSalahProgress] = useState<string[]>(() => {
@@ -1310,29 +1313,126 @@ export default function App() {
             </div>
           </div>
 
-          <div className="hidden md:flex items-center gap-2 bg-slate-100 p-1 rounded-xl">
-            {[
-              { id: 'home', icon: Home, label: 'Home' },
-              { id: 'deen', icon: Compass, label: 'Deen' },
-              { id: 'ai', icon: Bot, label: 'AI Assistant' },
-              { id: 'amal', icon: Sparkles, label: 'Daily Amal' },
-              { id: 'dashboard', icon: BarChart3, label: 'Dashboard' }
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
-                className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all",
-                  activeTab === tab.id ? "bg-white text-emerald-700 shadow-sm" : "text-slate-500 hover:text-slate-700"
-                )}
-              >
-                <tab.icon size={18} />
-                {tab.label}
-              </button>
-            ))}
+          <div className="flex items-center gap-3">
+            <div className="hidden md:flex items-center gap-2 bg-slate-100 p-1 rounded-xl">
+              {[
+                { id: 'home', icon: Home, label: 'Home' },
+                { id: 'deen', icon: Compass, label: 'Deen' },
+                { id: 'ai', icon: MessageSquare, label: 'AI Assistant' },
+                { id: 'amal', icon: Sparkles, label: 'Daily Amal' },
+                { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className={cn(
+                    "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all",
+                    activeTab === tab.id ? "bg-white text-emerald-700 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                  )}
+                >
+                  <tab.icon size={18} />
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            <button 
+              onClick={() => setIsMenuOpen(true)}
+              className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 transition-all"
+            >
+              <User size={24} />
+            </button>
           </div>
         </div>
       </header>
+
+      {/* Side Menu Drawer */}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMenuOpen(false)}
+              className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50"
+            />
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="fixed top-0 right-0 bottom-0 w-80 bg-white z-50 shadow-2xl p-6 overflow-y-auto"
+            >
+              <div className="flex justify-end mb-8">
+                <button 
+                  onClick={() => setIsMenuOpen(false)}
+                  className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-red-50 hover:text-red-500 transition-all"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="space-y-8">
+                <div className="text-center space-y-4">
+                  <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-inner">
+                    <User size={40} />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-black text-slate-900">Assalamu Alaikum</h2>
+                    <p className="text-emerald-600 font-bold mt-1">Welcome to My Noor App</p>
+                  </div>
+                </div>
+
+                <div className="h-px bg-slate-100" />
+
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => setShowEmail(!showEmail)}
+                      className="w-full flex items-center gap-4 p-4 rounded-2xl transition-all font-bold text-slate-600 hover:bg-slate-50"
+                    >
+                      <Mail size={20} />
+                      Contact
+                    </button>
+                    
+                    <AnimatePresence>
+                      {showEmail && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="px-4 pb-2"
+                        >
+                          <a 
+                            href="mailto:hasanalbannashishir@gmail.com" 
+                            className="text-sm text-emerald-600 font-bold break-all hover:underline"
+                          >
+                            hasanalbannashishir@gmail.com
+                          </a>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  <div className="pt-4 space-y-4 px-2">
+                    <p className="text-sm text-slate-600 leading-relaxed font-medium">
+                      My Noor App is your personal Islamic companion — built to help you read, listen, reflect and grow closer to Allah every single day.
+                    </p>
+                    <p className="text-sm text-slate-600 leading-relaxed font-medium">
+                      My Noor App is here to walk with you — one Surah, one Hadith, one habit at a time.
+                    </p>
+                    <div className="pt-12 text-center">
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Version 1.0.0</p>
+                      <p className="text-xs text-slate-500 mt-1 font-medium">Made with ❤️ for the Ummah</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       <main className="max-w-7xl mx-auto px-4 py-8 pb-32">
         <AnimatePresence mode="wait">

@@ -779,14 +779,23 @@ export default function App() {
     });
   };
 
-  const getPrayerIcon = (prayer: string) => {
+  const getPrayerIcon = (prayer: string, isActive: boolean = false) => {
+    const size = 18;
+    const colorClass = isActive ? "text-white" : {
+      'Fajr': "text-orange-600",
+      'Dhuhr': "text-yellow-600",
+      'Asr': "text-amber-700",
+      'Maghrib': "text-rose-600",
+      'Isha': "text-indigo-600",
+    }[prayer] || "text-slate-400";
+
     switch (prayer) {
-      case 'Fajr': return <Sunrise size={18} />;
-      case 'Dhuhr': return <Sun size={18} />;
-      case 'Asr': return <Sun size={18} />;
-      case 'Maghrib': return <Sunset size={18} />;
-      case 'Isha': return <Moon size={18} />;
-      default: return <Clock size={18} />;
+      case 'Fajr': return <Sunrise className={cn(colorClass, "drop-shadow-sm")} size={size} />;
+      case 'Dhuhr': return <Sun className={cn(colorClass, "drop-shadow-sm")} size={size} />;
+      case 'Asr': return <Sun className={cn(colorClass, "drop-shadow-sm")} size={size} />;
+      case 'Maghrib': return <Sunset className={cn(colorClass, "drop-shadow-sm")} size={size} />;
+      case 'Isha': return <Moon className={cn(colorClass, "drop-shadow-sm")} size={size} />;
+      default: return <Clock className={cn(colorClass, "drop-shadow-sm")} size={size} />;
     }
   };
 
@@ -1393,16 +1402,29 @@ export default function App() {
                 <div className="space-y-6">
                   {/* Row 1: Icons */}
                   <div className="grid grid-cols-5 gap-2 sm:gap-4">
-                    {['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'].map((p) => (
-                      <div key={`icon-${p}`} className="flex justify-center">
-                        <div className={cn(
-                          "w-10 h-10 rounded-xl flex items-center justify-center transition-all",
-                          currentPrayer === p ? "bg-emerald-600 text-white shadow-lg shadow-emerald-200" : "bg-slate-50 text-slate-400 border border-slate-100"
-                        )}>
-                          {getPrayerIcon(p)}
+                    {['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'].map((p) => {
+                      const isActive = currentPrayer === p;
+                      const prayerStyles = {
+                        'Fajr': "bg-gradient-to-br from-orange-50 to-rose-50 border-orange-100",
+                        'Dhuhr': "bg-gradient-to-br from-yellow-50 to-amber-50 border-yellow-100",
+                        'Asr': "bg-gradient-to-br from-amber-50 to-orange-100 border-amber-100",
+                        'Maghrib': "bg-gradient-to-br from-rose-50 to-purple-50 border-rose-100",
+                        'Isha': "bg-gradient-to-br from-indigo-50 to-slate-100 border-indigo-100"
+                      }[p] || "bg-slate-50 border-slate-100";
+
+                      return (
+                        <div key={`icon-${p}`} className="flex justify-center">
+                          <div className={cn(
+                            "w-10 h-10 rounded-xl flex items-center justify-center transition-all border",
+                            isActive 
+                              ? "bg-emerald-600 text-white shadow-lg shadow-emerald-200 border-emerald-500" 
+                              : `${prayerStyles} shadow-sm`
+                          )}>
+                            {getPrayerIcon(p, isActive)}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
 
                   {/* Row 2: Names */}
@@ -1544,45 +1566,49 @@ export default function App() {
               {!selectedSurah ? (
                 <div className="space-y-8">
                   {deenSubTab === 'grid' ? (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    <div className="grid grid-cols-3 gap-3">
                       {/* Al Quran Option */}
                       <button 
                         onClick={() => setDeenSubTab('quran')}
-                        className="group bg-emerald-600 p-4 rounded-2xl text-white text-center relative overflow-hidden shadow-lg shadow-emerald-100 transition-transform hover:scale-[1.05]"
+                        className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
                       >
-                        <div className="absolute top-0 right-0 w-16 h-16 bg-white/10 rounded-full -mr-6 -mt-6 blur-xl" />
-                        <BookOpen size={24} className="mx-auto mb-3 opacity-90" />
-                        <h3 className="text-sm font-bold">Al-Quran</h3>
+                        <div className="w-10 h-10 bg-slate-900 text-white rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
+                          <BookOpen size={20} />
+                        </div>
+                        <h3 className="text-[10px] font-bold uppercase tracking-tight">Al-Quran</h3>
                       </button>
 
                       {/* Zakat Option */}
                       <button 
                         onClick={() => setDeenSubTab('zakat')}
-                        className="group bg-blue-600 p-4 rounded-2xl text-white text-center relative overflow-hidden shadow-lg shadow-blue-100 transition-transform hover:scale-[1.05]"
+                        className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
                       >
-                        <div className="absolute top-0 right-0 w-16 h-16 bg-white/10 rounded-full -mr-6 -mt-6 blur-xl" />
-                        <Calculator size={24} className="mx-auto mb-3 opacity-90" />
-                        <h3 className="text-sm font-bold">Zakat</h3>
+                        <div className="w-10 h-10 bg-slate-900 text-white rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
+                          <Calculator size={20} />
+                        </div>
+                        <h3 className="text-[10px] font-bold uppercase tracking-tight">Zakat</h3>
                       </button>
 
                       {/* 99 Names Option */}
                       <button 
                         onClick={() => setDeenSubTab('names')}
-                        className="group bg-amber-600 p-4 rounded-2xl text-white text-center relative overflow-hidden shadow-lg shadow-amber-100 transition-transform hover:scale-[1.05]"
+                        className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
                       >
-                        <div className="absolute top-0 right-0 w-16 h-16 bg-white/10 rounded-full -mr-6 -mt-6 blur-xl" />
-                        <Heart size={24} className="mx-auto mb-3 opacity-90" />
-                        <h3 className="text-sm font-bold">99 Names</h3>
+                        <div className="w-10 h-10 bg-slate-900 text-white rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
+                          <Heart size={20} />
+                        </div>
+                        <h3 className="text-[10px] font-bold uppercase tracking-tight">99 Names</h3>
                       </button>
 
                       {/* Hadith Option */}
                       <button 
                         onClick={() => setDeenSubTab('hadith')}
-                        className="group bg-indigo-600 p-4 rounded-2xl text-white text-center relative overflow-hidden shadow-lg shadow-indigo-100 transition-transform hover:scale-[1.05]"
+                        className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
                       >
-                        <div className="absolute top-0 right-0 w-16 h-16 bg-white/10 rounded-full -mr-6 -mt-6 blur-xl" />
-                        <ScrollText size={24} className="mx-auto mb-3 opacity-90" />
-                        <h3 className="text-sm font-bold">Hadith</h3>
+                        <div className="w-10 h-10 bg-slate-900 text-white rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
+                          <ScrollText size={20} />
+                        </div>
+                        <h3 className="text-[10px] font-bold uppercase tracking-tight">Hadith</h3>
                       </button>
                     </div>
                   ) : (

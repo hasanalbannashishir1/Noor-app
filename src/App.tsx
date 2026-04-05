@@ -947,12 +947,24 @@ export default function App() {
       const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
-        contents: [...aiMessages.map(m => ({ role: m.role, parts: [{ text: m.text }] })), { role: 'user', parts: [{ text: userMsg }] }],
+        contents: [
+          ...aiMessages.map(m => ({ 
+            role: m.role === 'user' ? 'user' : 'model', 
+            parts: [{ text: m.text }] 
+          })), 
+          { role: 'user', parts: [{ text: userMsg }] }
+        ],
         config: {
           systemInstruction: "You are a helpful Islamic AI Assistant. Answer questions about Islam, Quran, Hadith, and general knowledge with wisdom and kindness. Always provide references where possible.",
         }
       });
-      setAiMessages(prev => [...prev, { role: 'model', text: response.text || "I couldn't generate a response." }]);
+      
+      const responseText = response.text;
+      if (!responseText) {
+        throw new Error("No response text generated");
+      }
+
+      setAiMessages(prev => [...prev, { role: 'model', text: responseText }]);
     } catch (err) {
       console.error("AI Error:", err);
       setAiMessages(prev => [...prev, { role: 'model', text: "Sorry, I encountered an error. Please try again." }]);
@@ -1952,19 +1964,19 @@ export default function App() {
           {activeTab === 'ai' && (
             <motion.div
               key="ai"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="max-w-3xl mx-auto h-[calc(100vh-250px)] flex flex-col"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-x-0 top-[73px] bottom-[73px] md:bottom-0 z-30 bg-slate-50"
             >
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm flex-1 flex flex-col overflow-hidden">
+              <div className="max-w-3xl mx-auto h-full flex flex-col p-4">
+                <div className="bg-white rounded-2xl border border-slate-200 shadow-lg flex-1 flex flex-col overflow-hidden">
                 <div className="p-4 border-b border-slate-100 flex items-center gap-3">
                   <div className="w-10 h-10 bg-emerald-100 text-emerald-700 rounded-xl flex items-center justify-center">
                     <Bot size={24} />
                   </div>
                   <div>
                     <h3 className="font-bold text-slate-900">Islamic AI Assistant</h3>
-                    <p className="text-[10px] text-emerald-600 font-bold uppercase tracking-widest">Powered by Gemini</p>
                   </div>
                 </div>
 
@@ -1972,8 +1984,8 @@ export default function App() {
                   {aiMessages.length === 0 && (
                     <div className="h-full flex flex-col items-center justify-center text-center p-8">
                       <Sparkles className="text-emerald-200 mb-4" size={48} />
-                      <h4 className="text-lg font-bold text-slate-800 mb-2">Ask me anything</h4>
-                      <p className="text-sm text-slate-500 max-w-xs">I can help you with Quranic verses, Hadith, Islamic history, or general knowledge.</p>
+                      <h4 className="text-lg font-bold text-slate-800 mb-2">As-Salamu Alaykum</h4>
+                      <p className="text-sm text-slate-500 max-w-xs">How can I help you today?</p>
                     </div>
                   )}
                   {aiMessages.map((msg, i) => (
@@ -2015,8 +2027,9 @@ export default function App() {
                   </div>
                 </div>
               </div>
-            </motion.div>
-          )}
+            </div>
+          </motion.div>
+        )}
 
           {activeTab === 'amal' && (
             <motion.div

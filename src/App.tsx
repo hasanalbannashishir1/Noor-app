@@ -110,6 +110,24 @@ const SALAH_REQUIREMENTS: PrayerRequirement[] = [
   }
 ];
 
+const SMALL_HADITHS = [
+  { text: "The best of you are those who learn the Quran and teach it.", source: "Sahih Bukhari" },
+  { text: "Cleanliness is half of faith.", source: "Sahih Muslim" },
+  { text: "The best among you is the one who is best to his family.", source: "Sunan al-Tirmidhi" },
+  { text: "A good word is charity.", source: "Sahih Bukhari" },
+  { text: "The most beloved of deeds to Allah are those that are most consistent, even if they are small.", source: "Sahih Bukhari" },
+  { text: "The best of people are those that are most useful to people.", source: "Al-Mu’jam al-Awsat" },
+  { text: "None of you will have faith until he loves for his brother what he loves for himself.", source: "Sahih Bukhari" },
+  { text: "The strong man is not the one who can wrestle, but the one who can control himself when he is angry.", source: "Sahih Bukhari" },
+  { text: "Seeking knowledge is an obligation upon every Muslim.", source: "Sunan Ibn Majah" },
+  { text: "Allah does not look at your appearance or your wealth, but He looks at your hearts and your deeds.", source: "Sahih Muslim" },
+  { text: "He who does not show mercy to our young ones and acknowledge the rights of our elders is not one of us.", source: "Sunan Abi Dawud" },
+  { text: "The world is a prison for the believer and a paradise for the disbeliever.", source: "Sahih Muslim" },
+  { text: "Modesty is part of faith.", source: "Sahih Bukhari" },
+  { text: "The most perfect man in his faith among the believers is the one whose behavior is most excellent.", source: "Sunan al-Tirmidhi" },
+  { text: "Whoever believes in Allah and the Last Day, let him speak good or remain silent.", source: "Sahih Bukhari" }
+];
+
 const ZakatCalculator = () => {
   const [wealth, setWealth] = useState<string>('');
   const [result, setResult] = useState<number | null>(null);
@@ -718,6 +736,7 @@ export default function App() {
   const [duration, setDuration] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showEmail, setShowEmail] = useState(false);
+  const [homeHadith, setHomeHadith] = useState<{ text: string, source: string } | null>(null);
 
   // Salah Tracker States
   const [salahProgress, setSalahProgress] = useState<string[]>(() => {
@@ -1028,6 +1047,11 @@ export default function App() {
     };
 
     fetchPrayerTimes();
+  }, []);
+
+  useEffect(() => {
+    const randomIndex = Math.floor(Math.random() * SMALL_HADITHS.length);
+    setHomeHadith(SMALL_HADITHS[randomIndex]);
   }, []);
 
   const detectCurrentPrayer = (timings: any) => {
@@ -1653,6 +1677,22 @@ export default function App() {
               </div>
 
               <TasbihCounter />
+
+              {/* Daily Home Hadith */}
+              {homeHadith && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center relative overflow-hidden"
+                >
+                  <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500" />
+                  <Quote className="text-slate-100 absolute -top-2 -right-2 rotate-180" size={48} />
+                  <p className="text-sm text-slate-600 italic leading-relaxed mb-3 relative z-10">
+                    "{homeHadith.text}"
+                  </p>
+                  <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">— {homeHadith.source}</p>
+                </motion.div>
+              )}
             </motion.div>
           )}
 

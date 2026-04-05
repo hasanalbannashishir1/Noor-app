@@ -193,26 +193,40 @@ const TasbihCounter = () => {
   ];
 
   const currentPhrase = phrases[phraseIndex];
+  const audioCtxRef = useRef<AudioContext | null>(null);
 
   const playClickSound = () => {
     try {
-      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      if (!audioCtxRef.current) {
+        audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      }
+      
+      const audioCtx = audioCtxRef.current;
+      
+      // Resume context if it's suspended (browser policy)
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+
       const oscillator = audioCtx.createOscillator();
       const gainNode = audioCtx.createGain();
 
-      // Mouse click sound: very short, high-frequency pulse
-      oscillator.type = 'square';
-      oscillator.frequency.setValueAtTime(1600, audioCtx.currentTime);
-      oscillator.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.015);
+      // Satisfying click sound: 
+      // A very fast frequency sweep from high to low with a square/triangle mix
+      oscillator.type = 'triangle'; 
+      oscillator.frequency.setValueAtTime(1800, audioCtx.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.02);
 
-      gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.015);
+      // Quick attack and decay for a "clicky" feel
+      gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+      gainNode.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.002); // Loud but short
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.02);
 
       oscillator.connect(gainNode);
       gainNode.connect(audioCtx.destination);
 
       oscillator.start();
-      oscillator.stop(audioCtx.currentTime + 0.015);
+      oscillator.stop(audioCtx.currentTime + 0.02);
     } catch (e) {
       console.error('Audio context error:', e);
     }

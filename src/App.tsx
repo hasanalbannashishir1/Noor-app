@@ -12,6 +12,7 @@ import {
   BookOpen, 
   Info, 
   ChevronLeft, 
+  ChevronRight,
   ChevronDown,
   Volume2, 
   VolumeX,
@@ -149,6 +150,86 @@ const ESSENTIAL_SURAHS = [
   { name: "Surah Al-Falaq", description: "The Daybreak - Seeking protection from evil." },
   { name: "Surah An-Nas", description: "Mankind - Seeking protection from whispers." },
   { name: "Surah Al-Asr", description: "The Declining Day - Importance of time and faith." }
+];
+
+const SALAH_DUAS = [
+  {
+    id: 'wudu',
+    title: "Wudu's Dua",
+    arabic: "أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللهُ وَحْدَهُ لَا شَرِيكَ لَهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ. اللَّهُمَّ اجْعَلْنِي مِنَ التَّوَّابِينَ وَاجْعَلْنِي مِنَ الْمُتَطَهِّرِينَ",
+    transliteration: "Ashhadu an la ilaha illallahu wahdahu la sharika lahu wa ashhadu anna Muhammadan 'abduhu wa Rasuluhu. Allahummaj'alni minat-tawwabina waj'alni minal-mutatahhirin.",
+    translation: "I bear witness that there is no god but Allah, alone, without partner, and I bear witness that Muhammad is His servant and His Messenger. O Allah, make me among those who repent and make me among those who purify themselves."
+  },
+  {
+    id: 'sana',
+    title: "Sana Dua",
+    arabic: "سُبْحَانَكَ اللَّهُمَّ وَبِحَمْدِكَ وَتَبَارَكَ اسْمُكَ وَتَعَالَى جَدُّكَ وَلَا إِلَهَ غَيْرُكَ",
+    transliteration: "Subhanakallahumma wa bihamdika wa tabarakasmuka wa ta'ala jadduka wa la ilaha ghayruk.",
+    translation: "Glory be to You, O Allah, and all praise is Yours. Blessed is Your name and exalted is Your majesty. There is no god besides You."
+  },
+  {
+    id: 'satan',
+    title: "Prayer to escape from Satan’s deception",
+    arabic: "أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ",
+    transliteration: "A'udhu billahi minash-shaytanir-rajim.",
+    translation: "I seek refuge in Allah from Satan the outcast."
+  },
+  {
+    id: 'ruku',
+    title: "Tasbih of Ruku",
+    arabic: "سُبْحَانَ رَبِّيَ الْعَظِيمِ",
+    transliteration: "Subhana Rabbiyal 'Azim.",
+    translation: "Glory be to my Lord, the Almighty."
+  },
+  {
+    id: 'rising',
+    title: "Dua After Rising from Ruku",
+    arabic: "سَمِعَ اللَّهُ لِمَنْ حَمِدَهُ. رَبَّنَا لَكَ الْحَمْدُ",
+    transliteration: "Sami'allahu liman hamidah. Rabbana lakal hamd.",
+    translation: "Allah hears those who praise Him. Our Lord, all praise is Yours."
+  },
+  {
+    id: 'sujud',
+    title: "Sijdar tasbih",
+    arabic: "سُبْحَانَ رَبِّيَ الْأَعْلَى",
+    transliteration: "Subhana Rabbiyal A'la.",
+    translation: "Glory be to my Lord, the Most High."
+  },
+  {
+    id: 'between',
+    title: "Prayer between two prostrations",
+    arabic: "رَبِّ اغْفِرْ لِي، رَبِّ اغْفِرْ لِي",
+    transliteration: "Rabbighfirli, Rabbighfirli.",
+    translation: "My Lord, forgive me. My Lord, forgive me."
+  },
+  {
+    id: 'tashahhud',
+    title: "Tashahhud (Attahiyatu)",
+    arabic: "التَّحِيَّاتُ لِلَّهِ وَالصَّلَوَاتُ وَالطَّيِّبَاتُ، السَّلَامُ عَلَيْكَ أَيُّهَا النَّبِيُّ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ، السَّلَامُ عَلَيْنَا وَعَلَى عِبَادِ اللَّهِ الصَّالِحِينَ، أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللَّهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ",
+    transliteration: "At-tahiyyatu lillahi was-salawatu wat-tayyibatu, as-salamu 'alayka ayyuhan-nabiyyu wa rahmatullahi wa barakatuhu, as-salamu 'alayna wa 'ala 'ibadillahis-salihin, ashhadu an la ilaha illallahu wa ashhadu anna Muhammadan 'abduhu wa Rasuluhu.",
+    translation: "All compliments, prayers, and pure words are due to Allah. Peace be upon you, O Prophet, and the mercy of Allah and His blessings. Peace be upon us and upon the righteous servants of Allah. I bear witness that there is no god but Allah, and I bear witness that Muhammad is His servant and His Messenger."
+  },
+  {
+    id: 'durood',
+    title: "Durood Sharif",
+    arabic: "اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ كَمَا صَلَّيْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ إِنَّكَ حَمِيدٌ مَجِيدٌ. اللَّهُمَّ بَارِكْ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ كَمَا بَارَكْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ إِنَّكَ حَمِيدٌ مَجِيدٌ",
+    transliteration: "Allahumma salli 'ala Muhammadin wa 'ala ali Muhammadin kama sallayta 'ala Ibrahima wa 'ala ali Ibrahima innaka Hamidum Majid. Allahumma barik 'ala Muhammadin wa 'ala ali Muhammadin kama barakta 'ala Ibrahima wa 'ala ali Ibrahima innaka Hamidum Majid.",
+    translation: "O Allah, send prayers upon Muhammad and upon the family of Muhammad, as You sent prayers upon Ibrahim and upon the family of Ibrahim; You are indeed Worthy of Praise, Full of Glory. O Allah, send blessings upon Muhammad and upon the family of Muhammad, as You sent blessings upon Ibrahim and upon the family of Ibrahim; You are indeed Worthy of Praise, Full of Glory."
+  },
+  {
+    id: 'masura',
+    title: "Dua Masura",
+    arabic: "اللَّهُمَّ إِنِّي ظَلَمْتُ نَفْسِي ظُلْمًا كَثِيرًا وَلَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ، فَاغْفِرْ لِي مَغْفِرَةً مِنْ عِنْدِكَ وَارْحَمْنِي إِنَّكَ أَنْتَ الْغَفُورُ الرَّحِيمُ",
+    transliteration: "Allahumma inni zalamtu nafsi zulman kathiran wa la yaghfiru dhunuba illa Anta, faghfir li maghfiratan min 'indika warhamni innaka Antal-Ghafurur-Rahim.",
+    translation: "O Allah, I have greatly wronged myself, and no one forgives sins but You. So, grant me forgiveness from You and have mercy on me. You are the Oft-Forgiving, Most Merciful."
+  },
+  {
+    id: 'kunut',
+    title: "Dua Kunut",
+    arabic: "اللَّهُمَّ إِنَّا نَسْتَعِينُكَ وَنَسْتَغْفِرُكَ وَنُؤْمِنُ بِكَ وَنَتَوَكَّلُ عَلَيْكَ وَنُثْنِي عَلَيْكَ الْخَيْرَ وَنَشْكُرُكَ وَلَا نَكْفُرُكَ وَنَخْلَعُ وَنَتْرُكُ مَنْ يَفْجُرُكَ. اللَّهُمَّ إِيَّاكَ نَعْبُدُ وَلَكَ نُصَلِّي وَنَسْجُدُ وَإِلَيْكَ نَسْعَى وَنَحْفِدُ وَنَرْجُو رَحْمَتَكَ وَنَخْشَى عَذَابَكَ إِنَّ عَذَابَكَ بِالْكُفَّارِ مُلْحِقٌ",
+    transliteration: "Allahumma inna nasta'inuka wa nastaghfiruka wa nu'minu bika wa natawakkalu 'alayka wa nuthni 'alaykal-khayra wa nashkuruka wa la nakfuruka wa nakhla'u wa natruku man yafjuruk. Allahumma iyyaka na'budu wa laka nusalli wa nasjudu wa ilayka nas'a wa nahfidu wa narju rahmataka wa nakhsha 'adhabaka inna 'adhabaka bil-kuffari mulhiq.",
+    translation: "O Allah, we seek Your help and Your forgiveness, we believe in You and rely on You. We praise You for all the good, we thank You and are not ungrateful to You. We cast off and leave those who disobey You. O Allah, You alone we worship, to You we pray and prostrate, for You we strive and serve. We hope for Your mercy and fear Your punishment. Indeed, Your punishment will overtake the disbelievers."
+  }
 ];
 
 const DOCUMENTARIES = [
@@ -741,6 +822,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<'home' | 'deen' | 'ai' | 'amal' | 'dashboard'>('home');
   const [deenSubTab, setDeenSubTab] = useState<'grid' | 'quran' | 'zakat' | 'names' | 'hadith' | 'events' | 'prayer' | 'documentary'>('grid');
   const [prayerSubTab, setPrayerSubTab] = useState<'menu' | 'wudu' | 'salah' | 'surah'>('menu');
+  const [selectedSalahDua, setSelectedSalahDua] = useState<string | null>(null);
   
   // Clock and Calendars
   const [timeString, setTimeString] = useState<string>(new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }));
@@ -1816,7 +1898,7 @@ export default function App() {
                           <div className="w-10 h-10 bg-slate-900 text-white rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
                             <Book size={20} />
                           </div>
-                          <h3 className="text-[10px] font-bold uppercase tracking-tight">Prayer Learning</h3>
+                          <h3 className="text-[10px] font-bold uppercase tracking-tight">Prayer learning</h3>
                         </button>
 
                         {/* Islamic Documentary Option */}
@@ -1943,7 +2025,7 @@ export default function App() {
 
                       {deenSubTab === 'prayer' && (
                         <div className="space-y-6">
-                          <h3 className="text-2xl font-black text-slate-900">Prayer Learning</h3>
+                          <h3 className="text-2xl font-black text-slate-900">Prayer learning</h3>
                           
                           {prayerSubTab === 'menu' ? (
                             <div className="grid grid-cols-1 gap-4">
@@ -1972,7 +2054,7 @@ export default function App() {
                                     <Sun size={24} />
                                   </div>
                                   <div className="text-left">
-                                    <h4 className="font-bold text-slate-900">Salah (Prayer)</h4>
+                                    <h4 className="font-bold text-slate-900">Dua's for Salah</h4>
                                     <p className="text-xs text-slate-500">The five daily prayers</p>
                                   </div>
                                 </div>
@@ -2042,6 +2124,23 @@ export default function App() {
                                           </li>
                                         ))}
                                       </ul>
+                                    </div>
+
+                                    <div className="mb-8 p-6 bg-slate-900 rounded-3xl text-center">
+                                      <h5 className="text-sm font-bold text-emerald-400 uppercase tracking-widest mb-4">Wudu's Dua</h5>
+                                      <p className="text-xl font-arabic text-white leading-loose mb-4">
+                                        أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللهُ وَحْدَهُ لَا شَرِيكَ لَهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ. اللَّهُمَّ اجْعَلْنِي مِنَ التَّوَّابِينَ وَاجْعَلْنِي مِنَ الْمُتَطَهِّرِينَ
+                                      </p>
+                                      <div className="space-y-3 text-left">
+                                        <div>
+                                          <h6 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Transliteration</h6>
+                                          <p className="text-xs text-slate-300 italic">Ashhadu an la ilaha illallahu wahdahu la sharika lahu wa ashhadu anna Muhammadan 'abduhu wa Rasuluhu. Allahummaj'alni minat-tawwabina waj'alni minal-mutatahhirin.</p>
+                                        </div>
+                                        <div>
+                                          <h6 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Translation</h6>
+                                          <p className="text-xs text-slate-400">I bear witness that there is no god but Allah, alone, without partner, and I bear witness that Muhammad is His servant and His Messenger. O Allah, make me among those who repent and make me among those who purify themselves.</p>
+                                        </div>
+                                      </div>
                                     </div>
 
                                     <h5 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
@@ -2122,17 +2221,81 @@ export default function App() {
                               )}
 
                               {prayerSubTab === 'salah' && (
-                                <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
-                                  <h4 className="text-xl font-bold text-slate-900 mb-6">Salah (Prayer)</h4>
-                                  <div className="space-y-4">
-                                    {PRAYER_STEPS[1].steps.map((step, j) => (
-                                      <div key={j} className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                                        <div className="w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-400">
-                                          {j + 1}
+                                <div className="space-y-6">
+                                  <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+                                    <h4 className="text-2xl font-bold text-slate-900 mb-6">Dua's for Salah</h4>
+                                    
+                                    {!selectedSalahDua ? (
+                                      <div className="space-y-8">
+                                        <div>
+                                          <h5 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Prayer Steps</h5>
+                                          <div className="space-y-3">
+                                            {PRAYER_STEPS[1].steps.map((step, j) => (
+                                              <div key={j} className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                                                <div className="w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-400">
+                                                  {j + 1}
+                                                </div>
+                                                <p className="text-sm font-bold text-slate-700">{step}</p>
+                                              </div>
+                                            ))}
+                                          </div>
                                         </div>
-                                        <p className="text-sm font-bold text-slate-700">{step}</p>
+
+                                        <div>
+                                          <h5 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Essential Duas</h5>
+                                          <div className="grid grid-cols-1 gap-3">
+                                            {SALAH_DUAS.map((dua) => (
+                                              <button 
+                                                key={dua.id}
+                                                onClick={() => setSelectedSalahDua(dua.id)}
+                                                className="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-2xl hover:border-emerald-500 hover:bg-emerald-50 transition-all group"
+                                              >
+                                                <span className="text-sm font-bold text-slate-700 group-hover:text-emerald-700">{dua.title}</span>
+                                                <ChevronRight size={18} className="text-slate-300 group-hover:text-emerald-500" />
+                                              </button>
+                                            ))}
+                                          </div>
+                                        </div>
                                       </div>
-                                    ))}
+                                    ) : (
+                                      <div className="space-y-6">
+                                        <button 
+                                          onClick={() => setSelectedSalahDua(null)}
+                                          className="flex items-center gap-2 text-slate-500 hover:text-emerald-600 transition-colors text-sm font-medium mb-4"
+                                        >
+                                          <ChevronLeft size={18} />
+                                          Back to Salah Overview
+                                        </button>
+
+                                        {SALAH_DUAS.find(d => d.id === selectedSalahDua) && (
+                                          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                            <h5 className="text-xl font-bold text-slate-900">{SALAH_DUAS.find(d => d.id === selectedSalahDua)?.title}</h5>
+                                            
+                                            <div className="p-6 bg-slate-900 rounded-3xl text-center">
+                                              <p className="text-2xl font-arabic text-emerald-400 leading-loose mb-4">
+                                                {SALAH_DUAS.find(d => d.id === selectedSalahDua)?.arabic}
+                                              </p>
+                                            </div>
+
+                                            <div className="space-y-4">
+                                              <div>
+                                                <h6 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Transliteration</h6>
+                                                <p className="text-sm text-slate-700 leading-relaxed italic">
+                                                  {SALAH_DUAS.find(d => d.id === selectedSalahDua)?.transliteration}
+                                                </p>
+                                              </div>
+
+                                              <div>
+                                                <h6 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Translation</h6>
+                                                <p className="text-sm text-slate-600 leading-relaxed">
+                                                  {SALAH_DUAS.find(d => d.id === selectedSalahDua)?.translation}
+                                                </p>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        )}
+                                      </div>
+                                    )}
                                   </div>
                                 </div>
                               )}

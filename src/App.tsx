@@ -2006,17 +2006,117 @@ export default function App() {
                               </button>
 
                               {prayerSubTab === 'wudu' && (
-                                <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
-                                  <h4 className="text-xl font-bold text-slate-900 mb-6">Wudu (Ablution)</h4>
-                                  <div className="space-y-4">
-                                    {PRAYER_STEPS[0].steps.map((step, j) => (
-                                      <div key={j} className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                                        <div className="w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-400">
-                                          {j + 1}
+                                <div className="space-y-6">
+                                  <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+                                    <h4 className="text-2xl font-bold text-slate-900 mb-4">Wudu (Ablution)</h4>
+                                    <p className="text-slate-600 text-sm leading-relaxed mb-6">
+                                      Wudu (Ablution) is a ritual purification in Islam that Muslims perform before acts of worship like Salah (prayer). It involves washing specific parts of the body in a prescribed way.
+                                    </p>
+                                    
+                                    <div className="bg-emerald-50 p-4 rounded-2xl border border-emerald-100 mb-8">
+                                      <div className="flex items-start gap-3">
+                                        <Quote className="text-emerald-500 flex-shrink-0" size={20} />
+                                        <div>
+                                          <p className="text-sm text-emerald-800 italic leading-relaxed">
+                                            "Cleanliness is half of faith."
+                                          </p>
+                                          <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mt-2">— Sahih Muslim</p>
                                         </div>
-                                        <p className="text-sm font-bold text-slate-700">{step}</p>
                                       </div>
-                                    ))}
+                                    </div>
+
+                                    <div className="mb-8">
+                                      <h5 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                                        <span>🙏</span> Why Wudu is Important
+                                      </h5>
+                                      <ul className="space-y-3">
+                                        {[
+                                          "It is required for prayer (Salah). Without Wudu (ablution), your Salah (prayer) is not valid in Islam.",
+                                          "It brings spiritual purity and physical cleanliness.",
+                                          "The Prophet Muhammad emphasized its importance and reward.",
+                                          "On the Day of Judgment, body parts washed in Wudu will shine (Hadith of Muhammad)."
+                                        ].map((point, i) => (
+                                          <li key={i} className="flex items-start gap-3 text-sm text-slate-600">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 flex-shrink-0" />
+                                            {point}
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    </div>
+
+                                    <h5 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
+                                      <span>🌿</span> Steps of Wudu
+                                    </h5>
+                                    <div className="space-y-3">
+                                      {[
+                                        "Make intention (Niyyah) – in your heart to perform Wudu.",
+                                        "Say “Bismillah” (In the name of Allah).",
+                                        "Wash hands – up to the wrists, 3 times.",
+                                        "Rinse mouth – 3 times.",
+                                        "Clean nose – sniff water and blow it out, 3 times.",
+                                        "Wash face – from forehead to chin and ear to ear, 3 times.",
+                                        "Wash arms – right then left, up to elbows, 3 times each.",
+                                        "Wipe head (Masah) – once with wet hands.",
+                                        "Clean ears – inside and outside, once.",
+                                        "Wash feet – right then left, up to ankles, 3 times each."
+                                      ].map((step, i) => (
+                                        <div key={i} className="flex items-start gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                                          <div className="w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-400 flex-shrink-0 mt-0.5">
+                                            {i + 1}
+                                          </div>
+                                          <p className="text-sm text-slate-700 leading-relaxed">{step}</p>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+
+                                  <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+                                    <h5 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
+                                      <span>✨</span> Important Points
+                                    </h5>
+                                    <ul className="space-y-4">
+                                      {[
+                                        "Follow the order (sequence) properly.",
+                                        "Do not waste water.",
+                                        "Make sure water reaches every part."
+                                      ].map((point, i) => (
+                                        <li key={i} className="flex items-center gap-3 text-sm text-slate-600">
+                                          <CheckCircle2 className="text-emerald-500 flex-shrink-0" size={18} />
+                                          {point}
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+
+                                  <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+                                    <h5 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
+                                      <span>❌</span> What Breaks Wudu?
+                                    </h5>
+                                    <ul className="space-y-4">
+                                      {[
+                                        "Using the toilet (urine, stool, gas)",
+                                        "Deep sleep",
+                                        "Loss of consciousness",
+                                        "Bleeding (according to some scholars)",
+                                        "Touching private parts (varies by interpretation)"
+                                      ].map((item, i) => (
+                                        <li key={i} className="flex items-center gap-3 text-sm text-slate-600">
+                                          <X className="text-red-500 flex-shrink-0" size={18} />
+                                          {item}
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+
+                                  <div className="bg-emerald-700 p-8 rounded-3xl text-white shadow-lg relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-10 -mt-10 blur-2xl" />
+                                    <div className="relative z-10 text-center">
+                                      <Quote className="text-emerald-400/30 mx-auto mb-4" size={32} />
+                                      <p className="text-sm font-medium italic leading-relaxed mb-4">
+                                        “Allah does not accept the prayer of one who has broken his ablution until he performs Wudu.”
+                                      </p>
+                                      <p className="text-[10px] font-bold text-emerald-200 uppercase tracking-widest">— Sahih al-Bukhari – Hadith No. 135</p>
+                                    </div>
                                   </div>
                                 </div>
                               )}

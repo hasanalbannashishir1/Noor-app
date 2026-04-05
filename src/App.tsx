@@ -580,8 +580,7 @@ const NamesOfAllah = () => {
   );
 };
 
-const HadithSection = () => {
-  const [selectedBook, setSelectedBook] = useState<string | null>(null);
+const HadithSection = ({ selectedBook, setSelectedBook }: { selectedBook: string | null, setSelectedBook: (id: string | null) => void }) => {
   const [hadiths, setHadiths] = useState<Hadith[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -823,6 +822,7 @@ export default function App() {
   const [deenSubTab, setDeenSubTab] = useState<'grid' | 'quran' | 'zakat' | 'names' | 'hadith' | 'events' | 'prayer' | 'documentary'>('grid');
   const [prayerSubTab, setPrayerSubTab] = useState<'menu' | 'wudu' | 'salah' | 'surah'>('menu');
   const [selectedSalahDua, setSelectedSalahDua] = useState<string | null>(null);
+  const [selectedBook, setSelectedBook] = useState<string | null>(null);
   
   // Clock and Calendars
   const [timeString, setTimeString] = useState<string>(new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }));
@@ -1914,13 +1914,19 @@ export default function App() {
                       </div>
                   ) : (
                     <div className="space-y-8">
-                      <button 
-                        onClick={() => setDeenSubTab('grid')}
-                        className="flex items-center gap-2 text-slate-600 hover:text-emerald-600 font-medium transition-colors text-sm mb-4"
-                      >
-                        <ChevronLeft size={20} />
-                        Back to Options
-                      </button>
+                      {/* Only show "Back to Options" if we are at the root of a sub-tab */}
+                      {((deenSubTab === 'prayer' && prayerSubTab === 'menu') || 
+                        (deenSubTab === 'hadith' && !selectedBook) || 
+                        (deenSubTab === 'quran') ||
+                        (!['prayer', 'hadith', 'quran'].includes(deenSubTab))) && (
+                        <button 
+                          onClick={() => setDeenSubTab('grid')}
+                          className="flex items-center gap-2 text-slate-600 hover:text-emerald-600 font-medium transition-colors text-sm mb-4"
+                        >
+                          <ChevronLeft size={20} />
+                          Back to Options
+                        </button>
+                      )}
 
                       {deenSubTab === 'quran' && (
                         <div id="surah-list" className="space-y-6">
@@ -2001,7 +2007,7 @@ export default function App() {
 
                       {deenSubTab === 'zakat' && <ZakatCalculator />}
                       {deenSubTab === 'names' && <NamesOfAllah />}
-                      {deenSubTab === 'hadith' && <HadithSection />}
+                      {deenSubTab === 'hadith' && <HadithSection selectedBook={selectedBook} setSelectedBook={setSelectedBook} />}
 
                       {deenSubTab === 'events' && (
                         <div className="space-y-6">
@@ -2079,13 +2085,16 @@ export default function App() {
                             </div>
                           ) : (
                             <div className="space-y-8">
-                              <button 
-                                onClick={() => setPrayerSubTab('menu')}
-                                className="flex items-center gap-2 text-slate-600 hover:text-emerald-600 font-medium transition-colors text-sm"
-                              >
-                                <ChevronLeft size={20} />
-                                Back to Prayer Menu
-                              </button>
+                              {/* Only show "Back to Prayer Menu" if we are not viewing a specific Salah Dua */}
+                              {(prayerSubTab !== 'salah' || !selectedSalahDua) && (
+                                <button 
+                                  onClick={() => setPrayerSubTab('menu')}
+                                  className="flex items-center gap-2 text-slate-600 hover:text-emerald-600 font-medium transition-colors text-sm"
+                                >
+                                  <ChevronLeft size={20} />
+                                  Back to Prayer Menu
+                                </button>
+                              )}
 
                               {prayerSubTab === 'wudu' && (
                                 <div className="space-y-6">

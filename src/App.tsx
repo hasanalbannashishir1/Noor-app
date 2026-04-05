@@ -44,7 +44,9 @@ import {
   Moon,
   X,
   MessageSquare,
-  Mail
+  Mail,
+  Video,
+  Book
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GoogleGenAI } from "@google/genai";
@@ -126,6 +128,33 @@ const SMALL_HADITHS = [
   { text: "Modesty is part of faith.", source: "Sahih Bukhari" },
   { text: "The most perfect man in his faith among the believers is the one whose behavior is most excellent.", source: "Sunan al-Tirmidhi" },
   { text: "Whoever believes in Allah and the Last Day, let him speak good or remain silent.", source: "Sahih Bukhari" }
+];
+
+const UPCOMING_EVENTS = [
+  { name: "Ramadan 2026", date: "March 2026", description: "The holy month of fasting, prayer, and reflection." },
+  { name: "Eid al-Fitr", date: "March 31, 2026", description: "Festival of breaking the fast." },
+  { name: "Hajj 2026", date: "June 2026", description: "The annual pilgrimage to Mecca." },
+  { name: "Eid al-Adha", date: "June 6, 2026", description: "Festival of Sacrifice." },
+  { name: "Islamic New Year", date: "June 26, 2026", description: "Beginning of the year 1448 AH." }
+];
+
+const PRAYER_STEPS = [
+  { title: "Wudu (Ablution)", steps: ["Wash hands", "Rinse mouth", "Clean nose", "Wash face", "Wash arms", "Wipe head", "Wash feet"] },
+  { title: "Salah (Prayer)", steps: ["Takbir (Allahu Akbar)", "Qiyam (Standing)", "Ruku (Bowing)", "Sujud (Prostration)", "Tashahhud (Sitting)"] }
+];
+
+const ESSENTIAL_SURAHS = [
+  { name: "Surah Al-Fatihah", description: "The Opening - Recited in every unit of prayer." },
+  { name: "Surah Al-Ikhlas", description: "The Sincerity - Equal to one-third of the Quran." },
+  { name: "Surah Al-Falaq", description: "The Daybreak - Seeking protection from evil." },
+  { name: "Surah An-Nas", description: "Mankind - Seeking protection from whispers." },
+  { name: "Surah Al-Asr", description: "The Declining Day - Importance of time and faith." }
+];
+
+const DOCUMENTARIES = [
+  { title: "The Message (1976)", description: "The story of the birth of Islam.", link: "https://www.youtube.com/results?search_query=the+message+full+movie+islam" },
+  { title: "Omar Series", description: "Historical drama about the second Caliph of Islam.", link: "https://www.youtube.com/results?search_query=omar+series+english+subtitles" },
+  { title: "The Sultan and the Saint", description: "The story of St. Francis of Assisi and the Sultan of Egypt.", link: "https://www.youtube.com/results?search_query=the+sultan+and+the+saint+documentary" }
 ];
 
 const ZakatCalculator = () => {
@@ -710,7 +739,8 @@ const HadithSection = () => {
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'home' | 'deen' | 'ai' | 'amal' | 'dashboard'>('home');
-  const [deenSubTab, setDeenSubTab] = useState<'grid' | 'quran' | 'zakat' | 'names' | 'hadith'>('grid');
+  const [deenSubTab, setDeenSubTab] = useState<'grid' | 'quran' | 'zakat' | 'names' | 'hadith' | 'events' | 'prayer' | 'documentary'>('grid');
+  const [prayerSubTab, setPrayerSubTab] = useState<'menu' | 'wudu' | 'salah' | 'surah'>('menu');
   
   // Clock and Calendars
   const [timeString, setTimeString] = useState<string>(new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }));
@@ -1719,51 +1749,87 @@ export default function App() {
               {!selectedSurah ? (
                 <div className="space-y-8">
                   {deenSubTab === 'grid' ? (
-                    <div className="grid grid-cols-3 gap-3">
-                      {/* Al Quran Option */}
-                      <button 
-                        onClick={() => setDeenSubTab('quran')}
-                        className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
-                      >
-                        <div className="w-10 h-10 bg-slate-900 text-white rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
-                          <BookOpen size={20} />
-                        </div>
-                        <h3 className="text-[10px] font-bold uppercase tracking-tight">Al-Quran</h3>
-                      </button>
+                      <div className="grid grid-cols-3 gap-3">
+                        {/* Al Quran Option */}
+                        <button 
+                          onClick={() => setDeenSubTab('quran')}
+                          className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
+                        >
+                          <div className="w-10 h-10 bg-slate-900 text-white rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
+                            <BookOpen size={20} />
+                          </div>
+                          <h3 className="text-[10px] font-bold uppercase tracking-tight">Al-Quran</h3>
+                        </button>
 
-                      {/* Zakat Option */}
-                      <button 
-                        onClick={() => setDeenSubTab('zakat')}
-                        className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
-                      >
-                        <div className="w-10 h-10 bg-slate-900 text-white rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
-                          <Calculator size={20} />
-                        </div>
-                        <h3 className="text-[10px] font-bold uppercase tracking-tight">Zakat</h3>
-                      </button>
+                        {/* Zakat Option */}
+                        <button 
+                          onClick={() => setDeenSubTab('zakat')}
+                          className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
+                        >
+                          <div className="w-10 h-10 bg-slate-900 text-white rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
+                            <Calculator size={20} />
+                          </div>
+                          <h3 className="text-[10px] font-bold uppercase tracking-tight">Zakat</h3>
+                        </button>
 
-                      {/* 99 Names Option */}
-                      <button 
-                        onClick={() => setDeenSubTab('names')}
-                        className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
-                      >
-                        <div className="w-10 h-10 bg-slate-900 text-white rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
-                          <Heart size={20} />
-                        </div>
-                        <h3 className="text-[10px] font-bold uppercase tracking-tight">99 Names</h3>
-                      </button>
+                        {/* 99 Names Option */}
+                        <button 
+                          onClick={() => setDeenSubTab('names')}
+                          className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
+                        >
+                          <div className="w-10 h-10 bg-slate-900 text-white rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
+                            <Heart size={20} />
+                          </div>
+                          <h3 className="text-[10px] font-bold uppercase tracking-tight">99 Names</h3>
+                        </button>
 
-                      {/* Hadith Option */}
-                      <button 
-                        onClick={() => setDeenSubTab('hadith')}
-                        className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
-                      >
-                        <div className="w-10 h-10 bg-slate-900 text-white rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
-                          <ScrollText size={20} />
-                        </div>
-                        <h3 className="text-[10px] font-bold uppercase tracking-tight">Hadith</h3>
-                      </button>
-                    </div>
+                        {/* Hadith Option */}
+                        <button 
+                          onClick={() => setDeenSubTab('hadith')}
+                          className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
+                        >
+                          <div className="w-10 h-10 bg-slate-900 text-white rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
+                            <ScrollText size={20} />
+                          </div>
+                          <h3 className="text-[10px] font-bold uppercase tracking-tight">Hadith</h3>
+                        </button>
+
+                        {/* Upcoming Events Option */}
+                        <button 
+                          onClick={() => setDeenSubTab('events')}
+                          className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
+                        >
+                          <div className="w-10 h-10 bg-slate-900 text-white rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
+                            <Calendar size={20} />
+                          </div>
+                          <h3 className="text-[10px] font-bold uppercase tracking-tight leading-tight">Upcoming Islamic Events</h3>
+                        </button>
+
+                        {/* Prayer Learning Option */}
+                        <button 
+                          onClick={() => {
+                            setDeenSubTab('prayer');
+                            setPrayerSubTab('menu');
+                          }}
+                          className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
+                        >
+                          <div className="w-10 h-10 bg-slate-900 text-white rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
+                            <Book size={20} />
+                          </div>
+                          <h3 className="text-[10px] font-bold uppercase tracking-tight">Prayer Learning</h3>
+                        </button>
+
+                        {/* Islamic Documentary Option */}
+                        <button 
+                          onClick={() => setDeenSubTab('documentary')}
+                          className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
+                        >
+                          <div className="w-10 h-10 bg-slate-900 text-white rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
+                            <Video size={20} />
+                          </div>
+                          <h3 className="text-[10px] font-bold uppercase tracking-tight">Documentary</h3>
+                        </button>
+                      </div>
                   ) : (
                     <div className="space-y-8">
                       <button 
@@ -1854,6 +1920,167 @@ export default function App() {
                       {deenSubTab === 'zakat' && <ZakatCalculator />}
                       {deenSubTab === 'names' && <NamesOfAllah />}
                       {deenSubTab === 'hadith' && <HadithSection />}
+
+                      {deenSubTab === 'events' && (
+                        <div className="space-y-6">
+                          <h3 className="text-2xl font-black text-slate-900">Upcoming Islamic Events</h3>
+                          <div className="grid grid-cols-1 gap-4">
+                            {UPCOMING_EVENTS.map((event, i) => (
+                              <div key={i} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-6">
+                                <div className="w-16 h-16 bg-emerald-100 text-emerald-700 rounded-2xl flex flex-col items-center justify-center flex-shrink-0">
+                                  <Calendar size={24} />
+                                </div>
+                                <div>
+                                  <h4 className="font-bold text-slate-900">{event.name}</h4>
+                                  <p className="text-xs text-emerald-600 font-bold uppercase tracking-widest mb-1">{event.date}</p>
+                                  <p className="text-sm text-slate-500 leading-relaxed">{event.description}</p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {deenSubTab === 'prayer' && (
+                        <div className="space-y-6">
+                          <h3 className="text-2xl font-black text-slate-900">Prayer Learning</h3>
+                          
+                          {prayerSubTab === 'menu' ? (
+                            <div className="grid grid-cols-1 gap-4">
+                              <button 
+                                onClick={() => setPrayerSubTab('wudu')}
+                                className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between group hover:border-emerald-500 transition-all"
+                              >
+                                <div className="flex items-center gap-4">
+                                  <div className="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-xl flex items-center justify-center">
+                                    <Sparkles size={24} />
+                                  </div>
+                                  <div className="text-left">
+                                    <h4 className="font-bold text-slate-900">Wudu (Ablution)</h4>
+                                    <p className="text-xs text-slate-500">Purification before prayer</p>
+                                  </div>
+                                </div>
+                                <ChevronDown className="-rotate-90 text-slate-300 group-hover:text-emerald-500 transition-colors" size={20} />
+                              </button>
+
+                              <button 
+                                onClick={() => setPrayerSubTab('salah')}
+                                className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between group hover:border-emerald-500 transition-all"
+                              >
+                                <div className="flex items-center gap-4">
+                                  <div className="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-xl flex items-center justify-center">
+                                    <Sun size={24} />
+                                  </div>
+                                  <div className="text-left">
+                                    <h4 className="font-bold text-slate-900">Salah (Prayer)</h4>
+                                    <p className="text-xs text-slate-500">The five daily prayers</p>
+                                  </div>
+                                </div>
+                                <ChevronDown className="-rotate-90 text-slate-300 group-hover:text-emerald-500 transition-colors" size={20} />
+                              </button>
+
+                              <button 
+                                onClick={() => setPrayerSubTab('surah')}
+                                className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between group hover:border-emerald-500 transition-all"
+                              >
+                                <div className="flex items-center gap-4">
+                                  <div className="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-xl flex items-center justify-center">
+                                    <BookOpen size={24} />
+                                  </div>
+                                  <div className="text-left">
+                                    <h4 className="font-bold text-slate-900">Essential Surah</h4>
+                                    <p className="text-xs text-slate-500">Surahs used in prayer</p>
+                                  </div>
+                                </div>
+                                <ChevronDown className="-rotate-90 text-slate-300 group-hover:text-emerald-500 transition-colors" size={20} />
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="space-y-8">
+                              <button 
+                                onClick={() => setPrayerSubTab('menu')}
+                                className="flex items-center gap-2 text-slate-600 hover:text-emerald-600 font-medium transition-colors text-sm"
+                              >
+                                <ChevronLeft size={20} />
+                                Back to Prayer Menu
+                              </button>
+
+                              {prayerSubTab === 'wudu' && (
+                                <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+                                  <h4 className="text-xl font-bold text-slate-900 mb-6">Wudu (Ablution)</h4>
+                                  <div className="space-y-4">
+                                    {PRAYER_STEPS[0].steps.map((step, j) => (
+                                      <div key={j} className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                                        <div className="w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-400">
+                                          {j + 1}
+                                        </div>
+                                        <p className="text-sm font-bold text-slate-700">{step}</p>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+
+                              {prayerSubTab === 'salah' && (
+                                <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+                                  <h4 className="text-xl font-bold text-slate-900 mb-6">Salah (Prayer)</h4>
+                                  <div className="space-y-4">
+                                    {PRAYER_STEPS[1].steps.map((step, j) => (
+                                      <div key={j} className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                                        <div className="w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-400">
+                                          {j + 1}
+                                        </div>
+                                        <p className="text-sm font-bold text-slate-700">{step}</p>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+
+                              {prayerSubTab === 'surah' && (
+                                <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+                                  <h4 className="text-xl font-bold text-slate-900 mb-6">Essential Surahs</h4>
+                                  <div className="space-y-4">
+                                    {ESSENTIAL_SURAHS.map((surah, j) => (
+                                      <div key={j} className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                                        <h5 className="font-bold text-emerald-700 mb-1">{surah.name}</h5>
+                                        <p className="text-sm text-slate-600 leading-relaxed">{surah.description}</p>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {deenSubTab === 'documentary' && (
+                        <div className="space-y-6">
+                          <h3 className="text-2xl font-black text-slate-900">Islamic Documentaries</h3>
+                          <div className="grid grid-cols-1 gap-4">
+                            {DOCUMENTARIES.map((doc, i) => (
+                              <div key={i} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm group hover:border-emerald-500 transition-all">
+                                <div className="flex items-start justify-between mb-4">
+                                  <div className="w-12 h-12 bg-slate-900 text-white rounded-xl flex items-center justify-center group-hover:bg-emerald-600 transition-colors">
+                                    <Video size={24} />
+                                  </div>
+                                  <a 
+                                    href={doc.link} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="p-2 bg-slate-50 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all"
+                                  >
+                                    <ExternalLink size={18} />
+                                  </a>
+                                </div>
+                                <h4 className="font-bold text-slate-900 mb-2">{doc.title}</h4>
+                                <p className="text-sm text-slate-500 leading-relaxed">{doc.description}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>

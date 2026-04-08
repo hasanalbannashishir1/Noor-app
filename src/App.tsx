@@ -25,18 +25,22 @@ import {
   Calendar,
   Settings,
   LayoutDashboard,
+  SkipForward,
   Check,
   Home,
   Compass,
+  MapPin,
   Bot,
   Sparkles,
   BarChart3,
   Calculator,
+  Download,
   Heart,
   Bookmark,
   Send,
   RefreshCw,
   Quote,
+  Flame,
   User,
   History,
   Sunrise,
@@ -288,68 +292,351 @@ const DOCUMENTARIES = [
 ];
 
 const ZakatCalculator = () => {
-  const [wealth, setWealth] = useState<string>('');
-  const [result, setResult] = useState<number | null>(null);
+  const [step, setStep] = useState(1);
+  
+  // Step 1: Nisab
+  const [nisab, setNisab] = useState<string>('');
+  
+  // Step 2: Gold & Silver
+  const [goldQuantity, setGoldQuantity] = useState<string>('');
+  const [goldPrice, setGoldPrice] = useState<string>(''); // Price per 10g
+  const [silverQuantity, setSilverQuantity] = useState<string>('');
+  const [silverPrice, setSilverPrice] = useState<string>(''); // Price per 10g
 
-  const calculate = () => {
-    const val = parseFloat(wealth);
-    if (!isNaN(val)) {
-      setResult(val * 0.025);
-    }
+  // Step 3: Property & Assets
+  const [cash, setCash] = useState<string>('');
+  const [investments, setInvestments] = useState<string>('');
+  const [property, setProperty] = useState<string>('');
+  const [business, setBusiness] = useState<string>('');
+  const [agricultural, setAgricultural] = useState<string>('');
+  const [others, setOthers] = useState<string>('');
+
+  // Step 4: Liabilities
+  const [debts, setDebts] = useState<string>('');
+  const [liabilities, setLiabilities] = useState<string>('');
+
+  const parse = (val: string) => parseFloat(val) || 0;
+
+  const totalAssets = () => {
+    const goldVal = (parse(goldQuantity) / 10) * parse(goldPrice);
+    const silverVal = (parse(silverQuantity) / 10) * parse(silverPrice);
+    return goldVal + silverVal + parse(cash) + parse(investments) + parse(property) + parse(business) + parse(agricultural) + parse(others);
+  };
+
+  const totalLiabilities = () => parse(debts) + parse(liabilities);
+  
+  const netWealth = totalAssets() - totalLiabilities();
+  const nisabVal = parse(nisab);
+  const isEligible = netWealth >= nisabVal && nisabVal > 0;
+  const zakatPayable = isEligible ? netWealth * 0.025 : 0;
+
+  const nextStep = () => setStep(prev => Math.min(prev + 1, 5));
+  const prevStep = () => setStep(prev => Math.max(prev - 1, 1));
+
+  const saveSummary = () => {
+    const summary = `
+Zakat Calculation Summary
+-------------------------
+Nisab: ${nisab}
+Total Assets: ${totalAssets().toFixed(2)}
+Total Liabilities: ${totalLiabilities().toFixed(2)}
+Net Wealth: ${netWealth.toFixed(2)}
+Eligible: ${isEligible ? 'Yes' : 'No'}
+Zakat Payable: ${zakatPayable.toFixed(2)}
+    `;
+    const blob = new Blob([summary], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'zakat_summary.txt';
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   return (
-    <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
-      <div className="flex items-center gap-3 mb-4">
-        <div className="w-10 h-10 bg-emerald-100 text-emerald-700 rounded-xl flex items-center justify-center">
-          <Calculator size={20} />
-        </div>
-        <div>
-          <h3 className="text-lg font-bold text-slate-900">Zakat Calculator</h3>
-          <p className="text-xs text-slate-500">Calculate your 2.5% annual zakat</p>
-        </div>
-      </div>
-      
-      <div className="space-y-4">
-        <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-100">
-          <p className="text-xs text-emerald-800 italic leading-relaxed mb-2">
-            "Establish prayer and give zakat, and whatever good you put forward for yourselves - you will find it with Allah." (Quran 2:110)
-          </p>
-          <p className="text-[10px] text-emerald-600 leading-relaxed">
-            Zakat is one of the Five Pillars of Islam, mandatory for every adult, sane Muslim who possesses wealth above a certain threshold (Nisab).
-          </p>
-        </div>
-
-        <div>
-          <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Total Zakatable Wealth</label>
-          <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
-            <input 
-              type="number" 
-              value={wealth}
-              onChange={(e) => setWealth(e.target.value)}
-              placeholder="0.00"
-              className="w-full pl-8 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all"
-            />
+    <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-xl max-w-2xl mx-auto">
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-2xl flex items-center justify-center shadow-inner">
+            <Calculator size={24} />
+          </div>
+          <div>
+            <h3 className="text-xl font-black text-slate-900">Zakat Calculator</h3>
+            <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">Step {step} of 5</p>
           </div>
         </div>
+        <div className="flex gap-1">
+          {[1, 2, 3, 4, 5].map(s => (
+            <div key={s} className={`w-8 h-1.5 rounded-full transition-all duration-500 ${step >= s ? 'bg-emerald-500' : 'bg-slate-100'}`} />
+          ))}
+        </div>
+      </div>
 
-        <button 
-          onClick={calculate}
-          className="w-full py-3 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-200"
-        >
-          Calculate Zakat
-        </button>
-
-        {result !== null && (
+      <AnimatePresence mode="wait">
+        {step === 1 && (
           <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="p-4 bg-slate-900 text-white rounded-xl text-center"
+            key="step1"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            className="space-y-6"
           >
-            <p className="text-xs text-slate-400 uppercase tracking-widest font-bold mb-1">Your Zakat Amount</p>
-            <p className="text-2xl font-black text-emerald-400">${result.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+            <div className="p-5 bg-emerald-50 rounded-2xl border border-emerald-100">
+              <h4 className="font-bold text-emerald-900 mb-2 flex items-center gap-2">
+                <span className="text-lg">Step 1:</span> Nisab Value
+              </h4>
+              <p className="text-sm text-emerald-800 leading-relaxed">
+                Enter the Value of Nisab in your local currency. According to Sharia Law, Nisab is the minimum amount a person possesses for over a year in order to be obliged to pay Zakah. You can calculate nisab in terms of either Gold or Silver value. For Silver, the standard nisab is 21 ounces of silver (612.36 grams) or its equivalent in cash. For Gold, the standard nisab is 3 ounces of gold (87.48 grams) or its cash equivalent. (Note: check the value of gold and silver in your local currency)
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Nisab in Local Currency</label>
+              <input 
+                type="number"
+                value={nisab}
+                onChange={(e) => setNisab(e.target.value)}
+                placeholder="Enter amount..."
+                className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-emerald-500 focus:bg-white outline-none transition-all text-lg font-bold"
+              />
+            </div>
           </motion.div>
+        )}
+
+        {step === 2 && (
+          <motion.div 
+            key="step2"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            className="space-y-6"
+          >
+            <div className="p-5 bg-emerald-50 rounded-2xl border border-emerald-100">
+              <h4 className="font-bold text-emerald-900 mb-2 flex items-center gap-2">
+                <span className="text-lg">Step 2:</span> Gold & Silver
+              </h4>
+              <p className="text-sm text-emerald-800 leading-relaxed">
+                In the next step, add the quantity of Gold and silver that you have possessed for more then a year and its price per 10 gram in your local currency. Each type (in Carats) of Gold you possess must be added separately as their values are different.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <h5 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-yellow-400" /> Gold
+                </h5>
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Total Quantity (Grams)</label>
+                  <input 
+                    type="number"
+                    value={goldQuantity}
+                    onChange={(e) => setGoldQuantity(e.target.value)}
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-emerald-500 outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Price per 10g</label>
+                  <input 
+                    type="number"
+                    value={goldPrice}
+                    onChange={(e) => setGoldPrice(e.target.value)}
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-emerald-500 outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h5 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-slate-300" /> Silver
+                </h5>
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Total Quantity (Grams)</label>
+                  <input 
+                    type="number"
+                    value={silverQuantity}
+                    onChange={(e) => setSilverQuantity(e.target.value)}
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-emerald-500 outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Price per 10g</label>
+                  <input 
+                    type="number"
+                    value={silverPrice}
+                    onChange={(e) => setSilverPrice(e.target.value)}
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-emerald-500 outline-none"
+                  />
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {step === 3 && (
+          <motion.div 
+            key="step3"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            className="space-y-6"
+          >
+            <div className="p-5 bg-emerald-50 rounded-2xl border border-emerald-100">
+              <h4 className="font-bold text-emerald-900 mb-2 flex items-center gap-2">
+                <span className="text-lg">Step 3:</span> Property & Assets
+              </h4>
+              <p className="text-sm text-emerald-800 leading-relaxed">
+                In this step, add the values of Cash, Properties and stocks in your possession for more then a year as Zakat is applicable on them as well.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {[
+                { label: 'Cash in Hand/Bank', value: cash, setter: setCash },
+                { label: 'Investments/Stocks', value: investments, setter: setInvestments },
+                { label: 'Property Value', value: property, setter: setProperty },
+                { label: 'Business Assets', value: business, setter: setBusiness },
+                { label: 'Agricultural Assets', value: agricultural, setter: setAgricultural },
+                { label: 'Other Assets', value: others, setter: setOthers },
+              ].map((item, i) => (
+                <div key={i}>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">{item.label}</label>
+                  <input 
+                    type="number"
+                    value={item.value}
+                    onChange={(e) => item.setter(e.target.value)}
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-emerald-500 outline-none"
+                  />
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
+        {step === 4 && (
+          <motion.div 
+            key="step4"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            className="space-y-6"
+          >
+            <div className="p-5 bg-emerald-50 rounded-2xl border border-emerald-100">
+              <h4 className="font-bold text-emerald-900 mb-2 flex items-center gap-2">
+                <span className="text-lg">Step 4:</span> Liabilities & Debts
+              </h4>
+              <p className="text-sm text-emerald-800 leading-relaxed">
+                In this final step, you need to add your debts and liabilities, the payments that are due on you and debts that you have to give. These amounts are subtracted from your assets/possessions in the final calculation to determine the Zakah obligatory on you.
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Debts to be Paid</label>
+                <input 
+                  type="number"
+                  value={debts}
+                  onChange={(e) => setDebts(e.target.value)}
+                  className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:border-emerald-500 outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Other Liabilities</label>
+                <input 
+                  type="number"
+                  value={liabilities}
+                  onChange={(e) => setLiabilities(e.target.value)}
+                  className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:border-emerald-500 outline-none"
+                />
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {step === 5 && (
+          <motion.div 
+            key="step5"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="space-y-6"
+          >
+            <div className="p-6 bg-slate-900 text-white rounded-3xl shadow-2xl overflow-hidden relative">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full -mr-16 -mt-16 blur-3xl" />
+              <div className="relative z-10">
+                <h4 className="text-emerald-400 font-bold uppercase tracking-widest text-xs mb-4">Calculation Summary</h4>
+                <p className="text-xs text-slate-400 mb-6">
+                  After completion of the steps above, a summary appears which tells you whether you are eligible to pay Zakat and, if you are, the zakat that you have to pay appears. The payable zakat is 2.5% of your overall possessions.
+                </p>
+                
+                <div className="space-y-4 mb-8">
+                  <div className="flex justify-between items-center border-b border-slate-800 pb-2">
+                    <span className="text-slate-400 text-sm">Total Assets</span>
+                    <span className="font-bold">{totalAssets().toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between items-center border-b border-slate-800 pb-2">
+                    <span className="text-slate-400 text-sm">Total Liabilities</span>
+                    <span className="font-bold text-red-400">-{totalLiabilities().toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between items-center border-b border-slate-800 pb-2">
+                    <span className="text-slate-400 text-sm">Net Wealth</span>
+                    <span className="font-bold text-emerald-400">{netWealth.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-400 text-sm">Nisab Threshold</span>
+                    <span className="font-bold">{nisabVal.toLocaleString()}</span>
+                  </div>
+                </div>
+
+                <div className="text-center p-6 bg-white/5 rounded-2xl border border-white/10">
+                  {isEligible ? (
+                    <>
+                      <p className="text-emerald-400 font-bold mb-1">You are eligible to pay Zakat</p>
+                      <p className="text-4xl font-black text-white mb-2">{zakatPayable.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                      <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">2.5% of Net Wealth</p>
+                    </>
+                  ) : (
+                    <p className="text-slate-400 font-medium">Your net wealth is below the Nisab threshold. Zakat is not obligatory.</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <button 
+              onClick={saveSummary}
+              className="w-full py-4 bg-slate-100 text-slate-900 font-bold rounded-2xl hover:bg-slate-200 transition-all flex items-center justify-center gap-2"
+            >
+              <Download size={20} />
+              Save Summary to Record
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="mt-8 pt-8 border-t border-slate-100 flex gap-4">
+        {step > 1 && (
+          <button 
+            onClick={prevStep}
+            className="flex-1 py-4 bg-slate-50 text-slate-600 font-bold rounded-2xl hover:bg-slate-100 transition-all flex items-center justify-center gap-2"
+          >
+            <ChevronLeft size={20} />
+            Back
+          </button>
+        )}
+        {step < 5 && (
+          <button 
+            onClick={nextStep}
+            className="flex-[2] py-4 bg-emerald-600 text-white font-bold rounded-2xl hover:bg-emerald-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-200"
+          >
+            Continue
+            <ChevronRight size={20} />
+          </button>
+        )}
+        {step === 5 && (
+          <button 
+            onClick={() => setStep(1)}
+            className="flex-1 py-4 bg-emerald-600 text-white font-bold rounded-2xl hover:bg-emerald-700 transition-all"
+          >
+            Recalculate
+          </button>
         )}
       </div>
     </div>
@@ -704,6 +991,13 @@ const HadithSection = ({ selectedBook, setSelectedBook }: { selectedBook: string
 
   return (
     <div className="space-y-6">
+      {/* Daily Reminder */}
+      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
+        <h4 className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mb-2">Daily Reminder</h4>
+        <p className="text-slate-700 font-medium italic">"I have left among you two things; you will never go astray as long as you hold fast to them; the book of Allah and my Sunnah."</p>
+        <p className="text-[10px] text-slate-400 mt-2">— Prophet Muhammad (PBUH) (Al-Muwatta, Imam Malik)</p>
+      </div>
+
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-indigo-100 text-indigo-700 rounded-xl flex items-center justify-center">
@@ -869,7 +1163,8 @@ const HadithSection = ({ selectedBook, setSelectedBook }: { selectedBook: string
 export default function App() {
   const [activeTab, setActiveTab] = useState<'home' | 'deen' | 'ai' | 'amal' | 'dashboard'>('home');
   const [deenSubTab, setDeenSubTab] = useState<'grid' | 'quran' | 'zakat' | 'names' | 'hadith' | 'events' | 'prayer' | 'documentary'>('grid');
-  const [prayerSubTab, setPrayerSubTab] = useState<'menu' | 'wudu' | 'salah' | 'surah'>('menu');
+  const [prayerSubTab, setPrayerSubTab] = useState<'menu' | 'wudu' | 'salah' | 'surah' | 'steps'>('menu');
+  const [amalSubTab, setAmalSubTab] = useState<'quran' | 'hadith' | 'dua'>('quran');
   const [selectedSalahDua, setSelectedSalahDua] = useState<string | null>(null);
   const [selectedBook, setSelectedBook] = useState<string | null>(null);
   const [selectedEssentialSurah, setSelectedEssentialSurah] = useState<number | null>(null);
@@ -1014,6 +1309,43 @@ export default function App() {
     const saved = localStorage.getItem('bookmarked_surahs');
     return saved ? JSON.parse(saved) : [];
   });
+
+  // Streak System
+  const [streakCount, setStreakCount] = useState<number>(() => {
+    const saved = localStorage.getItem('user_streak_count');
+    return saved ? parseInt(saved) : 0;
+  });
+
+  useEffect(() => {
+    const updateStreak = () => {
+      const now = new Date();
+      const today = now.toISOString().split('T')[0];
+      const lastVisit = localStorage.getItem('last_visit_date');
+      
+      if (!lastVisit) {
+        setStreakCount(1);
+        localStorage.setItem('user_streak_count', '1');
+        localStorage.setItem('last_visit_date', today);
+      } else if (lastVisit !== today) {
+        const lastDate = new Date(lastVisit);
+        const yesterday = new Date(now);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+        if (lastVisit === yesterdayStr) {
+          const newStreak = streakCount + 1;
+          setStreakCount(newStreak);
+          localStorage.setItem('user_streak_count', newStreak.toString());
+        } else {
+          setStreakCount(1);
+          localStorage.setItem('user_streak_count', '1');
+        }
+        localStorage.setItem('last_visit_date', today);
+      }
+    };
+
+    updateStreak();
+  }, []);
 
   const [recentActivity, setRecentActivity] = useState<{ id: string, type: 'salah' | 'quran', title: string, time: string }[]>(() => {
     const saved = localStorage.getItem('recent_activity');
@@ -1496,20 +1828,29 @@ export default function App() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
       {/* Header */}
-      <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-200 px-4 py-3">
+      <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-200 px-4 py-2">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-200">
-              <Sparkles size={24} />
+          <div className="flex items-center gap-2 md:gap-3">
+            <div className="w-8 h-8 md:w-10 md:h-10 bg-emerald-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-200">
+              <Sparkles size={20} className="md:w-6 md:h-6" />
             </div>
             <div>
-              <h1 className="text-xl font-bold tracking-tight text-slate-900">Noor App</h1>
-              <p className="text-xs text-slate-500 font-medium">Light of the Qur’an in Your Hands</p>
+              <h1 className="text-lg md:text-xl font-bold tracking-tight text-slate-900 leading-tight">Noor App</h1>
+              <p className="text-[10px] md:text-xs text-slate-500 font-medium leading-tight">Light of the Qur’an in Your Hands</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="hidden md:flex items-center gap-2 bg-slate-100 p-1 rounded-xl">
+          <div className="flex items-center gap-2 md:gap-4">
+            {/* Streak Level in Header */}
+            <div className="flex items-center gap-1.5 bg-orange-50 px-2 py-1 md:px-3 md:py-1.5 rounded-lg md:rounded-xl border border-orange-100 shadow-sm">
+              <Flame size={14} className="text-orange-500 md:w-4 md:h-4" fill="currentColor" />
+              <div className="flex flex-col">
+                <span className="hidden md:block text-[8px] font-bold text-orange-600 uppercase tracking-widest leading-none">Streak</span>
+                <span className="text-[10px] md:text-xs font-black text-slate-900 leading-none md:mt-0.5">Lvl {streakCount}</span>
+              </div>
+            </div>
+
+            <div className="hidden lg:flex items-center gap-2 bg-slate-100 p-1 rounded-xl">
               {[
                 { id: 'home', icon: Home, label: 'Home' },
                 { id: 'deen', icon: Compass, label: 'Deen' },
@@ -1521,11 +1862,11 @@ export default function App() {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
                   className={cn(
-                    "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all",
+                    "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all",
                     activeTab === tab.id ? "bg-white text-emerald-700 shadow-sm" : "text-slate-500 hover:text-slate-700"
                   )}
                 >
-                  <tab.icon size={18} />
+                  <tab.icon size={14} />
                   {tab.label}
                 </button>
               ))}
@@ -1533,9 +1874,9 @@ export default function App() {
 
             <button 
               onClick={() => setIsMenuOpen(true)}
-              className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 transition-all"
+              className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 transition-all"
             >
-              <User size={24} />
+              <User size={18} className="md:w-6 md:h-6" />
             </button>
           </div>
         </div>
@@ -1688,6 +2029,10 @@ export default function App() {
                     <Compass className="text-emerald-600" size={20} />
                     Prayer Times
                   </h3>
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold text-amber-600 uppercase tracking-wider mt-2 bg-amber-50 w-fit px-2 py-1 rounded-lg border border-amber-100">
+                    <MapPin size={12} />
+                    Please turn on location
+                  </div>
                   {nextPrayerInfo && (
                     <p className="text-sm font-medium text-slate-500 mt-1">
                       Next: <span className="text-emerald-600 font-bold">{nextPrayerInfo.name}</span> in <span className="font-mono text-slate-700">{nextPrayerInfo.remaining}</span>
@@ -1890,15 +2235,18 @@ export default function App() {
                           <h3 className="text-[10px] font-bold uppercase tracking-tight">Al-Quran</h3>
                         </button>
 
-                        {/* Zakat Option */}
+                        {/* Prayer Learning Option */}
                         <button 
-                          onClick={() => setDeenSubTab('zakat')}
+                          onClick={() => {
+                            setDeenSubTab('prayer');
+                            setPrayerSubTab('menu');
+                          }}
                           className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
                         >
                           <div className="w-10 h-10 bg-slate-900 text-white rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
-                            <Calculator size={20} />
+                            <Book size={20} />
                           </div>
-                          <h3 className="text-[10px] font-bold uppercase tracking-tight">Zakat</h3>
+                          <h3 className="text-[10px] font-bold uppercase tracking-tight">Prayer learning</h3>
                         </button>
 
                         {/* 99 Names Option */}
@@ -1910,6 +2258,17 @@ export default function App() {
                             <Heart size={20} />
                           </div>
                           <h3 className="text-[10px] font-bold uppercase tracking-tight">99 Names</h3>
+                        </button>
+
+                        {/* Zakat Option */}
+                        <button 
+                          onClick={() => setDeenSubTab('zakat')}
+                          className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
+                        >
+                          <div className="w-10 h-10 bg-slate-900 text-white rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
+                            <Calculator size={20} />
+                          </div>
+                          <h3 className="text-[10px] font-bold uppercase tracking-tight">Zakat</h3>
                         </button>
 
                         {/* Hadith Option */}
@@ -1932,20 +2291,6 @@ export default function App() {
                             <Calendar size={20} />
                           </div>
                           <h3 className="text-[10px] font-bold uppercase tracking-tight leading-tight">Upcoming Islamic Events</h3>
-                        </button>
-
-                        {/* Prayer Learning Option */}
-                        <button 
-                          onClick={() => {
-                            setDeenSubTab('prayer');
-                            setPrayerSubTab('menu');
-                          }}
-                          className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
-                        >
-                          <div className="w-10 h-10 bg-slate-900 text-white rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
-                            <Book size={20} />
-                          </div>
-                          <h3 className="text-[10px] font-bold uppercase tracking-tight">Prayer learning</h3>
                         </button>
 
                         {/* Islamic Documentary Option */}
@@ -1983,12 +2328,16 @@ export default function App() {
 
                       {deenSubTab === 'quran' && (
                         <div id="surah-list" className="space-y-6">
+                          {/* Daily Reminder */}
+                          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center mb-6">
+                            <h4 className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-2">Daily Reminder</h4>
+                            <p className="text-slate-700 font-medium italic">"The best of you are those who learn the Quran and teach it"</p>
+                            <p className="text-[10px] text-slate-400 mt-2">— Prophet Muhammad (PBUH)</p>
+                          </div>
+
                           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                             <div>
                               <h3 className="text-2xl font-black text-slate-900">The Holy Quran</h3>
-                              <p className="text-sm text-slate-500 font-medium italic mt-1">
-                                "The best of you are those who learn the Quran and teach it" — Prophet Muhammad (PBUH)
-                              </p>
                               <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-2">114 Chapters (Surahs)</p>
                             </div>
                             <div className="relative">
@@ -2131,6 +2480,22 @@ export default function App() {
                                   <div className="text-left">
                                     <h4 className="font-bold text-slate-900">Essential Surah</h4>
                                     <p className="text-xs text-slate-500">Surahs used in prayer</p>
+                                  </div>
+                                </div>
+                                <ChevronDown className="-rotate-90 text-slate-300 group-hover:text-emerald-500 transition-colors" size={20} />
+                              </button>
+
+                              <button 
+                                onClick={() => setPrayerSubTab('steps')}
+                                className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between group hover:border-emerald-500 transition-all"
+                              >
+                                <div className="flex items-center gap-4">
+                                  <div className="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-xl flex items-center justify-center">
+                                    <LayoutDashboard size={24} />
+                                  </div>
+                                  <div className="text-left">
+                                    <h4 className="font-bold text-slate-900">Prayer Steps</h4>
+                                    <p className="text-xs text-slate-500">Complete steps of Salah</p>
                                   </div>
                                 </div>
                                 <ChevronDown className="-rotate-90 text-slate-300 group-hover:text-emerald-500 transition-colors" size={20} />
@@ -2288,6 +2653,13 @@ export default function App() {
 
                               {prayerSubTab === 'salah' && (
                                 <div className="space-y-6">
+                                  {/* Daily Reminder */}
+                                  <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
+                                    <h4 className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-2">Daily Reminder</h4>
+                                    <p className="text-slate-700 font-medium italic">"Dua is worship."</p>
+                                    <p className="text-[10px] text-slate-400 mt-2">— The Prophet Muhammad (PBUH)</p>
+                                  </div>
+
                                   <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
                                     <h4 className="text-2xl font-bold text-slate-900 mb-6">Dua's for Salah</h4>
                                     
@@ -2399,6 +2771,87 @@ export default function App() {
                                         </div>
                                       </div>
                                     )}
+                                  </div>
+                                )}
+
+                                {prayerSubTab === 'steps' && (
+                                  <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+                                    <h4 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                                      <span>🕌</span> Complete Steps of Salah (Prayer)
+                                    </h4>
+                                    
+                                    <div className="space-y-8">
+                                      {/* Before Starting */}
+                                      <div className="p-6 bg-emerald-50 rounded-2xl border border-emerald-100">
+                                        <h5 className="font-bold text-emerald-800 mb-3 flex items-center gap-2">
+                                          <span>🔹</span> Before Starting
+                                        </h5>
+                                        <ul className="space-y-2">
+                                          <li className="flex items-start gap-2 text-sm text-emerald-700">
+                                            <span className="text-emerald-500 font-bold">✔️</span> Be in Wudu (ablution)
+                                          </li>
+                                          <li className="flex items-start gap-2 text-sm text-emerald-700">
+                                            <span className="text-emerald-500 font-bold">✔️</span> Face the Qiblah (direction of Kaaba)
+                                          </li>
+                                          <li className="flex items-start gap-2 text-sm text-emerald-700">
+                                            <span className="text-emerald-500 font-bold">✔️</span> Make intention (Niyyah) in your heart
+                                          </li>
+                                        </ul>
+                                      </div>
+
+                                      {/* Steps */}
+                                      <div className="space-y-4">
+                                        {[
+                                          { step: "Step 1: Takbir (Start Prayer)", content: "Raise both hands and say:", highlight: "Allahu Akbar (الله أكبر)" },
+                                          { step: "Step 2: Qiyam (Standing)", content: "Fold hands (right over left)\nRecite:\n• Sana (Subhanaka Allahumma...)\n• Ta’awwuz (A‘وذ بالله...)\n• Bismillah\n• Surah Al-Fatiha\n• Another Surah (e.g., Surah Al-Ikhlas)" },
+                                          { step: "Step 3: Ruku (Bowing)", content: "Say Allahu Akbar and bow\nHands on knees, back straight\nRecite:", highlight: "Subhana Rabbiyal ‘Azim (3 times)" },
+                                          { step: "Step 4: Qawmah (Standing After Ruku)", content: "Stand up and say:", highlight: "Sami‘allahu liman hamidah\nRabbana lakal hamd" },
+                                          { step: "Step 5: Sajdah (Prostration)", content: "Say Allahu Akbar and go into سجدة\nForehead, nose, hands, knees, toes on ground\nRecite:", highlight: "Subhana Rabbiyal A‘la (3 times)" },
+                                          { step: "Step 6: Jalsa (Sitting Between Two Sajdahs)", content: "Sit and say:", highlight: "Rabbighfir li" },
+                                          { step: "Step 7: Second Sajdah", content: "Go into سجدة again\nRecite:", highlight: "Subhana Rabbiyal A‘la (3 times)" },
+                                          { step: "🔁 Step 8: Next Rak‘ah", content: "Stand up and repeat steps (Fatiha + Surah, Ruku, Sajdah)" },
+                                          { step: "Step 9: Tashahhud (Sitting)", content: "After 2 Rak‘ah:\nSit and recite:", highlight: "Attahiyyatu..." },
+                                          { step: "Step 10: Final Sitting", content: "In last Rak‘ah:\nRecite:\n• Tashahhud\n• Durood Sharif\n• Dua Masura" },
+                                          { step: "Step 11: Salam (End Prayer)", content: "Turn head right:", highlight: "Assalamu Alaikum wa Rahmatullah", content2: "Turn head left:", highlight2: "Assalamu Alaikum wa Rahmatullah" }
+                                        ].map((item, idx) => (
+                                          <div key={idx} className="p-5 bg-slate-50 rounded-2xl border border-slate-100">
+                                            <h5 className="font-bold text-slate-900 mb-2 flex items-center gap-2">
+                                              {!item.step.startsWith('🔁') && <span className="text-emerald-500">🔹</span>}
+                                              {item.step}
+                                            </h5>
+                                            <div className="text-sm text-slate-600 whitespace-pre-line leading-relaxed">
+                                              {item.content}
+                                              {item.highlight && (
+                                                <div className="mt-2 p-3 bg-white rounded-xl border border-slate-200 font-bold text-emerald-700 text-center">
+                                                  {item.highlight}
+                                                </div>
+                                              )}
+                                              {item.content2 && <div className="mt-3">{item.content2}</div>}
+                                              {item.highlight2 && (
+                                                <div className="mt-2 p-3 bg-white rounded-xl border border-slate-200 font-bold text-emerald-700 text-center">
+                                                  {item.highlight2}
+                                                </div>
+                                              )}
+                                            </div>
+                                          </div>
+                                        ))}
+                                      </div>
+
+                                      {/* Important Tips */}
+                                      <div className="p-6 bg-amber-50 rounded-2xl border border-amber-100">
+                                        <h5 className="font-bold text-amber-800 mb-3 flex items-center gap-2">
+                                          <span>⚠️</span> Important Tips
+                                        </h5>
+                                        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                          {["Pray with focus (khushu')", "Don’t rush", "Maintain proper posture", "Follow correct sequence"].map((tip, i) => (
+                                            <li key={i} className="flex items-center gap-2 text-sm text-amber-700">
+                                              <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                                              {tip}
+                                            </li>
+                                          ))}
+                                        </ul>
+                                      </div>
+                                    </div>
                                   </div>
                                 )}
                             </div>
@@ -2617,86 +3070,181 @@ export default function App() {
               exit={{ opacity: 0, y: -20 }}
               className="space-y-8"
             >
-              {/* Random Surah Section */}
-              <div className="bg-emerald-700 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-10 -mt-10 blur-2xl" />
-                <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
-                  <div className="text-center md:text-left">
-                    <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
-                      <Sparkles size={20} className="text-emerald-300" />
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-200">Surah of the Moment</span>
+              {/* Tab Switcher */}
+              <div className="flex bg-white p-1.5 rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <button
+                  onClick={() => setAmalSubTab('quran')}
+                  className={cn(
+                    "flex-1 py-3 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2",
+                    amalSubTab === 'quran' ? "bg-emerald-600 text-white shadow-lg shadow-emerald-100" : "text-slate-500 hover:bg-slate-50"
+                  )}
+                >
+                  <BookOpen size={16} />
+                  Quran
+                </button>
+                <button
+                  onClick={() => setAmalSubTab('hadith')}
+                  className={cn(
+                    "flex-1 py-3 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2",
+                    amalSubTab === 'hadith' ? "bg-emerald-600 text-white shadow-lg shadow-emerald-100" : "text-slate-500 hover:bg-slate-50"
+                  )}
+                >
+                  <ScrollText size={16} />
+                  Hadith
+                </button>
+                <button
+                  onClick={() => setAmalSubTab('dua')}
+                  className={cn(
+                    "flex-1 py-3 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2",
+                    amalSubTab === 'dua' ? "bg-emerald-600 text-white shadow-lg shadow-emerald-100" : "text-slate-500 hover:bg-slate-50"
+                  )}
+                >
+                  <Bookmark size={16} />
+                  Daily Dua
+                </button>
+              </div>
+
+              <AnimatePresence mode="wait">
+                {amalSubTab === 'quran' && (
+                  <motion.div
+                    key="quran-tab"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    className="space-y-6"
+                  >
+                    {/* Daily Reminder */}
+                    <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
+                      <h4 className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-2">Daily Reminder</h4>
+                      <p className="text-slate-700 font-medium italic">"The best of you are those who learn the Quran and teach it"</p>
+                      <p className="text-[10px] text-slate-400 mt-2">— Prophet Muhammad (PBUH)</p>
                     </div>
-                    {randomSurah ? (
-                      <>
-                        <h3 className="text-3xl font-bold mb-2">{randomSurah.name_simple}</h3>
-                        <p className="text-emerald-100/80 mb-6">{randomSurah.translated_name.name}</p>
-                        <div className="flex items-center justify-center md:justify-start gap-4">
-                          <button 
-                            onClick={() => handleSurahClick(randomSurah)}
-                            className="bg-white text-emerald-700 px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg hover:scale-105 transition-transform"
-                          >
-                            Read Now
-                          </button>
-                          <button 
-                            onClick={fetchRandomAmal}
-                            className="p-2.5 bg-white/10 rounded-xl hover:bg-white/20 transition-colors"
-                          >
-                            <RefreshCw size={20} />
-                          </button>
+
+                    {/* Random Surah Section */}
+                    <div className="bg-emerald-700 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-10 -mt-10 blur-2xl" />
+                      <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                        <div className="text-center md:text-left">
+                          <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
+                            <Sparkles size={20} className="text-emerald-300" />
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-200">Surah of the Moment</span>
+                          </div>
+                          {randomSurah ? (
+                            <>
+                              <h3 className="text-3xl font-bold mb-2">{randomSurah.name_simple}</h3>
+                              <p className="text-emerald-100/80 mb-6">{randomSurah.translated_name.name}</p>
+                              <div className="flex items-center justify-center md:justify-start gap-4">
+                                <button 
+                                  onClick={(e) => handleListPlay(e, randomSurah)}
+                                  className="bg-white text-emerald-700 px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg hover:scale-105 transition-transform flex items-center gap-2"
+                                  disabled={listAudioLoading === randomSurah.id}
+                                >
+                                  {listAudioLoading === randomSurah.id ? (
+                                    <Loader2 size={18} className="animate-spin" />
+                                  ) : (
+                                    listPlayingId === randomSurah.id && isPlaying ? <Pause size={18} /> : <Play size={18} />
+                                  )}
+                                  {listPlayingId === randomSurah.id && isPlaying ? 'Pause' : 'Play'}
+                                </button>
+                                <button 
+                                  onClick={fetchRandomAmal}
+                                  className="p-2.5 bg-white/10 rounded-xl hover:bg-white/20 transition-colors"
+                                  title="Next Surah"
+                                >
+                                  <SkipForward size={20} />
+                                </button>
+                              </div>
+                            </>
+                          ) : <Loader2 className="animate-spin" />}
                         </div>
-                      </>
-                    ) : <Loader2 className="animate-spin" />}
-                  </div>
-                  <div className="text-6xl font-arabic opacity-80">{randomSurah?.name_arabic}</div>
-                </div>
-              </div>
-
-              {/* Hadith Section */}
-              <div className="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm text-center">
-                <Heart className="text-red-500 mx-auto mb-4" size={32} />
-                <h3 className="text-lg font-bold text-slate-900 mb-4">Daily Hadith</h3>
-                <p className="text-slate-600 italic leading-relaxed mb-6">"{randomHadith?.hadithEnglish}"</p>
-                <p className="text-xs font-bold text-emerald-600 uppercase tracking-widest">— {randomHadith?.bookSlug.replace('-', ' ')}</p>
-              </div>
-
-              {/* Dua Section */}
-              <div className="space-y-6">
-                <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                  <Bookmark className="text-emerald-600" size={24} />
-                  Daily Duas
-                </h3>
-                <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
-                  {DUA_CATEGORIES.map(cat => (
-                    <button
-                      key={cat}
-                      className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold whitespace-nowrap hover:border-emerald-500 hover:text-emerald-600 transition-all"
-                    >
-                      {cat}
-                    </button>
-                  ))}
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {DUAS.map(dua => (
-                    <div key={dua.id} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all relative group">
-                      <div className="flex items-center justify-between mb-4">
-                        <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">{dua.category}</span>
-                        <button 
-                          onClick={() => toggleDuaBookmark(dua.id)}
-                          className={cn(
-                            "p-2 rounded-lg transition-all",
-                            bookmarkedDuas.includes(dua.id) ? "bg-emerald-50 text-emerald-600" : "text-slate-300 hover:text-emerald-600 hover:bg-emerald-50"
-                          )}
-                        >
-                          <Bookmark size={18} fill={bookmarkedDuas.includes(dua.id) ? "currentColor" : "none"} />
-                        </button>
+                        <div className="text-6xl font-arabic opacity-80">{randomSurah?.name_arabic}</div>
                       </div>
-                      <h4 className="font-bold text-slate-900 mb-2">{dua.title}</h4>
-                      <p className="text-right text-lg font-arabic mb-4 leading-relaxed">{dua.arabic}</p>
-                      <p className="text-xs text-slate-500 leading-relaxed">{dua.translation}</p>
                     </div>
-                  ))}
-                </div>
-              </div>
+                  </motion.div>
+                )}
+
+                {amalSubTab === 'hadith' && (
+                  <motion.div
+                    key="hadith-tab"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    className="space-y-6"
+                  >
+                    {/* Daily Reminder */}
+                    <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
+                      <h4 className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-2">Daily Reminder</h4>
+                      <p className="text-slate-700 font-medium italic">"I have left among you two things; you will never go astray as long as you hold fast to them; the book of Allah and my Sunnah."</p>
+                      <p className="text-[10px] text-slate-400 mt-2">— Prophet Muhammad (PBUH) (Al-Muwatta, Imam Malik)</p>
+                    </div>
+
+                    {/* Hadith Section */}
+                    <div className="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm text-center">
+                      <Heart className="text-red-500 mx-auto mb-4" size={32} />
+                      <h3 className="text-lg font-bold text-slate-900 mb-4">Daily Hadith</h3>
+                      <p className="text-slate-600 italic leading-relaxed mb-6">"{randomHadith?.hadithEnglish}"</p>
+                      <p className="text-xs font-bold text-emerald-600 uppercase tracking-widest">— {randomHadith?.bookSlug.replace('-', ' ')}</p>
+                    </div>
+                  </motion.div>
+                )}
+
+                {amalSubTab === 'dua' && (
+                  <motion.div
+                    key="dua-tab"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    className="space-y-6"
+                  >
+                    {/* Daily Reminder */}
+                    <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
+                      <h4 className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-2">Daily Reminder</h4>
+                      <p className="text-slate-700 font-medium italic">"Dua is the essence of worship."</p>
+                      <p className="text-[10px] text-slate-400 mt-1">— Prophet Muhammad (PBUH) (Tirmidhi)</p>
+                      <p className="text-xs text-slate-500 mt-3 font-medium">Make your heart speak to its Creator (Allah).</p>
+                    </div>
+
+                    {/* Dua Section */}
+                    <div className="space-y-6">
+                      <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                        <Bookmark className="text-emerald-600" size={24} />
+                        Daily Duas
+                      </h3>
+                      <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+                        {DUA_CATEGORIES.map(cat => (
+                          <button
+                            key={cat}
+                            className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold whitespace-nowrap hover:border-emerald-500 hover:text-emerald-600 transition-all"
+                          >
+                            {cat}
+                          </button>
+                        ))}
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {DUAS.map(dua => (
+                          <div key={dua.id} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all relative group">
+                            <div className="flex items-center justify-between mb-4">
+                              <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">{dua.category}</span>
+                              <button 
+                                onClick={() => toggleDuaBookmark(dua.id)}
+                                className={cn(
+                                  "p-2 rounded-lg transition-all",
+                                  bookmarkedDuas.includes(dua.id) ? "bg-emerald-50 text-emerald-600" : "text-slate-300 hover:text-emerald-600 hover:bg-emerald-50"
+                                )}
+                              >
+                                <Bookmark size={18} fill={bookmarkedDuas.includes(dua.id) ? "currentColor" : "none"} />
+                              </button>
+                            </div>
+                            <h4 className="font-bold text-slate-900 mb-2">{dua.title}</h4>
+                            <p className="text-right text-lg font-arabic mb-4 leading-relaxed">{dua.arabic}</p>
+                            <p className="text-xs text-slate-500 leading-relaxed">{dua.translation}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.div>
           )}
 

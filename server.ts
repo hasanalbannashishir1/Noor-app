@@ -2,6 +2,7 @@ import express from "express";
 import { createServer as createViteServer } from "vite";
 import path from "path";
 import { fileURLToPath } from "url";
+import { GoogleGenAI } from "@google/genai";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -9,6 +10,8 @@ const __dirname = path.dirname(__filename);
 async function startServer() {
   const app = express();
   const PORT = 3000;
+
+  app.use(express.json());
 
   // API Proxy for Hadith Books
   app.get("/api/books", async (req, res) => {
@@ -59,6 +62,41 @@ async function startServer() {
     } catch (error) {
       console.error("Proxy error:", error);
       res.status(500).json({ error: "Failed to fetch from Hadith API" });
+    }
+  });
+
+  // AI Chat Endpoint
+  app.post("/api/chat", async (req, res) => {
+    try {
+      const { messages, userMsg } = req.body;
+      
+      if (!process.env.GEMINI_API_KEY) {
+        throw new Error("GEMINI_API_KEY is not set");
+      }
+
+      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: [
+          ...messages.map((m: any) => ({
+            role: m.role === 'user' ? 'user' : 'model',
+            parts: [{ text: m.text }]
+          })),
+          { role: 'user', parts: [{ text: userMsg }] }
+        ],
+        config: {
+          systemInstruction: "You are a helpful Islamic AI Assistant. Answer questions about Islam, Quran, Hadith, and general knowledge with wisdom and kindness. Always provide references where possible.",
+        }
+      });
+
+      if (!response.text) {
+        throw new Error("No response text generated");
+      }
+
+      res.json({ text: response.text });
+    } catch (error) {
+      console.error("AI Chat error:", error);
+      res.status(500).json({ error: error instanceof Error ? error.message : "Failed to generate AI response" });
     }
   });
 

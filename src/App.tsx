@@ -50,7 +50,6 @@ import {
   Book
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { GoogleGenAI } from "@google/genai";
 import { quranService } from './services/quranService';
 import { hadithService, HadithBook } from './services/hadithService';
 import { 
@@ -145,11 +144,61 @@ const PRAYER_STEPS = [
 ];
 
 const ESSENTIAL_SURAHS = [
-  { name: "Surah Al-Fatihah", description: "The Opening - Recited in every unit of prayer." },
-  { name: "Surah Al-Ikhlas", description: "The Sincerity - Equal to one-third of the Quran." },
-  { name: "Surah Al-Falaq", description: "The Daybreak - Seeking protection from evil." },
-  { name: "Surah An-Nas", description: "Mankind - Seeking protection from whispers." },
-  { name: "Surah Al-Asr", description: "The Declining Day - Importance of time and faith." }
+  { 
+    name: "Surah Al-Fatihah", 
+    arabic: "بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ (1) الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ (2) الرَّحْمَنِ الرَّحِيمِ (3) مَالِكِ يَوْمِ الدِّينِ (4) إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ (5) اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ (6) صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ (7)",
+    pronunciation: "Bismillaahir-Rahmaanir-Raheem. Al-hamdu lillaahi Rabbil-'aalameen. Ar-Rahmaanir-Raheem. Maaliki Yawmid-Deen. Iyyaaka na'budu wa iyyaaka nasta'een. Ihdinas-siraatal-mustaqeem. Siraatal-ladheena an'amta 'alaihim ghairil-maghdoobi 'alaihim wa lad-daalleen."
+  },
+  { 
+    name: "Surah Al-Fil", 
+    arabic: "أَلَمْ تَرَ كَيْفَ فَعَلَ رَبُّكَ بِأَصْحَابِ الْفِيلِ (1) أَلَمْ يَجْعَلْ كَيْدَهُمْ فِي تَضْلِيلٍ (2) وَأَرْسَلَ عَلَيْهِمْ طَيْرًا أَبَابِيلَ (3) تَرْمِيهِم بِحِجَارَةٍ مِّن سِجِّيلٍ (4) فَجَعَلَهُمْ كَعَصْفٍ مَّأْكُولٍ (5)",
+    pronunciation: "Alam tara kaifa fa'ala rabbuka bi ashaabil feel. Alam yaj'al kaidahum fee tadleel. Wa arsala 'alaihim tairan abaabeel. Tarmeehim bihijaaratim min sijjeel. Faja'alahum ka'asfim ma'kool."
+  },
+  { 
+    name: "Surah Quraysh", 
+    arabic: "لِإِيلَافِ قُرَيْشٍ (1) إِيلَافِهِمْ رِحْلَةَ الشِّتَاءِ وَالصَّيْفِ (2) فَلْيَعْبُدُوا رَبَّ هَذَا الْبَيْتِ (3) الَّذِي أَطْعَمَهُم مِّن جُوعٍ وَآمَنَهُم مِّنْ خَوْفٍ (4)",
+    pronunciation: "Li-eelaafi quraish. Eelaafihim rihlatash shitaaa'i wassaif. Falya'budoo rabba haadhal bait. Alladheee at'amahum min joo'inw wa aamanahum min khauf."
+  },
+  { 
+    name: "Surah Al-Ma'un", 
+    arabic: "أَرَأَيْتَ الَّذِي يُكَذِّبُ بِالدِّينِ (1) فَذَلِكَ الَّذِي يَدُعُّ الْيَتِيمَ (2) وَلَا يَحُضُّ عَلَى طَعَامِ الْمِسْكِينِ (3) فَوَيْلٌ لِّلْمُصَلِّينَ (4) الَّذِينَ هُمْ عَن صَلَاتِهِمْ سَاهُونَ (5) الَّذِينَ هُمْ يُرَاؤُونَ (6) وَيَمْنَعُونَ الْمَاعُونَ (7)",
+    pronunciation: "Ara'aytal ladhee yukadhdhibu biddeen. Fadhaalikal ladhee yadu''ul yateem. Wa laa yahuddu 'alaa ta'aamil miskeen. Fawailul lil musalleen. Alladheena hum 'an salaatihim saahoon. Alladheena hum yuraaa'oon. Wa yamna'oonal maa'oon."
+  },
+  { 
+    name: "Surah Al-Kawthar", 
+    arabic: "إِنَّا أَعْطَيْنَاكَ الْكَوْثَرَ (1) فَصَلِّ لِرَبِّكَ وَانْحَرْ (2) إِنَّ شَانِئَكَ هُوَ الْأَبْتَرُ (3)",
+    pronunciation: "Innaaa a'tainaakal kawthar. Fasalli lirabbika wanhar. Inna shaani'aka huwal abtar."
+  },
+  { 
+    name: "Surah Al-Kafirun", 
+    arabic: "قُلْ يَا أَيُّهَا الْكَافِرُونَ (1) لَا أَعْبُدُ مَا تَعْبُدُونَ (2) وَلَا أَنتُمْ عَابِدُونَ مَا أَعْبُدُ (3) وَلَا أَنَا عَابِدٌ مَّا عَبَدتُّمْ (4) وَلَا أَنتُمْ عَابِدُونَ مَا أَعْبُدُ (5) لَكُمْ دِينُكُمْ وَلِيَ دِينِ (6)",
+    pronunciation: "Qul yaaa-ayyuhal kaafiroon. Laaa a'budu maa ta'budoon. Wa laaa antum 'aabidoona maaa a'bud. Wa laaa ana 'aabidum maa 'abattum. Wa laaa antum 'aabidoona maaa a'bud. Lakum deenukum wa liya deen."
+  },
+  { 
+    name: "Surah An-Nasr", 
+    arabic: "إِذَا جَاءَ نَصْرُ اللَّهِ وَالْفَتْحُ (1) وَرَأَيْتَ النَّاسَ يَدْخُلُونَ فِي دِينِ اللَّهِ أَفْوَاجًا (2) فَسَبِّحْ بِحَمْدِ رَبِّكَ وَاسْتَغْفِرْهُ إِنَّهُ كَانَ تَوَّابًا (3)",
+    pronunciation: "Idhaa jaaa'a nasrullaahi walfath. Wa ra'aitan naasa yadkhuloona fee deenillaahi afwaajaa. Fasabbih bihamdi rabbika wastaghfirh; innahoo kaana tawwaabaa."
+  },
+  { 
+    name: "Surah Al-Masad", 
+    arabic: "تَبَّتْ يَدَا أَبِي لَهَبٍ وَتَبَّ (1) مَا أَغْنَى عَنْهُ مَالُهُ وَمَا كَسَبَ (2) سَيَصْلَى نَارًا ذَاتَ لَهَبٍ (3) وَامْرَأَتُهُ حَمَّالَةَ الْحَطَبِ (4) فِي جِيدِهَا حَبْلٌ مِّن مَّسَدٍ (5)",
+    pronunciation: "Tabbat yadaaa abee lahabinw wa tabb. Maaa aghnaa 'anhu maaluhuu wa maa kasab. Sayaslaa naaran dhaata lahab. Wamra-atuhuu hammaalatal hatab. Fee jeedihaa hablum mim masad."
+  },
+  { 
+    name: "Surah Al-Ikhlas", 
+    arabic: "قُلْ هُوَ اللَّهُ أَحَدٌ (1) اللَّهُ الصَّمَدُ (2) لَمْ يَلِدْ وَلَمْ يُولَدْ (3) وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ (4)",
+    pronunciation: "Qul huwal laahu ahad. Allahus-samad. Lam yalid wa lam yoolad. Wa lam yakul-lahoo kufuwan ahad."
+  },
+  { 
+    name: "Surah Al-Falaq", 
+    arabic: "قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ (1) مِن شَرِّ مَا خَلَقَ (2) وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ (3) وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ (4) وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ (5)",
+    pronunciation: "Qul a'oodhu bi rabbil-falaq. Min sharri maa khalaq. Wa min sharri ghaasiqin idhaa waqab. Wa min sharri naffaathaati fil 'uqad. Wa min sharri haasidin idhaa hasad."
+  },
+  { 
+    name: "Surah An-Nas", 
+    arabic: "قُلْ أَعُوذُ بِرَبِّ النَّاسِ (1) مَلِكِ النَّاسِ (2) إِلَهِ النَّاسِ (3) مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ (4) الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ (5) مِنَ الْجِنَّةِ وَالنَّاسِ (6)",
+    pronunciation: "Qul a'oodhu bi rabbin-naas. Malikin-naas. Ilaahin-naas. Min sharril waswaasil khannaas. Alladhee yuwaswisu fee sudoorin-naas. Minal jinnati wannaas."
+  }
 ];
 
 const SALAH_DUAS = [
@@ -823,6 +872,7 @@ export default function App() {
   const [prayerSubTab, setPrayerSubTab] = useState<'menu' | 'wudu' | 'salah' | 'surah'>('menu');
   const [selectedSalahDua, setSelectedSalahDua] = useState<string | null>(null);
   const [selectedBook, setSelectedBook] = useState<string | null>(null);
+  const [selectedEssentialSurah, setSelectedEssentialSurah] = useState<number | null>(null);
   
   // Clock and Calendars
   const [timeString, setTimeString] = useState<string>(new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }));
@@ -1056,27 +1106,24 @@ export default function App() {
     setIsAiLoading(true);
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-      const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: [
-          ...aiMessages.map(m => ({ 
-            role: m.role === 'user' ? 'user' : 'model', 
-            parts: [{ text: m.text }] 
-          })), 
-          { role: 'user', parts: [{ text: userMsg }] }
-        ],
-        config: {
-          systemInstruction: "You are a helpful Islamic AI Assistant. Answer questions about Islam, Quran, Hadith, and general knowledge with wisdom and kindness. Always provide references where possible.",
-        }
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          messages: aiMessages,
+          userMsg: userMsg,
+        }),
       });
-      
-      const responseText = response.text;
-      if (!responseText) {
-        throw new Error("No response text generated");
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to get AI response");
       }
 
-      setAiMessages(prev => [...prev, { role: 'model', text: responseText }]);
+      const data = await response.json();
+      setAiMessages(prev => [...prev, { role: 'model', text: data.text }]);
     } catch (err) {
       console.error("AI Error:", err);
       setAiMessages(prev => [...prev, { role: 'model', text: "Sorry, I encountered an error. Please try again." }]);
@@ -1920,7 +1967,13 @@ export default function App() {
                         (deenSubTab === 'quran') ||
                         (!['prayer', 'hadith', 'quran'].includes(deenSubTab))) && (
                         <button 
-                          onClick={() => setDeenSubTab('grid')}
+                          onClick={() => {
+                            setDeenSubTab('grid');
+                            setPrayerSubTab('menu');
+                            setSelectedSalahDua(null);
+                            setSelectedBook(null);
+                            setSelectedEssentialSurah(null);
+                          }}
                           className="flex items-center gap-2 text-slate-600 hover:text-emerald-600 font-medium transition-colors text-sm mb-4"
                         >
                           <ChevronLeft size={20} />
@@ -2085,10 +2138,14 @@ export default function App() {
                             </div>
                           ) : (
                             <div className="space-y-8">
-                              {/* Only show "Back to Prayer Menu" if we are not viewing a specific Salah Dua */}
-                              {(prayerSubTab !== 'salah' || !selectedSalahDua) && (
+                              {/* Only show "Back to Prayer Menu" if we are not viewing a specific Salah Dua or Essential Surah */}
+                              {((prayerSubTab !== 'salah' || !selectedSalahDua) && (prayerSubTab !== 'surah' || selectedEssentialSurah === null)) && (
                                 <button 
-                                  onClick={() => setPrayerSubTab('menu')}
+                                  onClick={() => {
+                                    setPrayerSubTab('menu');
+                                    setSelectedSalahDua(null);
+                                    setSelectedEssentialSurah(null);
+                                  }}
                                   className="flex items-center gap-2 text-slate-600 hover:text-emerald-600 font-medium transition-colors text-sm"
                                 >
                                   <ChevronLeft size={20} />
@@ -2237,20 +2294,6 @@ export default function App() {
                                     {!selectedSalahDua ? (
                                       <div className="space-y-8">
                                         <div>
-                                          <h5 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Prayer Steps</h5>
-                                          <div className="space-y-3">
-                                            {PRAYER_STEPS[1].steps.map((step, j) => (
-                                              <div key={j} className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                                                <div className="w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-400">
-                                                  {j + 1}
-                                                </div>
-                                                <p className="text-sm font-bold text-slate-700">{step}</p>
-                                              </div>
-                                            ))}
-                                          </div>
-                                        </div>
-
-                                        <div>
                                           <h5 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Essential Duas</h5>
                                           <div className="grid grid-cols-1 gap-3">
                                             {SALAH_DUAS.map((dua) => (
@@ -2309,19 +2352,55 @@ export default function App() {
                                 </div>
                               )}
 
-                              {prayerSubTab === 'surah' && (
-                                <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
-                                  <h4 className="text-xl font-bold text-slate-900 mb-6">Essential Surahs</h4>
-                                  <div className="space-y-4">
-                                    {ESSENTIAL_SURAHS.map((surah, j) => (
-                                      <div key={j} className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                                        <h5 className="font-bold text-emerald-700 mb-1">{surah.name}</h5>
-                                        <p className="text-sm text-slate-600 leading-relaxed">{surah.description}</p>
+                                {prayerSubTab === 'surah' && (
+                                  <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+                                    {selectedEssentialSurah === null ? (
+                                      <>
+                                        <h4 className="text-xl font-bold text-slate-900 mb-6">Essential Surahs</h4>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                          {ESSENTIAL_SURAHS.map((surah, j) => (
+                                            <button
+                                              key={j}
+                                              onClick={() => setSelectedEssentialSurah(j)}
+                                              className="p-4 bg-slate-50 rounded-2xl border border-slate-100 text-left hover:border-emerald-500 hover:bg-emerald-50 transition-all group"
+                                            >
+                                              <h5 className="font-bold text-slate-700 group-hover:text-emerald-700">{surah.name}</h5>
+                                            </button>
+                                          ))}
+                                        </div>
+                                      </>
+                                    ) : (
+                                      <div className="space-y-6">
+                                        <button 
+                                          onClick={() => setSelectedEssentialSurah(null)}
+                                          className="flex items-center gap-2 text-slate-500 hover:text-emerald-600 transition-colors text-sm font-medium mb-4"
+                                        >
+                                          <ChevronLeft size={18} />
+                                          Back to Surah List
+                                        </button>
+                                        
+                                        <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100 space-y-4">
+                                          <h5 className="font-bold text-emerald-700 text-lg border-b border-emerald-100 pb-2">
+                                            {ESSENTIAL_SURAHS[selectedEssentialSurah].name}
+                                          </h5>
+                                          
+                                          <div className="bg-white p-4 rounded-xl border border-slate-200">
+                                            <p className="text-2xl font-arabic text-slate-900 leading-loose text-right" dir="rtl">
+                                              {ESSENTIAL_SURAHS[selectedEssentialSurah].arabic}
+                                            </p>
+                                          </div>
+
+                                          <div className="space-y-1">
+                                            <h6 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pronunciation</h6>
+                                            <p className="text-sm text-slate-600 leading-relaxed italic">
+                                              {ESSENTIAL_SURAHS[selectedEssentialSurah].pronunciation}
+                                            </p>
+                                          </div>
+                                        </div>
                                       </div>
-                                    ))}
+                                    )}
                                   </div>
-                                </div>
-                              )}
+                                )}
                             </div>
                           )}
                         </div>

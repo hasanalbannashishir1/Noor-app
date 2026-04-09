@@ -731,7 +731,7 @@ const TasbihCounter = () => {
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm overflow-hidden border border-slate-100">
             <img 
-              src="https://i.postimg.cc/Dm2BqdH2/beads.png" 
+              src="https://i.postimg.cc/bZwcYCK9/tasbih.png" 
               alt="Tasbih beads" 
               className="w-full h-full object-cover"
               referrerPolicy="no-referrer"
@@ -2140,7 +2140,7 @@ export default function App() {
                   <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
                     <div className="w-6 h-6 bg-white rounded-md flex items-center justify-center shadow-sm overflow-hidden border border-slate-100">
                       <img 
-                        src="https://i.postimg.cc/DSj8MFys/praying.png" 
+                        src="https://i.postimg.cc/CRGNtSvJ/mosque.png" 
                         alt="Salah Tracker" 
                         className="w-full h-full object-cover"
                         referrerPolicy="no-referrer"

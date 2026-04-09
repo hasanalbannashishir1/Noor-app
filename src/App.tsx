@@ -729,8 +729,13 @@ const TasbihCounter = () => {
     <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-blue-100 text-blue-700 rounded-xl flex items-center justify-center">
-            <Sparkles size={20} />
+          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm overflow-hidden border border-slate-100">
+            <img 
+              src="https://i.postimg.cc/Dm2BqdH2/beads.png" 
+              alt="Tasbih beads" 
+              className="w-full h-full object-cover"
+              referrerPolicy="no-referrer"
+            />
           </div>
           <div>
             <h3 className="text-lg font-bold text-slate-900">Tasbih Counter</h3>
@@ -1831,8 +1836,13 @@ export default function App() {
       <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-200 px-4 py-2">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2 md:gap-3">
-            <div className="w-8 h-8 md:w-10 md:h-10 bg-emerald-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-200">
-              <Sparkles size={20} className="md:w-6 md:h-6" />
+            <div className="w-8 h-8 md:w-10 md:h-10 bg-white rounded-xl flex items-center justify-center shadow-lg shadow-emerald-100 overflow-hidden border border-slate-100">
+              <img 
+                src="https://i.postimg.cc/QF5tN5XB/quran-1.png" 
+                alt="Noor App Logo" 
+                className="w-full h-full object-cover"
+                referrerPolicy="no-referrer"
+              />
             </div>
             <div>
               <h1 className="text-lg md:text-xl font-bold tracking-tight text-slate-900 leading-tight">Noor App</h1>
@@ -2026,7 +2036,14 @@ export default function App() {
               <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
                 <div className="mb-8">
                   <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                    <Compass className="text-emerald-600" size={20} />
+                    <div className="w-6 h-6 bg-white rounded-md flex items-center justify-center shadow-sm overflow-hidden border border-slate-100">
+                      <img 
+                        src="https://i.postimg.cc/tsSYMyC1/time.png" 
+                        alt="Prayer Times" 
+                        className="w-full h-full object-cover"
+                        referrerPolicy="no-referrer"
+                      />
+                    </div>
                     Prayer Times
                   </h3>
                   <div className="flex items-center gap-1.5 text-[10px] font-bold text-amber-600 uppercase tracking-wider mt-2 bg-amber-50 w-fit px-2 py-1 rounded-lg border border-amber-100">
@@ -2121,7 +2138,14 @@ export default function App() {
               <div className="space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                    <CheckCircle2 className="text-emerald-600" size={20} />
+                    <div className="w-6 h-6 bg-white rounded-md flex items-center justify-center shadow-sm overflow-hidden border border-slate-100">
+                      <img 
+                        src="https://i.postimg.cc/DSj8MFys/praying.png" 
+                        alt="Salah Tracker" 
+                        className="w-full h-full object-cover"
+                        referrerPolicy="no-referrer"
+                      />
+                    </div>
                     Salah Tracker
                   </h3>
                   <div className="flex items-center justify-between sm:justify-end gap-4">

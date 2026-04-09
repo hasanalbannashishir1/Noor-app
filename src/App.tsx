@@ -2658,12 +2658,12 @@ export default function App() {
                                     </h5>
                                     <div className="space-y-3">
                                       {[
-                                        { text: "Make intention (Niyyah) – in your heart to perform Wudu.", icons: ["https://i.postimg.cc/Hcbrkhbg/step1.png"] },
+                                        { text: "Make intention (Niyyah) – in your heart to perform Wudu.", icons: ["https://i.postimg.cc/d7zQbjk9/step1.png"] },
                                         { text: "Say “Bismillah” (In the name of Allah).", icons: [] },
                                         { text: "Wash hands – up to the wrists, 3 times.", icons: ["https://i.postimg.cc/QBK1gVkQ/step3.png"] },
-                                        { text: "Rinse mouth – 3 times.", icons: ["https://i.postimg.cc/Ffk3b1g1/step4.png"] },
+                                        { text: "Rinse mouth – 3 times.", icons: ["https://i.postimg.cc/hfSZBJmF/salah-11.png"] },
                                         { text: "Clean nose – sniff water and blow it out, 3 times.", icons: ["https://i.postimg.cc/Ffk3b1g1/step5.png"] },
-                                        { text: "Wash face – from forehead to chin and ear to ear, 3 times.", icons: ["https://i.postimg.cc/CZnkCdH8/step6.png"] },
+                                        { text: "Wash face – from forehead to chin and ear to ear, 3 times.", icons: ["https://i.postimg.cc/RNMpB3tz/salah-10.png"] },
                                         { text: "Wash arms – right then left, up to elbows, 3 times each.", icons: ["https://i.postimg.cc/DW4LQmdX/step7.png"] },
                                         { text: "Wipe head (Masah) – once with wet hands.", icons: ["https://i.postimg.cc/kVRKNDFt/step8a.png", "https://i.postimg.cc/Z9vpP0Fq/step8b.png"] },
                                         { text: "Clean ears – inside and outside, once.", icons: ["https://i.postimg.cc/WDqgmt6q/step9.png"] },
@@ -2897,17 +2897,19 @@ export default function App() {
                                       {/* Steps */}
                                       <div className="space-y-4">
                                         {[
-                                          { step: "Step 1: Takbir (Start Prayer)", content: "Raise both hands and say:", highlight: "Allahu Akbar (الله أكبر)" },
-                                          { step: "Step 2: Qiyam (Standing)", content: "Fold hands (right over left)\nRecite:\n• Sana (Subhanaka Allahumma...)\n• Ta’awwuz (A‘وذ بالله...)\n• Bismillah\n• Surah Al-Fatiha\n• Another Surah (e.g., Surah Al-Ikhlas)" },
-                                          { step: "Step 3: Ruku (Bowing)", content: "Say Allahu Akbar and bow\nHands on knees, back straight\nRecite:", highlight: "Subhana Rabbiyal ‘Azim (3 times)" },
-                                          { step: "Step 4: Qawmah (Standing After Ruku)", content: "Stand up and say:", highlight: "Sami‘allahu liman hamidah\nRabbana lakal hamd" },
-                                          { step: "Step 5: Sajdah (Prostration)", content: "Say Allahu Akbar and go into سجدة\nForehead, nose, hands, knees, toes on ground\nRecite:", highlight: "Subhana Rabbiyal A‘la (3 times)" },
-                                          { step: "Step 6: Jalsa (Sitting Between Two Sajdahs)", content: "Sit and say:", highlight: "Rabbighfir li" },
-                                          { step: "Step 7: Second Sajdah", content: "Go into سجدة again\nRecite:", highlight: "Subhana Rabbiyal A‘la (3 times)" },
-                                          { step: "🔁 Step 8: Next Rak‘ah", content: "Stand up and repeat steps (Fatiha + Surah, Ruku, Sajdah)" },
-                                          { step: "Step 9: Tashahhud (Sitting)", content: "After 2 Rak‘ah:\nSit and recite:", highlight: "Attahiyyatu..." },
-                                          { step: "Step 10: Final Sitting", content: "In last Rak‘ah:\nRecite:\n• Tashahhud\n• Durood Sharif\n• Dua Masura" },
-                                          { step: "Step 11: Salam (End Prayer)", content: "Turn head right:", highlight: "Assalamu Alaikum wa Rahmatullah", content2: "Turn head left:", highlight2: "Assalamu Alaikum wa Rahmatullah" }
+                                          { step: "Step 1: Takbir (Start Prayer)", content: "Raise both hands and say:", highlight: "Allahu Akbar (الله أكبر)", icons: ["https://i.postimg.cc/Q9cFdycr/takbir.png"] },
+                                          { step: "Step 2: Qiyam (Standing)", content: "Fold hands (right over left)\nRecite:\n• Sana (Subhanaka Allahumma...)\n• Ta’awwuz (A‘وذ بالله...)\n• Bismillah\n• Surah Al-Fatiha\n• Another Surah (e.g., Surah Al-Ikhlas)", icons: ["https://i.postimg.cc/xX9SbFHG/shalat.png"] },
+                                          { step: "Step 3: Ruku (Bowing)", content: "Say Allahu Akbar and bow\nHands on knees, back straight\nRecite:", highlight: "Subhana Rabbiyal ‘Azim (3 times)", icons: ["https://i.postimg.cc/NLbSL7Bj/ruku.png"] },
+                                          { step: "Step 4: Qawmah (Standing After Ruku)", content: "Stand up and say:", highlight: "Sami‘allahu liman hamidah\nRabbana lakal hamd", icons: ["https://i.postimg.cc/jwJvMtPD/salat.png"] },
+                                          { step: "Step 5: Sajdah (Prostration)", content: "Say Allahu Akbar and go into سجدة\nForehead, nose, hands, knees, toes on ground\nRecite:", highlight: "Subhana Rabbiyal A‘la (3 times)", icons: ["https://i.postimg.cc/rzPYGZrB/sujud.png"] },
+                                          { step: "Step 6: Jalsa (Sitting Between Two Sajdahs)", content: "Sit and say:", highlight: "Rabbighfir li", icons: ["https://i.postimg.cc/8JcW4SJn/salat-3.png"] },
+                                          { step: "Step 7: Second Sajdah", content: "Go into سجدة again\nRecite:", highlight: "Subhana Rabbiyal A‘la (3 times)", icons: ["https://i.postimg.cc/rzPYGZrB/sujud.png"] },
+                                          { step: "🔁 Step 8: Next Rak‘ah", content: "Stand up and repeat steps (Fatiha + Surah, Ruku, Sajdah)", icons: ["https://i.postimg.cc/xX9SbFHG/shalat.png"] },
+                                          { step: "Step 9: Tashahhud (Sitting)", content: "After 2 Rak‘ah:\nSit and recite:", highlight: "Attahiyyatu...", icons: ["https://i.postimg.cc/8JcW4SJn/salat-3.png"] },
+                                          { step: "Step 10: Final Sitting", content: "In last Rak‘ah:\nRecite:\n• Tashahhud\n• Durood Sharif\n• Dua Masura", icons: [] },
+                                          { step: "Step 11: Salam (End Prayer)", content: "Turn head right:", highlight: "Assalamu Alaikum wa Rahmatullah", content2: "Turn head left:", highlight2: "Assalamu Alaikum wa Rahmatullah", icons: ["https://i.postimg.cc/V5fwvNyZ/salam-right.png", "https://i.postimg.cc/Z0bmnqk7/salam-left.png"] },
+                                          { step: "Step 12: Dua After Salam", content: "It is recommended to offer dua after salah, especially after fardh salah", icons: ["https://i.postimg.cc/jDZg8R3J/dua.png", "https://i.postimg.cc/9DJ8xcgw/dua-hands.png", "https://i.postimg.cc/v43qPG2V/dua-3.png"] },
+                                          { step: "Note", content: "A note for the third and fourth rakah prayers (as in Zuhr, Asr, Maghrib, and Insha) the process is the repeated as per usual. The only difference is in the third and fourth rakat Surah Fatiha is always read silently. After saying Ameen it’s not necessary to recite any other Surah or verse and go straight into ruku and sajdah to complete the rakat." }
                                         ].map((item, idx) => (
                                           <div key={idx} className="p-5 bg-slate-50 rounded-2xl border border-slate-100">
                                             <h5 className="font-bold text-slate-900 mb-2 flex items-center gap-2">
@@ -2928,6 +2930,20 @@ export default function App() {
                                                 </div>
                                               )}
                                             </div>
+                                            {item.icons && item.icons.length > 0 && (
+                                              <div className="flex flex-wrap gap-2 mt-4 ml-6">
+                                                {item.icons.map((icon, iIdx) => (
+                                                  <div key={iIdx} className="w-24 h-24 bg-white rounded-xl border border-slate-100 p-1 shadow-sm overflow-hidden">
+                                                    <img 
+                                                      src={icon} 
+                                                      alt={`${item.step} icon ${iIdx + 1}`} 
+                                                      className="w-full h-full object-contain"
+                                                      referrerPolicy="no-referrer"
+                                                    />
+                                                  </div>
+                                                ))}
+                                              </div>
+                                            )}
                                           </div>
                                         ))}
                                       </div>

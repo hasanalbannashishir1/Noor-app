@@ -2057,61 +2057,52 @@ export default function App() {
                   )}
                 </div>
                 
-                <div className="space-y-6">
-                  {/* Row 1: Icons */}
-                  <div className="grid grid-cols-5 gap-2 sm:gap-4">
-                    {['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'].map((p) => {
-                      const isActive = currentPrayer === p;
-                      const prayerStyles = {
-                        'Fajr': "bg-gradient-to-br from-orange-50 to-rose-50 border-orange-100",
-                        'Dhuhr': "bg-gradient-to-br from-yellow-50 to-amber-50 border-yellow-100",
-                        'Asr': "bg-gradient-to-br from-amber-50 to-orange-100 border-amber-100",
-                        'Maghrib': "bg-gradient-to-br from-rose-50 to-purple-50 border-rose-100",
-                        'Isha': "bg-gradient-to-br from-indigo-50 to-slate-100 border-indigo-100"
-                      }[p] || "bg-slate-50 border-slate-100";
+                <div className="grid grid-cols-5 gap-2 sm:gap-3">
+                  {['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'].map((p) => {
+                    const isActive = currentPrayer === p;
+                    const prayerStyles = {
+                      'Fajr': "bg-gradient-to-br from-orange-50 to-rose-50 border-orange-100",
+                      'Dhuhr': "bg-gradient-to-br from-yellow-50 to-amber-50 border-yellow-100",
+                      'Asr': "bg-gradient-to-br from-amber-50 to-orange-100 border-amber-100",
+                      'Maghrib': "bg-gradient-to-br from-rose-50 to-purple-50 border-rose-100",
+                      'Isha': "bg-gradient-to-br from-indigo-50 to-slate-100 border-indigo-100"
+                    }[p] || "bg-slate-50 border-slate-100";
 
-                      return (
-                        <div key={`icon-${p}`} className="flex justify-center">
-                          <div className={cn(
-                            "w-10 h-10 rounded-xl flex items-center justify-center transition-all border",
-                            isActive 
-                              ? "bg-emerald-600 text-white shadow-lg shadow-emerald-200 border-emerald-500" 
-                              : `${prayerStyles} shadow-sm`
-                          )}>
-                            {getPrayerIcon(p, isActive)}
-                          </div>
+                    return (
+                      <div 
+                        key={p} 
+                        className={cn(
+                          "flex flex-col items-center gap-3 p-3 rounded-2xl border transition-all duration-300",
+                          isActive 
+                            ? "bg-emerald-50/50 border-emerald-300 shadow-sm" 
+                            : `${prayerStyles} shadow-sm opacity-80 hover:opacity-100`
+                        )}
+                      >
+                        <div className={cn(
+                          "w-10 h-10 rounded-xl flex items-center justify-center transition-all border",
+                          isActive 
+                            ? "bg-emerald-600 text-white shadow-lg shadow-emerald-200 border-emerald-500" 
+                            : "bg-white border-slate-100 shadow-sm"
+                        )}>
+                          {getPrayerIcon(p, isActive)}
                         </div>
-                      );
-                    })}
-                  </div>
-
-                  {/* Row 2: Names */}
-                  <div className="grid grid-cols-5 gap-2 sm:gap-4">
-                    {['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'].map((p) => (
-                      <div key={`name-${p}`} className="text-center">
-                        <p className={cn(
-                          "text-[10px] font-mono font-black uppercase tracking-widest transition-colors",
-                          currentPrayer === p ? "text-emerald-600" : "text-slate-400"
-                        )}>
-                          {p}
-                        </p>
+                        <div className="text-center space-y-1">
+                          <p className={cn(
+                            "text-[10px] font-bold uppercase tracking-wider transition-colors",
+                            isActive ? "text-emerald-700" : "text-slate-400"
+                          )}>
+                            {p}
+                          </p>
+                          <p className={cn(
+                            "text-xs sm:text-sm font-bold whitespace-nowrap transition-colors",
+                            isActive ? "text-slate-900" : "text-slate-500"
+                          )}>
+                            {prayerTimes ? convertTo12Hour(prayerTimes[p]) : '--:--'}
+                          </p>
+                        </div>
                       </div>
-                    ))}
-                  </div>
-
-                  {/* Row 3: Times */}
-                  <div className="grid grid-cols-5 gap-2 sm:gap-4">
-                    {prayerTimes && ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'].map((p) => (
-                      <div key={`time-${p}`} className="text-center">
-                        <p className={cn(
-                          "text-xs sm:text-sm font-bold whitespace-nowrap transition-colors font-mono",
-                          currentPrayer === p ? "text-slate-900" : "text-slate-500"
-                        )}>
-                          {convertTo12Hour(prayerTimes[p])}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
+                    );
+                  })}
                 </div>
               </div>
 

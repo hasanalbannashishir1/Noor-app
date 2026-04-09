@@ -2253,8 +2253,13 @@ export default function App() {
                           onClick={() => setDeenSubTab('quran')}
                           className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
                         >
-                          <div className="w-10 h-10 bg-slate-900 text-white rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
-                            <BookOpen size={20} />
+                          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm overflow-hidden border border-slate-100">
+                            <img 
+                              src="https://i.postimg.cc/LJfX4fHY/quran.png" 
+                              alt="Al Quran" 
+                              className="w-full h-full object-cover"
+                              referrerPolicy="no-referrer"
+                            />
                           </div>
                           <h3 className="text-[10px] font-bold uppercase tracking-tight">Al-Quran</h3>
                         </button>
@@ -2267,8 +2272,13 @@ export default function App() {
                           }}
                           className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
                         >
-                          <div className="w-10 h-10 bg-slate-900 text-white rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
-                            <Book size={20} />
+                          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm overflow-hidden border border-slate-100">
+                            <img 
+                              src="https://i.postimg.cc/0bWqDNy3/salah-8.png" 
+                              alt="Prayer Learning" 
+                              className="w-full h-full object-cover"
+                              referrerPolicy="no-referrer"
+                            />
                           </div>
                           <h3 className="text-[10px] font-bold uppercase tracking-tight">Prayer learning</h3>
                         </button>
@@ -2278,8 +2288,13 @@ export default function App() {
                           onClick={() => setDeenSubTab('names')}
                           className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
                         >
-                          <div className="w-10 h-10 bg-slate-900 text-white rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
-                            <Heart size={20} />
+                          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm overflow-hidden border border-slate-100">
+                            <img 
+                              src="https://i.postimg.cc/LJCnbR6J/islamic.png" 
+                              alt="99 Names" 
+                              className="w-full h-full object-cover"
+                              referrerPolicy="no-referrer"
+                            />
                           </div>
                           <h3 className="text-[10px] font-bold uppercase tracking-tight">99 Names</h3>
                         </button>
@@ -2289,8 +2304,13 @@ export default function App() {
                           onClick={() => setDeenSubTab('zakat')}
                           className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
                         >
-                          <div className="w-10 h-10 bg-slate-900 text-white rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
-                            <Calculator size={20} />
+                          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm overflow-hidden border border-slate-100">
+                            <img 
+                              src="https://i.postimg.cc/XXB5TrTH/zakat.png" 
+                              alt="Zakat" 
+                              className="w-full h-full object-cover"
+                              referrerPolicy="no-referrer"
+                            />
                           </div>
                           <h3 className="text-[10px] font-bold uppercase tracking-tight">Zakat</h3>
                         </button>
@@ -2300,8 +2320,13 @@ export default function App() {
                           onClick={() => setDeenSubTab('hadith')}
                           className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
                         >
-                          <div className="w-10 h-10 bg-slate-900 text-white rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
-                            <ScrollText size={20} />
+                          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm overflow-hidden border border-slate-100">
+                            <img 
+                              src="https://i.postimg.cc/LJCnbR6X/quran-2.png" 
+                              alt="Hadith" 
+                              className="w-full h-full object-cover"
+                              referrerPolicy="no-referrer"
+                            />
                           </div>
                           <h3 className="text-[10px] font-bold uppercase tracking-tight">Hadith</h3>
                         </button>
@@ -2311,8 +2336,13 @@ export default function App() {
                           onClick={() => setDeenSubTab('events')}
                           className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
                         >
-                          <div className="w-10 h-10 bg-slate-900 text-white rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
-                            <Calendar size={20} />
+                          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm overflow-hidden border border-slate-100">
+                            <img 
+                              src="https://i.postimg.cc/bZCsB8ND/calendar.png" 
+                              alt="Upcoming Events" 
+                              className="w-full h-full object-cover"
+                              referrerPolicy="no-referrer"
+                            />
                           </div>
                           <h3 className="text-[10px] font-bold uppercase tracking-tight leading-tight">Upcoming Islamic Events</h3>
                         </button>
@@ -2322,8 +2352,13 @@ export default function App() {
                           onClick={() => setDeenSubTab('documentary')}
                           className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
                         >
-                          <div className="w-10 h-10 bg-slate-900 text-white rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
-                            <Video size={20} />
+                          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm overflow-hidden border border-slate-100">
+                            <img 
+                              src="https://i.postimg.cc/HVppbK46/documentary.png" 
+                              alt="Documentary" 
+                              className="w-full h-full object-cover"
+                              referrerPolicy="no-referrer"
+                            />
                           </div>
                           <h3 className="text-[10px] font-bold uppercase tracking-tight">Documentary</h3>
                         </button>
@@ -2466,8 +2501,13 @@ export default function App() {
                                 className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between group hover:border-emerald-500 transition-all"
                               >
                                 <div className="flex items-center gap-4">
-                                  <div className="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-xl flex items-center justify-center">
-                                    <Sparkles size={24} />
+                                  <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm overflow-hidden border border-slate-100">
+                                    <img 
+                                      src="https://i.postimg.cc/xcKsMf3J/wudhu-1.png" 
+                                      alt="Wudu" 
+                                      className="w-full h-full object-cover"
+                                      referrerPolicy="no-referrer"
+                                    />
                                   </div>
                                   <div className="text-left">
                                     <h4 className="font-bold text-slate-900">Wudu (Ablution)</h4>
@@ -2482,8 +2522,13 @@ export default function App() {
                                 className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between group hover:border-emerald-500 transition-all"
                               >
                                 <div className="flex items-center gap-4">
-                                  <div className="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-xl flex items-center justify-center">
-                                    <Sun size={24} />
+                                  <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm overflow-hidden border border-slate-100">
+                                    <img 
+                                      src="https://i.postimg.cc/Hjb0PSc8/prayer.png" 
+                                      alt="Dua's for Salah" 
+                                      className="w-full h-full object-cover"
+                                      referrerPolicy="no-referrer"
+                                    />
                                   </div>
                                   <div className="text-left">
                                     <h4 className="font-bold text-slate-900">Dua's for Salah</h4>
@@ -2498,8 +2543,13 @@ export default function App() {
                                 className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between group hover:border-emerald-500 transition-all"
                               >
                                 <div className="flex items-center gap-4">
-                                  <div className="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-xl flex items-center justify-center">
-                                    <BookOpen size={24} />
+                                  <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm overflow-hidden border border-slate-100">
+                                    <img 
+                                      src="https://i.postimg.cc/gnnhbNnm/quran-3.png" 
+                                      alt="Essential Surah" 
+                                      className="w-full h-full object-cover"
+                                      referrerPolicy="no-referrer"
+                                    />
                                   </div>
                                   <div className="text-left">
                                     <h4 className="font-bold text-slate-900">Essential Surah</h4>
@@ -2514,8 +2564,13 @@ export default function App() {
                                 className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between group hover:border-emerald-500 transition-all"
                               >
                                 <div className="flex items-center gap-4">
-                                  <div className="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-xl flex items-center justify-center">
-                                    <LayoutDashboard size={24} />
+                                  <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm overflow-hidden border border-slate-100">
+                                    <img 
+                                      src="https://i.postimg.cc/xX9SbFHG/shalat.png" 
+                                      alt="Prayer steps" 
+                                      className="w-full h-full object-cover"
+                                      referrerPolicy="no-referrer"
+                                    />
                                   </div>
                                   <div className="text-left">
                                     <h4 className="font-bold text-slate-900">Prayer Steps</h4>
@@ -2603,22 +2658,38 @@ export default function App() {
                                     </h5>
                                     <div className="space-y-3">
                                       {[
-                                        "Make intention (Niyyah) – in your heart to perform Wudu.",
-                                        "Say “Bismillah” (In the name of Allah).",
-                                        "Wash hands – up to the wrists, 3 times.",
-                                        "Rinse mouth – 3 times.",
-                                        "Clean nose – sniff water and blow it out, 3 times.",
-                                        "Wash face – from forehead to chin and ear to ear, 3 times.",
-                                        "Wash arms – right then left, up to elbows, 3 times each.",
-                                        "Wipe head (Masah) – once with wet hands.",
-                                        "Clean ears – inside and outside, once.",
-                                        "Wash feet – right then left, up to ankles, 3 times each."
+                                        { text: "Make intention (Niyyah) – in your heart to perform Wudu.", icons: ["https://i.postimg.cc/Hcbrkhbg/step1.png"] },
+                                        { text: "Say “Bismillah” (In the name of Allah).", icons: [] },
+                                        { text: "Wash hands – up to the wrists, 3 times.", icons: ["https://i.postimg.cc/QBK1gVkQ/step3.png"] },
+                                        { text: "Rinse mouth – 3 times.", icons: ["https://i.postimg.cc/Ffk3b1g1/step4.png"] },
+                                        { text: "Clean nose – sniff water and blow it out, 3 times.", icons: ["https://i.postimg.cc/Ffk3b1g1/step5.png"] },
+                                        { text: "Wash face – from forehead to chin and ear to ear, 3 times.", icons: ["https://i.postimg.cc/CZnkCdH8/step6.png"] },
+                                        { text: "Wash arms – right then left, up to elbows, 3 times each.", icons: ["https://i.postimg.cc/DW4LQmdX/step7.png"] },
+                                        { text: "Wipe head (Masah) – once with wet hands.", icons: ["https://i.postimg.cc/kVRKNDFt/step8a.png", "https://i.postimg.cc/Z9vpP0Fq/step8b.png"] },
+                                        { text: "Clean ears – inside and outside, once.", icons: ["https://i.postimg.cc/WDqgmt6q/step9.png"] },
+                                        { text: "Wash feet – right then left, up to ankles, 3 times each.", icons: ["https://i.postimg.cc/gwL8yrqj/step10.png"] }
                                       ].map((step, i) => (
-                                        <div key={i} className="flex items-start gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                                          <div className="w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-400 flex-shrink-0 mt-0.5">
-                                            {i + 1}
+                                        <div key={i} className="flex flex-col gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                                          <div className="flex items-start gap-4">
+                                            <div className="w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-400 flex-shrink-0 mt-0.5">
+                                              {i + 1}
+                                            </div>
+                                            <p className="text-sm text-slate-700 leading-relaxed">{step.text}</p>
                                           </div>
-                                          <p className="text-sm text-slate-700 leading-relaxed">{step}</p>
+                                          {step.icons.length > 0 && (
+                                            <div className="flex flex-wrap gap-2 ml-10">
+                                              {step.icons.map((icon, idx) => (
+                                                <div key={idx} className="w-24 h-24 bg-white rounded-xl border border-slate-100 p-1 shadow-sm overflow-hidden">
+                                                  <img 
+                                                    src={icon} 
+                                                    alt={`Step ${i + 1} icon ${idx + 1}`} 
+                                                    className="w-full h-full object-contain"
+                                                    referrerPolicy="no-referrer"
+                                                  />
+                                                </div>
+                                              ))}
+                                            </div>
+                                          )}
                                         </div>
                                       ))}
                                     </div>

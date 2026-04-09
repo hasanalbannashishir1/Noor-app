@@ -51,7 +51,8 @@ import {
   MessageSquare,
   Mail,
   Video,
-  Book
+  Book,
+  Headphones,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { quranService } from './services/quranService';
@@ -785,6 +786,66 @@ const TasbihCounter = () => {
             className="text-[10px] font-bold text-slate-400 hover:text-red-500 uppercase tracking-widest transition-colors"
           >
             Reset
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const DailySurahReminder = () => {
+  const [listened, setListened] = useState(() => {
+    const saved = localStorage.getItem('dailySurahListened');
+    const lastDate = localStorage.getItem('dailySurahDate');
+    const today = new Date().toDateString();
+    
+    if (lastDate === today) {
+      return saved === 'true';
+    }
+    return false;
+  });
+
+  const toggleListened = () => {
+    const newState = !listened;
+    setListened(newState);
+    localStorage.setItem('dailySurahListened', String(newState));
+    localStorage.setItem('dailySurahDate', new Date().toDateString());
+  };
+
+  return (
+    <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm mb-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm overflow-hidden border border-slate-100">
+            <img 
+              src="https://i.postimg.cc/gnnhbNnm/quran-3.png" 
+              alt="Surah Listening" 
+              className="w-full h-full object-cover"
+              referrerPolicy="no-referrer"
+            />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-slate-900">Daily Surah</h3>
+            <p className="text-xs text-slate-500">Listen to one Surah today</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="text-right">
+            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Progress</p>
+            <p className={cn("text-sm font-black transition-colors", listened ? "text-emerald-600" : "text-slate-400")}>
+              {listened ? '1 / 1' : '0 / 1'}
+            </p>
+          </div>
+          <button 
+            onClick={toggleListened}
+            className={cn(
+              "w-10 h-10 rounded-xl flex items-center justify-center transition-all border shadow-sm",
+              listened 
+                ? "bg-emerald-600 text-white border-emerald-500" 
+                : "bg-white text-slate-400 border-slate-100 hover:border-emerald-200 hover:text-emerald-600"
+            )}
+          >
+            <Check size={20} />
           </button>
         </div>
       </div>
@@ -2207,6 +2268,7 @@ export default function App() {
                 </div>
               </div>
 
+              <DailySurahReminder />
               <TasbihCounter />
 
               {/* Daily Home Hadith */}

@@ -71,6 +71,7 @@ import {
 } from './types';
 import { cn } from './lib/utils';
 import ReactMarkdown from 'react-markdown';
+import { GoogleGenAI } from "@google/genai";
 
 const SALAH_REQUIREMENTS: PrayerRequirement[] = [
   {
@@ -1275,6 +1276,7 @@ export default function App() {
   const [prayerTimes, setPrayerTimes] = useState<any>(null);
   const [currentPrayer, setCurrentPrayer] = useState<string | null>(null);
   const [showAllSalah, setShowAllSalah] = useState(false);
+  const [showForbiddenTimes, setShowForbiddenTimes] = useState(false);
   const [nextPrayerInfo, setNextPrayerInfo] = useState<{ name: string, remaining: string } | null>(null);
 
   const convertTo12Hour = (time24: string) => {
@@ -1504,27 +1506,29 @@ export default function App() {
     setIsAiLoading(true);
 
     try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          messages: aiMessages,
-          userMsg: userMsg,
-        }),
+      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      const response = await ai.models.generateContent({
+        model: "gemini-3.1-pro-preview",
+        contents: [
+          ...aiMessages.map((m: any) => ({
+            role: m.role === 'user' ? 'user' : 'model',
+            parts: [{ text: m.text }]
+          })),
+          { role: 'user', parts: [{ text: userMsg }] }
+        ],
+        config: {
+          systemInstruction: "You are a highly advanced Islamic AI Assistant. Answer questions about Islam, Quran, Hadith, and general knowledge with deep wisdom, accuracy, and kindness. Always provide authentic references (Surah:Verse or Hadith collection) where possible. If you are unsure, advise the user to consult a qualified scholar.",
+        }
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to get AI response");
+      if (!response.text) {
+        throw new Error("No response text generated");
       }
 
-      const data = await response.json();
-      setAiMessages(prev => [...prev, { role: 'model', text: data.text }]);
+      setAiMessages(prev => [...prev, { role: 'model', text: response.text }]);
     } catch (err) {
       console.error("AI Error:", err);
-      setAiMessages(prev => [...prev, { role: 'model', text: "Sorry, I encountered an error. Please try again." }]);
+      setAiMessages(prev => [...prev, { role: 'model', text: "I apologize, but I'm having trouble connecting right now. Please ensure your internet is stable and try again. (Error: " + (err instanceof Error ? err.message : "Unknown") + ")" }]);
     } finally {
       setIsAiLoading(false);
     }
@@ -2165,6 +2169,75 @@ export default function App() {
                     );
                   })}
                 </div>
+              </div>
+
+              {/* Forbidden Times for Salah */}
+              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <button 
+                  onClick={() => setShowForbiddenTimes(!showForbiddenTimes)}
+                  className="w-full p-4 flex items-center justify-between hover:bg-slate-50 transition-colors"
+                >
+                  <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                    <span className="text-lg">🚫</span> Forbidden Times for Salah
+                  </h3>
+                  <ChevronDown 
+                    size={18} 
+                    className={cn("text-slate-400 transition-transform duration-300", showForbiddenTimes && "rotate-180")} 
+                  />
+                </button>
+                
+                <AnimatePresence>
+                  {showForbiddenTimes && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="p-4 pt-0 space-y-4 border-t border-slate-50">
+                        <div className="bg-orange-50/50 p-3 rounded-xl border border-orange-100">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-lg">🌅</span>
+                            <h4 className="text-xs font-bold text-orange-900 uppercase tracking-wider">Sunrise</h4>
+                          </div>
+                          <p className="text-xs text-orange-800 leading-relaxed">
+                            From sunrise → ~10–15 min after
+                          </p>
+                          <div className="mt-2 flex items-center gap-1.5 text-[10px] font-bold text-rose-600 uppercase tracking-widest bg-white/50 w-fit px-2 py-1 rounded-lg border border-rose-100">
+                            ❌ Prayer not allowed (Sunrise time)
+                          </div>
+                        </div>
+
+                        <div className="bg-amber-50/50 p-3 rounded-xl border border-amber-100">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-lg">☀️</span>
+                            <h4 className="text-xs font-bold text-amber-900 uppercase tracking-wider">Zawal (Midday)</h4>
+                          </div>
+                          <p className="text-xs text-amber-800 leading-relaxed">
+                            ~5–10 min before Dhuhr
+                          </p>
+                          <div className="mt-2 flex items-center gap-1.5 text-[10px] font-bold text-rose-600 uppercase tracking-widest bg-white/50 w-fit px-2 py-1 rounded-lg border border-rose-100">
+                            ❌ Prayer not allowed (Zawal time)
+                          </div>
+                        </div>
+
+                        <div className="bg-rose-50/50 p-3 rounded-xl border border-rose-100">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-lg">🌇</span>
+                            <h4 className="text-xs font-bold text-rose-900 uppercase tracking-wider">Sunset</h4>
+                          </div>
+                          <p className="text-xs text-rose-800 leading-relaxed">
+                            From sunset start → until Maghrib
+                          </p>
+                          <div className="mt-2 flex items-center gap-1.5 text-[10px] font-bold text-rose-600 uppercase tracking-widest bg-white/50 w-fit px-2 py-1 rounded-lg border border-rose-100">
+                            ❌ Prayer not allowed (Sunset time)
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
               {/* Quranic Verse about Salah */}
@@ -3172,6 +3245,7 @@ export default function App() {
                   </div>
                   <div>
                     <h3 className="font-bold text-slate-900">Islamic AI Assistant</h3>
+                    <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">Powered by Gemini 3.1 Pro</p>
                   </div>
                 </div>
 

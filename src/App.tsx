@@ -118,6 +118,18 @@ const SALAH_REQUIREMENTS: PrayerRequirement[] = [
   }
 ];
 
+const TASBIH_PHRASES = [
+  { text: 'SubhanAllah', limit: 33 },
+  { text: 'Bismillah', limit: 33 },
+  { text: 'Alhamdulillah', limit: 33 },
+  { text: 'Astaghfirullah', limit: 33 },
+  { text: 'La-ilaha ilallah', limit: 33 },
+  { text: 'La hawla wala Kuwata illa bilah', limit: 33 },
+  { text: 'Subhanallahi wa bihamdihi', limit: 33 },
+  { text: 'Subhanallahil Azeem', limit: 33 },
+  { text: 'Allahu - Akbar', limit: 33 }
+];
+
 const SMALL_HADITHS = [
   { text: "The best of you are those who learn the Quran and teach it.", source: "Sahih Bukhari" },
   { text: "Cleanliness is half of faith.", source: "Sahih Muslim" },
@@ -645,20 +657,10 @@ Zakat Payable: ${zakatPayable.toFixed(2)}
   );
 };
 
-const TasbihCounter = () => {
+const TasbihCounter = ({ onIncrement }: { onIncrement: (phrase: string) => void }) => {
   const [count, setCount] = useState(0);
   const [phraseIndex, setPhraseIndex] = useState(0);
-  const phrases = [
-    { text: 'SubhanAllah', limit: 33 },
-    { text: 'Bismillah', limit: 33 },
-    { text: 'Alhamdulillah', limit: 33 },
-    { text: 'Astaghfirullah', limit: 33 },
-    { text: 'La-ilaha ilallah', limit: 33 },
-    { text: 'La hawla wala Kuwata illa bilah', limit: 33 },
-    { text: 'Subhanallahi wa bihamdihi', limit: 33 },
-    { text: 'Subhanallahil Azeem', limit: 33 },
-    { text: 'Allahu - Akbar', limit: 33 }
-  ];
+  const phrases = TASBIH_PHRASES;
 
   const currentPhrase = phrases[phraseIndex];
   const audioCtxRef = useRef<AudioContext | null>(null);
@@ -708,6 +710,9 @@ const TasbihCounter = () => {
     
     // Sound feedback
     playClickSound();
+
+    // Update global stats
+    onIncrement(currentPhrase.text);
 
     if (count + 1 >= currentPhrase.limit) {
       setCount(0);
@@ -855,6 +860,16 @@ const DailySurahReminder = () => {
 };
 
 const SalahDashboard = ({ salahProgress }: { salahProgress: string[] }) => {
+  const totalRakats = SALAH_REQUIREMENTS.reduce((acc, prayer) => 
+    acc + prayer.rakats.reduce((pAcc, r) => pAcc + r.count, 0), 0
+  );
+  
+  const completedRakats = SALAH_REQUIREMENTS.reduce((acc, prayer) => 
+    acc + prayer.rakats.reduce((pAcc, r) => 
+      salahProgress.includes(r.id) ? pAcc + r.count : pAcc, 0
+    ), 0
+  );
+
   const headers = [
     { title: 'Sunnah', sub: 'Muakkadah/Ghair' },
     { title: 'Fardh', sub: 'Obligatory' },
@@ -896,11 +911,18 @@ const SalahDashboard = ({ salahProgress }: { salahProgress: string[] }) => {
   return (
     <div className="bg-white border-2 border-black rounded-xl overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-8">
       <div className="p-2 sm:p-3 border-b-2 border-black bg-black text-white flex items-center justify-between">
-        <h3 className="font-normal uppercase text-[10px] sm:text-[11px] flex items-center gap-1.5 sm:gap-2">
-          <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-          Salah Performance
-        </h3>
-        <span className="text-[8px] sm:text-[9px] font-normal text-slate-400 uppercase">Read Only</span>
+        <div className="flex items-center gap-3">
+          <h3 className="font-normal uppercase text-[10px] sm:text-[11px] flex items-center gap-1.5 sm:gap-2">
+            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+            Salah Performance
+          </h3>
+          <div className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-500/20 rounded-md border border-emerald-500/30">
+            <span className="text-[8px] sm:text-[10px] font-black text-emerald-400">
+              {completedRakats}/{totalRakats} <span className="hidden sm:inline">Rakats</span>
+            </span>
+          </div>
+        </div>
+        <span className="text-[8px] sm:text-[9px] font-normal text-black uppercase">Read Only</span>
       </div>
       <div className="w-full overflow-hidden">
         <table className="w-full border-collapse table-fixed">
@@ -911,7 +933,7 @@ const SalahDashboard = ({ salahProgress }: { salahProgress: string[] }) => {
                 <th key={i} className="border-b border-r border-black py-2 sm:py-4 px-0.5 text-center w-[14.3%]">
                   <div className="flex flex-col leading-none">
                     <span className="text-[7px] sm:text-[9px] font-normal uppercase text-black truncate">{h.title}</span>
-                    <span className="text-[5px] sm:text-[7px] font-normal uppercase text-slate-400 mt-0.5 truncate px-0.5">
+                    <span className="text-[5px] sm:text-[7px] font-normal uppercase text-black mt-0.5 truncate px-0.5">
                       {h.sub.split('/')[0]}
                     </span>
                   </div>
@@ -950,6 +972,46 @@ const SalahDashboard = ({ salahProgress }: { salahProgress: string[] }) => {
                     </td>
                   );
                 })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+const TasbihDashboard = ({ stats }: { stats: { daily: { [key: string]: number }, lifetime: { [key: string]: number } } }) => {
+  return (
+    <div className="bg-white border-2 border-black rounded-xl overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-8">
+      <div className="p-2 sm:p-3 border-b-2 border-black bg-black text-white flex items-center justify-between">
+        <h3 className="font-normal uppercase text-[10px] sm:text-[11px] flex items-center gap-1.5 sm:gap-2">
+          <div className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse" />
+          Tasbih Counter Dashboard
+        </h3>
+        <span className="text-[8px] sm:text-[9px] font-normal text-black uppercase">Read Only</span>
+      </div>
+      <div className="w-full overflow-hidden">
+        <table className="w-full border-collapse table-fixed">
+          <thead>
+            <tr className="bg-slate-50">
+              <th className="border-b border-r border-black py-2 sm:py-4 px-1 text-[7px] sm:text-[9px] font-normal uppercase text-black text-center w-[40%]">Dua / Phrase</th>
+              <th className="border-b border-r border-black py-2 sm:py-4 px-1 text-[7px] sm:text-[9px] font-normal uppercase text-black text-center w-[30%]">Today</th>
+              <th className="border-b border-black py-2 sm:py-4 px-1 text-[7px] sm:text-[9px] font-normal uppercase text-black text-center w-[30%]">Lifetime</th>
+            </tr>
+          </thead>
+          <tbody>
+            {TASBIH_PHRASES.map((phrase) => (
+              <tr key={phrase.text} className="group hover:bg-slate-50/50 transition-colors">
+                <td className="border-b border-r border-black py-2 sm:py-4 px-2 font-normal text-[8px] sm:text-[10px] uppercase text-black bg-slate-50/50 group-hover:bg-slate-100 transition-colors truncate">
+                  {phrase.text}
+                </td>
+                <td className="border-b border-r border-black py-2 sm:py-4 px-1 text-center font-black text-emerald-600 text-[9px] sm:text-[12px]">
+                  {stats.daily[phrase.text] || 0}
+                </td>
+                <td className="border-b border-black py-2 sm:py-4 px-1 text-center font-black text-blue-600 text-[9px] sm:text-[12px]">
+                  {stats.lifetime[phrase.text] || 0}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -1378,6 +1440,57 @@ export default function App() {
     }
     return [];
   });
+
+  // Tasbih Stats
+  const [tasbihStats, setTasbihStats] = useState<{
+    daily: { [key: string]: number },
+    lifetime: { [key: string]: number },
+    lastUpdate: string
+  }>(() => {
+    const saved = localStorage.getItem('tasbih_stats');
+    const today = new Date().toDateString();
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed.lastUpdate === today) {
+        return parsed;
+      } else {
+        return {
+          ...parsed,
+          daily: {},
+          lastUpdate: today
+        };
+      }
+    }
+    return { daily: {}, lifetime: {}, lastUpdate: today };
+  });
+
+  useEffect(() => {
+    localStorage.setItem('tasbih_stats', JSON.stringify(tasbihStats));
+  }, [tasbihStats]);
+
+  const updateTasbihCount = (phrase: string) => {
+    setTasbihStats(prev => {
+      const today = new Date().toDateString();
+      const isNewDay = prev.lastUpdate !== today;
+      
+      const newDaily = isNewDay ? { [phrase]: 1 } : {
+        ...prev.daily,
+        [phrase]: (prev.daily[phrase] || 0) + 1
+      };
+      
+      const newLifetime = {
+        ...prev.lifetime,
+        [phrase]: (prev.lifetime[phrase] || 0) + 1
+      };
+      
+      return {
+        daily: newDaily,
+        lifetime: newLifetime,
+        lastUpdate: today
+      };
+    });
+  };
+
   const [prayerTimes, setPrayerTimes] = useState<any>(null);
   const [currentPrayer, setCurrentPrayer] = useState<string | null>(null);
   const [showAllSalah, setShowAllSalah] = useState(false);
@@ -1759,15 +1872,17 @@ export default function App() {
   }, [salahProgress]);
 
   const toggleSalahProgress = (id: string) => {
+    const prayer = SALAH_REQUIREMENTS.find(p => p.rakats.some(r => r.id === id));
+    if (!prayer || prayer.name !== currentPrayer) return;
+
     const isCompleting = !salahProgress.includes(id);
     setSalahProgress(prev => 
       isCompleting ? [...prev, id] : prev.filter(p => p !== id)
     );
     
     if (isCompleting) {
-      const rakat = SALAH_REQUIREMENTS.flatMap(p => p.rakats).find(r => r.id === id);
-      const prayer = SALAH_REQUIREMENTS.find(p => p.rakats.some(r => r.id === id));
-      if (rakat && prayer) {
+      const rakat = prayer.rakats.find(r => r.id === id);
+      if (rakat) {
         logActivity('salah', `Completed ${rakat.count} ${rakat.label} for ${prayer.name}`);
       }
     }
@@ -2420,9 +2535,11 @@ export default function App() {
                             <button
                               key={rakat.id}
                               onClick={() => toggleSalahProgress(rakat.id)}
+                              disabled={currentPrayer !== prayer.name}
                               className={cn(
                                 "flex items-center justify-between p-2.5 rounded-xl border text-xs transition-all",
-                                salahProgress.includes(rakat.id) ? "bg-emerald-50 border-emerald-200" : "bg-white border-slate-100"
+                                salahProgress.includes(rakat.id) ? "bg-emerald-50 border-emerald-200" : "bg-white border-slate-100",
+                                currentPrayer !== prayer.name && "opacity-50 cursor-not-allowed grayscale-[0.5]"
                               )}
                             >
                               <div className="flex items-center gap-2">
@@ -2447,7 +2564,7 @@ export default function App() {
               </div>
 
               <DailySurahReminder />
-              <TasbihCounter />
+              <TasbihCounter onIncrement={updateTasbihCount} />
 
               {/* Daily Home Hadith */}
               {homeHadith && (
@@ -3870,6 +3987,7 @@ export default function App() {
               className="space-y-6"
             >
               <SalahDashboard salahProgress={salahProgress} />
+              <TasbihDashboard stats={tasbihStats} />
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-emerald-600 p-8 rounded-3xl text-white shadow-xl shadow-emerald-100">

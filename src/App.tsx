@@ -854,6 +854,101 @@ const DailySurahReminder = () => {
   );
 };
 
+const SalahDashboard = ({ salahProgress }: { salahProgress: string[] }) => {
+  const headers = ['Sunnah (B)', 'Fardh', 'Sunnah (A)', 'Nafl', 'Witr', 'Nafl'];
+  
+  const getRakatForCell = (prayerName: string, colIndex: number) => {
+    const prayer = SALAH_REQUIREMENTS.find(p => p.name === prayerName);
+    if (!prayer) return null;
+
+    if (prayerName === 'Fajr') {
+      if (colIndex === 0) return prayer.rakats[0];
+      if (colIndex === 1) return prayer.rakats[1];
+    }
+    if (prayerName === 'Dhuhr') {
+      if (colIndex === 0) return prayer.rakats[0];
+      if (colIndex === 1) return prayer.rakats[1];
+      if (colIndex === 2) return prayer.rakats[2];
+      if (colIndex === 3) return prayer.rakats[3];
+    }
+    if (prayerName === 'Asr') {
+      if (colIndex === 0) return prayer.rakats[0];
+      if (colIndex === 1) return prayer.rakats[1];
+    }
+    if (prayerName === 'Maghrib') {
+      if (colIndex === 1) return prayer.rakats[0];
+      if (colIndex === 2) return prayer.rakats[1];
+      if (colIndex === 3) return prayer.rakats[2];
+    }
+    if (prayerName === 'Isha') {
+      return prayer.rakats[colIndex];
+    }
+    return null;
+  };
+
+  return (
+    <div className="bg-white border-2 border-black rounded-xl overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-8">
+      <div className="p-3 border-b-2 border-black bg-black text-white flex items-center justify-between">
+        <h3 className="font-black uppercase tracking-[0.1em] text-[10px] flex items-center gap-2">
+          <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+          Salah Performance
+        </h3>
+        <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Read Only</span>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="bg-slate-50">
+              <th className="border-b border-r border-black p-1.5 text-[7px] font-black uppercase tracking-widest text-black text-left w-16">Prayer</th>
+              {headers.map((h, i) => (
+                <th key={i} className="border-b border-r border-black p-1.5 text-[7px] font-black uppercase tracking-widest text-black min-w-[50px]">
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'].map((pName) => (
+              <tr key={pName} className="group hover:bg-slate-50/50 transition-colors">
+                <td className="border-b border-r border-black p-1.5 font-black text-[8px] uppercase tracking-widest text-black bg-slate-50/50 group-hover:bg-slate-100 transition-colors">
+                  {pName}
+                </td>
+                {headers.map((_, i) => {
+                  const rakat = getRakatForCell(pName, i);
+                  if (!rakat) return <td key={i} className="border-b border-r border-black p-1.5 bg-slate-100/10" />;
+                  
+                  const isCompleted = salahProgress.includes(rakat.id);
+                  
+                  return (
+                    <td key={i} className="border-b border-r border-black p-1.5 text-center">
+                      <div className="flex flex-col items-center gap-0.5">
+                        {isCompleted ? (
+                          <div className="w-4 h-4 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200 shadow-sm">
+                            <Check size={10} strokeWidth={3} />
+                          </div>
+                        ) : (
+                          <div className="w-4 h-4 rounded-md bg-rose-50 text-rose-400 flex items-center justify-center border border-rose-100 shadow-sm">
+                            <X size={10} strokeWidth={3} />
+                          </div>
+                        )}
+                        <div className="flex flex-col items-center">
+                          <span className="text-[6px] font-black text-slate-900 leading-none">
+                            {rakat.count}R
+                          </span>
+                        </div>
+                      </div>
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
 const NamesOfAllah = () => {
   const names = [
     { ar: 'ٱللَّٰه', en: 'Allah', tr: 'The One and Only God' },
@@ -1229,7 +1324,7 @@ const HadithSection = ({ selectedBook, setSelectedBook }: { selectedBook: string
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'home' | 'deen' | 'ai' | 'amal' | 'dashboard'>('home');
-  const [deenSubTab, setDeenSubTab] = useState<'grid' | 'quran' | 'zakat' | 'names' | 'hadith' | 'events' | 'prayer' | 'documentary'>('grid');
+  const [deenSubTab, setDeenSubTab] = useState<'grid' | 'quran' | 'zakat' | 'names' | 'hadith' | 'events' | 'prayer' | 'documentary' | 'ramadan' | 'hajj' | 'qibla' | 'calendar' | 'milad'>('grid');
   const [prayerSubTab, setPrayerSubTab] = useState<'menu' | 'wudu' | 'salah' | 'surah' | 'steps'>('menu');
   const [amalSubTab, setAmalSubTab] = useState<'quran' | 'hadith' | 'dua'>('quran');
   const [selectedSalahDua, setSelectedSalahDua] = useState<string | null>(null);
@@ -2488,6 +2583,86 @@ export default function App() {
                           </div>
                           <h3 className="text-[10px] font-bold uppercase tracking-tight">Documentary</h3>
                         </button>
+
+                        {/* Ramadan Option */}
+                        <button 
+                          onClick={() => setDeenSubTab('ramadan')}
+                          className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
+                        >
+                          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm overflow-hidden border border-slate-100">
+                            <img 
+                              src="https://i.postimg.cc/Mc1w5B6x/ramadan.png" 
+                              alt="Ramadan" 
+                              className="w-full h-full object-cover"
+                              referrerPolicy="no-referrer"
+                            />
+                          </div>
+                          <h3 className="text-[10px] font-bold uppercase tracking-tight">Ramadan</h3>
+                        </button>
+
+                        {/* Hajj & Umrah Option */}
+                        <button 
+                          onClick={() => setDeenSubTab('hajj')}
+                          className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
+                        >
+                          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm overflow-hidden border border-slate-100">
+                            <img 
+                              src="https://i.postimg.cc/bGgCqYLP/hajj.png" 
+                              alt="Hajj & Umrah" 
+                              className="w-full h-full object-cover"
+                              referrerPolicy="no-referrer"
+                            />
+                          </div>
+                          <h3 className="text-[10px] font-bold uppercase tracking-tight">Hajj & Umrah</h3>
+                        </button>
+
+                        {/* Qibla Option */}
+                        <button 
+                          onClick={() => setDeenSubTab('qibla')}
+                          className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
+                        >
+                          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm overflow-hidden border border-slate-100">
+                            <img 
+                              src="https://i.postimg.cc/186b1ZLf/qibla.png" 
+                              alt="Qibla" 
+                              className="w-full h-full object-cover"
+                              referrerPolicy="no-referrer"
+                            />
+                          </div>
+                          <h3 className="text-[10px] font-bold uppercase tracking-tight">Qibla</h3>
+                        </button>
+
+                        {/* Islamic Calendar Option */}
+                        <button 
+                          onClick={() => setDeenSubTab('calendar')}
+                          className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
+                        >
+                          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm overflow-hidden border border-slate-100">
+                            <img 
+                              src="https://i.postimg.cc/XG3bzvJm/calendar.png" 
+                              alt="Islamic Calendar" 
+                              className="w-full h-full object-cover"
+                              referrerPolicy="no-referrer"
+                            />
+                          </div>
+                          <h3 className="text-[10px] font-bold uppercase tracking-tight">Islamic Calendar</h3>
+                        </button>
+
+                        {/* Eid e Milladunnabi Option */}
+                        <button 
+                          onClick={() => setDeenSubTab('milad')}
+                          className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
+                        >
+                          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm overflow-hidden border border-slate-100">
+                            <img 
+                              src="https://i.postimg.cc/WD0V8ZN2/milad.png" 
+                              alt="Eid e Milladunnabi" 
+                              className="w-full h-full object-cover"
+                              referrerPolicy="no-referrer"
+                            />
+                          </div>
+                          <h3 className="text-[10px] font-bold uppercase tracking-tight">Eid e Milladunnabi</h3>
+                        </button>
                       </div>
                   ) : (
                     <div className="space-y-8">
@@ -3122,6 +3297,196 @@ export default function App() {
                           </div>
                         </div>
                       )}
+
+                      {deenSubTab === 'ramadan' && (
+                        <div className="space-y-6">
+                          <div className="bg-emerald-700 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
+                            <div className="relative z-10">
+                              <h3 className="text-3xl font-black mb-2">Ramadan Mubarak</h3>
+                              <p className="text-emerald-100/80 text-sm max-w-md">The month of mercy, forgiveness, and salvation. A time for spiritual reflection and growth.</p>
+                            </div>
+                            <div className="absolute top-0 right-0 p-4 opacity-10">
+                              <img src="https://i.postimg.cc/Mc1w5B6x/ramadan.png" alt="" className="w-32 h-32 object-contain" />
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                              <h4 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
+                                <span className="w-8 h-8 bg-amber-100 text-amber-600 rounded-lg flex items-center justify-center text-lg">🥣</span>
+                                Suhoor Dua
+                              </h4>
+                              <p className="text-xl font-arabic text-emerald-700 leading-loose mb-4 text-center">
+                                وَبِصَوْمِ غَدٍ نَّوَيْتُ مِنْ شَهْرِ رَمَضَانَ
+                              </p>
+                              <p className="text-xs text-slate-500 italic text-center">"I intend to keep the fast for tomorrow in the month of Ramadan."</p>
+                            </div>
+
+                            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                              <h4 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
+                                <span className="w-8 h-8 bg-rose-100 text-rose-600 rounded-lg flex items-center justify-center text-lg">🌅</span>
+                                Iftar Dua
+                              </h4>
+                              <p className="text-xl font-arabic text-emerald-700 leading-loose mb-4 text-center">
+                                اللَّهُمَّ اِنِّى لَكَ صُمْتُ وَبِكَ امنْتُ [وَعَلَيْكَ تَوَكَّلْتُ] وَعَلَى رِزْقِكَ اَفْطَرْتُ
+                              </p>
+                              <p className="text-xs text-slate-500 italic text-center">"O Allah! I fasted for You and I believe in You and I put my trust in You and I break my fast with Your sustenance."</p>
+                            </div>
+                          </div>
+
+                          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                            <h4 className="font-bold text-slate-900 mb-4">Virtues of Ramadan</h4>
+                            <ul className="space-y-4">
+                              {[
+                                "The Quran was revealed in this month.",
+                                "The gates of Paradise are opened and the gates of Hell are closed.",
+                                "Laylatul Qadr (The Night of Power) is in the last ten nights.",
+                                "Fasting is one of the five pillars of Islam."
+                              ].map((v, i) => (
+                                <li key={i} className="flex items-start gap-3 text-sm text-slate-600">
+                                  <CheckCircle2 className="text-emerald-500 flex-shrink-0 mt-0.5" size={16} />
+                                  {v}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      )}
+
+                      {deenSubTab === 'hajj' && (
+                        <div className="space-y-6">
+                          <div className="bg-slate-900 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
+                            <div className="relative z-10">
+                              <h3 className="text-3xl font-black mb-2">Hajj & Umrah</h3>
+                              <p className="text-slate-400 text-sm max-w-md">The sacred journey to the House of Allah. A lifetime spiritual experience for every Muslim.</p>
+                            </div>
+                            <div className="absolute top-0 right-0 p-4 opacity-10">
+                              <img src="https://i.postimg.cc/bGgCqYLP/hajj.png" alt="" className="w-32 h-32 object-contain" />
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 gap-4">
+                            {[
+                              { title: "Ihram", desc: "The sacred state of purity and intention." },
+                              { title: "Tawaf", desc: "Circling the Kaaba seven times." },
+                              { title: "Sa'i", desc: "Walking between Safa and Marwa seven times." },
+                              { title: "Arafat", desc: "The pinnacle of Hajj, standing in prayer." },
+                              { title: "Muzdalifah", desc: "Spending the night and collecting pebbles." },
+                              { title: "Jamarat", desc: "Stoning the pillars representing the devil." }
+                            ].map((step, i) => (
+                              <div key={i} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+                                <div className="w-10 h-10 bg-emerald-50 text-emerald-700 rounded-xl flex items-center justify-center font-black">
+                                  {i + 1}
+                                </div>
+                                <div>
+                                  <h4 className="font-bold text-slate-900">{step.title}</h4>
+                                  <p className="text-xs text-slate-500">{step.desc}</p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {deenSubTab === 'qibla' && (
+                        <div className="space-y-6 text-center">
+                          <h3 className="text-2xl font-black text-slate-900">Qibla Direction</h3>
+                          <p className="text-sm text-slate-500 max-w-xs mx-auto">Face the Kaaba in Makkah for your prayers.</p>
+                          
+                          <div className="relative w-64 h-64 mx-auto mt-8">
+                            {/* Simple Compass UI */}
+                            <div className="absolute inset-0 rounded-full border-4 border-slate-200 shadow-inner" />
+                            <div className="absolute inset-2 rounded-full border border-slate-100" />
+                            
+                            {/* Compass Marks */}
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <span className="absolute top-2 font-bold text-slate-400 text-xs">N</span>
+                              <span className="absolute bottom-2 font-bold text-slate-400 text-xs">S</span>
+                              <span className="absolute left-2 font-bold text-slate-400 text-xs">W</span>
+                              <span className="absolute right-2 font-bold text-slate-400 text-xs">E</span>
+                            </div>
+
+                            {/* Compass Needle */}
+                            <motion.div 
+                              animate={{ rotate: 45 }} // Static for demo, would use device orientation in real app
+                              className="absolute inset-0 flex items-center justify-center"
+                            >
+                              <div className="w-1 h-32 bg-slate-300 rounded-full relative">
+                                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-4 h-4 bg-emerald-600 rotate-45 -mt-2 rounded-sm shadow-md" />
+                                <div className="absolute top-0 left-1/2 -translate-x-1/2 -mt-8">
+                                  <img src="https://i.postimg.cc/186b1ZLf/qibla.png" alt="Kaaba" className="w-8 h-8 object-contain" />
+                                </div>
+                              </div>
+                            </motion.div>
+                            
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <div className="w-3 h-3 bg-white border-2 border-slate-400 rounded-full shadow-sm" />
+                            </div>
+                          </div>
+
+                          <div className="bg-emerald-50 p-4 rounded-2xl border border-emerald-100 max-w-xs mx-auto mt-8">
+                            <p className="text-xs text-emerald-800 font-medium">
+                              Note: This is a visual representation. For accurate direction, please use a device with a magnetometer.
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {deenSubTab === 'calendar' && (
+                        <div className="space-y-6">
+                          <h3 className="text-2xl font-black text-slate-900">Islamic Calendar</h3>
+                          
+                          <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm text-center">
+                            <h4 className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-2">Current Hijri Date</h4>
+                            <p className="text-4xl font-black text-slate-900 mb-2">{hijriDate}</p>
+                            <p className="text-sm text-slate-500">{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {[
+                              "Muharram", "Safar", "Rabi' al-Awwal", "Rabi' al-Thani",
+                              "Jumada al-Ula", "Jumada al-Akhirah", "Rajab", "Sha'ban",
+                              "Ramadan", "Shawwal", "Dhu al-Qi'dah", "Dhu al-Hijjah"
+                            ].map((month, i) => (
+                              <div key={i} className="bg-white p-4 rounded-2xl border border-slate-200 flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                  <span className="w-8 h-8 bg-slate-50 text-slate-400 rounded-lg flex items-center justify-center text-xs font-bold">{i + 1}</span>
+                                  <span className="font-bold text-slate-800">{month}</span>
+                                </div>
+                                {month === "Ramadan" && <span className="px-2 py-1 bg-emerald-100 text-emerald-700 text-[8px] font-bold rounded-full uppercase">Current</span>}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {deenSubTab === 'milad' && (
+                        <div className="space-y-6">
+                          <div className="bg-emerald-900 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
+                            <div className="relative z-10">
+                              <h3 className="text-3xl font-black mb-2">Eid e Miladunnabi</h3>
+                              <p className="text-emerald-200/80 text-sm max-w-md">Celebrating the birth of the Prophet Muhammad (PBUH), the mercy to all worlds.</p>
+                            </div>
+                            <div className="absolute top-0 right-0 p-4 opacity-10">
+                              <img src="https://i.postimg.cc/WD0V8ZN2/milad.png" alt="" className="w-32 h-32 object-contain" />
+                            </div>
+                          </div>
+
+                          <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+                            <h4 className="text-xl font-bold text-slate-900 mb-4">Significance</h4>
+                            <p className="text-slate-600 text-sm leading-relaxed mb-6">
+                              Eid-e-Milad-un-Nabi, also known as Mawlid, is the observance of the birthday of the Islamic prophet Muhammad which is commemorated in Rabi' al-awwal, the third month in the Islamic calendar.
+                            </p>
+                            <div className="bg-emerald-50 p-6 rounded-2xl border border-emerald-100">
+                              <p className="text-lg font-arabic text-emerald-800 leading-loose text-center mb-4">
+                                وَمَا أَرْسَلْنَاكَ إِلَّا رَحْمَةً لِّلْعَالَمِينَ
+                              </p>
+                              <p className="text-xs text-emerald-600 italic text-center">"And We have not sent you, [O Muhammad], except as a mercy to the worlds."</p>
+                              <p className="text-[10px] text-emerald-400 font-bold uppercase tracking-widest mt-2 text-center">— Surah Al-Anbiya [21:107]</p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -3494,6 +3859,8 @@ export default function App() {
               exit={{ opacity: 0, y: -20 }}
               className="space-y-6"
             >
+              <SalahDashboard salahProgress={salahProgress} />
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-emerald-600 p-8 rounded-3xl text-white shadow-xl shadow-emerald-100">
                   <BarChart3 size={32} className="mb-4 opacity-80" />

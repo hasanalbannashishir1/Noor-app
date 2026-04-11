@@ -899,9 +899,9 @@ const SalahDashboard = ({ salahProgress }: { salahProgress: string[] }) => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-slate-50">
-              <th className="border-b border-r border-black p-1.5 text-[7px] font-black uppercase tracking-widest text-black text-left w-16">Prayer</th>
+              <th className="border-b border-r border-black p-1.5 text-[8px] font-black uppercase tracking-widest text-black text-left w-20">Prayer</th>
               {headers.map((h, i) => (
-                <th key={i} className="border-b border-r border-black p-1.5 text-[7px] font-black uppercase tracking-widest text-black min-w-[50px]">
+                <th key={i} className="border-b border-r border-black p-1.5 text-[8px] font-black uppercase tracking-widest text-black min-w-[55px]">
                   {h}
                 </th>
               ))}
@@ -910,7 +910,7 @@ const SalahDashboard = ({ salahProgress }: { salahProgress: string[] }) => {
           <tbody>
             {['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'].map((pName) => (
               <tr key={pName} className="group hover:bg-slate-50/50 transition-colors">
-                <td className="border-b border-r border-black p-1.5 font-black text-[8px] uppercase tracking-widest text-black bg-slate-50/50 group-hover:bg-slate-100 transition-colors">
+                <td className="border-b border-r border-black p-1.5 font-black text-[9px] uppercase tracking-widest text-black bg-slate-50/50 group-hover:bg-slate-100 transition-colors">
                   {pName}
                 </td>
                 {headers.map((_, i) => {
@@ -932,7 +932,7 @@ const SalahDashboard = ({ salahProgress }: { salahProgress: string[] }) => {
                           </div>
                         )}
                         <div className="flex flex-col items-center">
-                          <span className="text-[6px] font-black text-slate-900 leading-none">
+                          <span className="text-[7px] font-black text-slate-900 leading-none">
                             {rakat.count}R
                           </span>
                         </div>

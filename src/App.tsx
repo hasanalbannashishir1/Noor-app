@@ -855,7 +855,14 @@ const DailySurahReminder = () => {
 };
 
 const SalahDashboard = ({ salahProgress }: { salahProgress: string[] }) => {
-  const headers = ['S(B)', 'Fardh', 'S(A)', 'Nafl', 'Witr', 'Nafl'];
+  const headers = [
+    { title: 'Sunnah', sub: 'Muakkadah/Ghair' },
+    { title: 'Fardh', sub: 'Obligatory' },
+    { title: 'Sunnah', sub: 'Muakkadah' },
+    { title: 'Nafl', sub: 'Voluntary' },
+    { title: 'Witr', sub: 'Wajib' },
+    { title: 'Nafl', sub: 'Voluntary' }
+  ];
   
   const getRakatForCell = (prayerName: string, colIndex: number) => {
     const prayer = SALAH_REQUIREMENTS.find(p => p.name === prayerName);
@@ -889,20 +896,23 @@ const SalahDashboard = ({ salahProgress }: { salahProgress: string[] }) => {
   return (
     <div className="bg-white border-2 border-black rounded-xl overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-8">
       <div className="p-3 border-b-2 border-black bg-black text-white flex items-center justify-between">
-        <h3 className="font-black uppercase tracking-[0.1em] text-[10px] flex items-center gap-2">
+        <h3 className="font-black uppercase text-[10px] flex items-center gap-2">
           <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
           Salah Performance
         </h3>
-        <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Read Only</span>
+        <span className="text-[8px] font-bold text-slate-400 uppercase">Read Only</span>
       </div>
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse table-fixed">
+        <table className="w-full border-collapse">
           <thead>
             <tr className="bg-slate-50">
-              <th className="border-b border-r border-black p-1 text-[7px] font-black uppercase tracking-tighter text-black text-left w-12">Prayer</th>
+              <th className="border-b border-r border-black py-4 px-2 text-[8px] font-black uppercase text-black text-left w-20">Prayer</th>
               {headers.map((h, i) => (
-                <th key={i} className="border-b border-r border-black p-1 text-[7px] font-black uppercase tracking-tighter text-black text-center">
-                  {h}
+                <th key={i} className="border-b border-r border-black py-4 px-2 text-center min-w-[65px]">
+                  <div className="flex flex-col">
+                    <span className="text-[8px] font-black uppercase text-black">{h.title}</span>
+                    <span className="text-[6px] font-bold uppercase text-slate-400 leading-tight">{h.sub}</span>
+                  </div>
                 </th>
               ))}
             </tr>
@@ -910,28 +920,28 @@ const SalahDashboard = ({ salahProgress }: { salahProgress: string[] }) => {
           <tbody>
             {['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'].map((pName) => (
               <tr key={pName} className="group hover:bg-slate-50/50 transition-colors">
-                <td className="border-b border-r border-black p-1 font-black text-[8px] uppercase tracking-tighter text-black bg-slate-50/50 group-hover:bg-slate-100 transition-colors">
+                <td className="border-b border-r border-black py-4 px-2 font-black text-[9px] uppercase text-black bg-slate-50/50 group-hover:bg-slate-100 transition-colors">
                   {pName}
                 </td>
                 {headers.map((_, i) => {
                   const rakat = getRakatForCell(pName, i);
-                  if (!rakat) return <td key={i} className="border-b border-r border-black p-1 bg-slate-100/10" />;
+                  if (!rakat) return <td key={i} className="border-b border-r border-black py-4 px-2 bg-slate-100/10" />;
                   
                   const isCompleted = salahProgress.includes(rakat.id);
                   
                   return (
-                    <td key={i} className="border-b border-r border-black p-1 text-center">
-                      <div className="flex flex-col items-center gap-0.5">
+                    <td key={i} className="border-b border-r border-black py-4 px-2 text-center">
+                      <div className="flex flex-col items-center gap-1">
                         {isCompleted ? (
-                          <div className="w-3.5 h-3.5 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200 shadow-sm">
-                            <Check size={8} strokeWidth={4} />
+                          <div className="w-5 h-5 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200 shadow-sm">
+                            <Check size={12} strokeWidth={3} />
                           </div>
                         ) : (
-                          <div className="w-3.5 h-3.5 rounded-md bg-rose-50 text-rose-400 flex items-center justify-center border border-rose-100 shadow-sm">
-                            <X size={8} strokeWidth={4} />
+                          <div className="w-5 h-5 rounded-md bg-rose-50 text-rose-400 flex items-center justify-center border border-rose-100 shadow-sm">
+                            <X size={12} strokeWidth={3} />
                           </div>
                         )}
-                        <span className="text-[6px] font-black text-slate-900 leading-none">
+                        <span className="text-[7px] font-black text-slate-900 leading-none">
                           {rakat.count}R
                         </span>
                       </div>

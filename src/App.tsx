@@ -855,7 +855,7 @@ const DailySurahReminder = () => {
 };
 
 const SalahDashboard = ({ salahProgress }: { salahProgress: string[] }) => {
-  const headers = ['Sunnah (B)', 'Fardh', 'Sunnah (A)', 'Nafl', 'Witr', 'Nafl'];
+  const headers = ['S(B)', 'Fardh', 'S(A)', 'Nafl', 'Witr', 'Nafl'];
   
   const getRakatForCell = (prayerName: string, colIndex: number) => {
     const prayer = SALAH_REQUIREMENTS.find(p => p.name === prayerName);
@@ -896,12 +896,12 @@ const SalahDashboard = ({ salahProgress }: { salahProgress: string[] }) => {
         <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Read Only</span>
       </div>
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse">
+        <table className="w-full border-collapse table-fixed">
           <thead>
             <tr className="bg-slate-50">
-              <th className="border-b border-r border-black p-1.5 text-[8px] font-black uppercase tracking-widest text-black text-left w-20">Prayer</th>
+              <th className="border-b border-r border-black p-1 text-[7px] font-black uppercase tracking-tighter text-black text-left w-12">Prayer</th>
               {headers.map((h, i) => (
-                <th key={i} className="border-b border-r border-black p-1.5 text-[8px] font-black uppercase tracking-widest text-black min-w-[55px]">
+                <th key={i} className="border-b border-r border-black p-1 text-[7px] font-black uppercase tracking-tighter text-black text-center">
                   {h}
                 </th>
               ))}
@@ -910,32 +910,30 @@ const SalahDashboard = ({ salahProgress }: { salahProgress: string[] }) => {
           <tbody>
             {['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'].map((pName) => (
               <tr key={pName} className="group hover:bg-slate-50/50 transition-colors">
-                <td className="border-b border-r border-black p-1.5 font-black text-[9px] uppercase tracking-widest text-black bg-slate-50/50 group-hover:bg-slate-100 transition-colors">
+                <td className="border-b border-r border-black p-1 font-black text-[8px] uppercase tracking-tighter text-black bg-slate-50/50 group-hover:bg-slate-100 transition-colors">
                   {pName}
                 </td>
                 {headers.map((_, i) => {
                   const rakat = getRakatForCell(pName, i);
-                  if (!rakat) return <td key={i} className="border-b border-r border-black p-1.5 bg-slate-100/10" />;
+                  if (!rakat) return <td key={i} className="border-b border-r border-black p-1 bg-slate-100/10" />;
                   
                   const isCompleted = salahProgress.includes(rakat.id);
                   
                   return (
-                    <td key={i} className="border-b border-r border-black p-1.5 text-center">
+                    <td key={i} className="border-b border-r border-black p-1 text-center">
                       <div className="flex flex-col items-center gap-0.5">
                         {isCompleted ? (
-                          <div className="w-4 h-4 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200 shadow-sm">
-                            <Check size={10} strokeWidth={3} />
+                          <div className="w-3.5 h-3.5 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200 shadow-sm">
+                            <Check size={8} strokeWidth={4} />
                           </div>
                         ) : (
-                          <div className="w-4 h-4 rounded-md bg-rose-50 text-rose-400 flex items-center justify-center border border-rose-100 shadow-sm">
-                            <X size={10} strokeWidth={3} />
+                          <div className="w-3.5 h-3.5 rounded-md bg-rose-50 text-rose-400 flex items-center justify-center border border-rose-100 shadow-sm">
+                            <X size={8} strokeWidth={4} />
                           </div>
                         )}
-                        <div className="flex flex-col items-center">
-                          <span className="text-[7px] font-black text-slate-900 leading-none">
-                            {rakat.count}R
-                          </span>
-                        </div>
+                        <span className="text-[6px] font-black text-slate-900 leading-none">
+                          {rakat.count}R
+                        </span>
                       </div>
                     </td>
                   );

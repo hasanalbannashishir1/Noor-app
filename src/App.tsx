@@ -896,22 +896,22 @@ const SalahDashboard = ({ salahProgress }: { salahProgress: string[] }) => {
   return (
     <div className="bg-white border-2 border-black rounded-xl overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-8">
       <div className="p-2 sm:p-3 border-b-2 border-black bg-black text-white flex items-center justify-between">
-        <h3 className="font-black uppercase text-[9px] sm:text-[10px] flex items-center gap-1.5 sm:gap-2">
+        <h3 className="font-normal uppercase text-[9px] sm:text-[10px] flex items-center gap-1.5 sm:gap-2">
           <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
           Salah Performance
         </h3>
-        <span className="text-[7px] sm:text-[8px] font-bold text-slate-400 uppercase">Read Only</span>
+        <span className="text-[7px] sm:text-[8px] font-normal text-slate-400 uppercase">Read Only</span>
       </div>
       <div className="w-full overflow-hidden">
         <table className="w-full border-collapse table-fixed">
           <thead>
             <tr className="bg-slate-50">
-              <th className="border-b border-r border-black py-2 sm:py-4 px-1 text-[6px] sm:text-[8px] font-black uppercase text-black text-left w-[14%]">Prayer</th>
+              <th className="border-b border-r border-black py-2 sm:py-4 px-1 text-[6px] sm:text-[8px] font-normal uppercase text-black text-center w-[14%]">Prayer</th>
               {headers.map((h, i) => (
                 <th key={i} className="border-b border-r border-black py-2 sm:py-4 px-0.5 text-center w-[14.3%]">
                   <div className="flex flex-col leading-none">
-                    <span className="text-[6px] sm:text-[8px] font-black uppercase text-black truncate">{h.title}</span>
-                    <span className="text-[4px] sm:text-[6px] font-bold uppercase text-slate-400 mt-0.5 truncate px-0.5">
+                    <span className="text-[6px] sm:text-[8px] font-normal uppercase text-black truncate">{h.title}</span>
+                    <span className="text-[4px] sm:text-[6px] font-normal uppercase text-slate-400 mt-0.5 truncate px-0.5">
                       {h.sub.split('/')[0]}
                     </span>
                   </div>
@@ -922,7 +922,7 @@ const SalahDashboard = ({ salahProgress }: { salahProgress: string[] }) => {
           <tbody>
             {['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'].map((pName) => (
               <tr key={pName} className="group hover:bg-slate-50/50 transition-colors">
-                <td className="border-b border-r border-black py-2 sm:py-4 px-1 font-black text-[7px] sm:text-[9px] uppercase text-black bg-slate-50/50 group-hover:bg-slate-100 transition-colors truncate">
+                <td className="border-b border-r border-black py-2 sm:py-4 px-1 font-normal text-[7px] sm:text-[9px] uppercase text-black bg-slate-50/50 group-hover:bg-slate-100 transition-colors truncate text-center">
                   {pName}
                 </td>
                 {headers.map((_, i) => {
@@ -943,7 +943,7 @@ const SalahDashboard = ({ salahProgress }: { salahProgress: string[] }) => {
                             <X className="w-2.5 h-2.5 sm:w-3 sm:h-3" strokeWidth={4} />
                           </div>
                         )}
-                        <span className="text-[5px] sm:text-[7px] font-black text-slate-900 leading-none">
+                        <span className="text-[5px] sm:text-[7px] font-normal text-slate-900 leading-none">
                           {rakat.count}R
                         </span>
                       </div>

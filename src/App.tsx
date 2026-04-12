@@ -1684,6 +1684,12 @@ export default function App() {
       const today = new Date().toDateString();
       const current = prevHistory[today] || [];
       const next = typeof update === 'function' ? update(current) : update;
+      
+      // Check if actually changed to prevent unnecessary re-renders
+      if (current.length === next.length && current.every((val, index) => next.includes(val))) {
+        return prevHistory;
+      }
+      
       return {
         ...prevHistory,
         [today]: next
@@ -1822,6 +1828,7 @@ export default function App() {
 
   // Daily Amal
   const [randomHadith, setRandomHadith] = useState<Hadith | null>(null);
+  const [isHadithLoading, setIsHadithLoading] = useState(false);
   const [amalBookmarks, setAmalBookmarks] = useState<BookmarkType[]>([]);
   const [selectedDuaCategory, setSelectedDuaCategory] = useState<string | null>(null);
 
@@ -1960,10 +1967,23 @@ export default function App() {
     };
     
     setDashboardHistory(prev => {
-      const filtered = prev.filter(h => h.date !== stats.date);
-      return [stats, ...filtered].slice(0, 15);
+      // Only update if stats have actually changed to prevent infinite loops
+      const today = stats.date;
+      const existing = prev.find(h => h.date === today);
+      
+      if (existing && 
+          existing.completedRakats === stats.completedRakats && 
+          existing.totalRakats === stats.totalRakats && 
+          existing.surahListens === stats.surahListens && 
+          existing.missedPrayers === stats.missedPrayers) {
+        return prev;
+      }
+
+      const filtered = prev.filter(h => h.date !== today);
+      const updated = [stats, ...filtered].slice(0, 15);
+      return updated;
     });
-  }, [salahProgress, surahsListenedCount]);
+  }, [salahHistory, surahsListenedCount, currentPrayer]);
 
   useEffect(() => {
     const fetchHijri = async () => {
@@ -2042,22 +2062,51 @@ export default function App() {
   ];
 
   const fetchRandomAmal = async () => {
-    setRandomHadith({
-      id: 1,
-      hadithNumber: "5027",
-      englishNarrator: "Uthman bin Affan",
-      hadithArabic: "خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ",
-      hadithEnglish: "The best among you are those who learn the Quran and teach it.",
-      bookSlug: "sahih-bukhari",
-      status: "Sahih"
-    });
+    setIsHadithLoading(true);
+    try {
+      const books = hadithService.getBooks();
+      const randomBook = books[Math.floor(Math.random() * books.length)];
+      
+      // Try to find a long hadith (mid to long size for 1-2 min reading)
+      let foundHadith: Hadith | null = null;
+      let attempts = 0;
+      
+      // We'll try up to 3 different random pages to find a substantial hadith
+      while (!foundHadith && attempts < 3) {
+        const randomPage = Math.floor(Math.random() * 20) + 1; 
+        const hadiths = await hadithService.getHadiths(randomBook.id, randomPage);
+        
+        // Filter for hadiths with at least 500 characters (roughly 80-100 words)
+        // This usually takes about 1-2 minutes to read carefully.
+        const substantialHadiths = hadiths.filter(h => h.hadithEnglish.length > 500);
+        
+        if (substantialHadiths.length > 0) {
+          foundHadith = substantialHadiths[Math.floor(Math.random() * substantialHadiths.length)];
+        }
+        attempts++;
+      }
+      
+      if (foundHadith) {
+        setRandomHadith(foundHadith);
+      } else {
+        // Fallback: if no long hadith found, just get any hadith from the first page
+        const hadiths = await hadithService.getHadiths(randomBook.id, 1);
+        if (hadiths.length > 0) {
+          setRandomHadith(hadiths[Math.floor(Math.random() * hadiths.length)]);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching random hadith:', error);
+    } finally {
+      setIsHadithLoading(false);
+    }
   };
 
   useEffect(() => {
     if (activeTab === 'amal') {
       fetchRandomAmal();
     }
-  }, [activeTab, surahs]);
+  }, [activeTab]);
 
   useEffect(() => {
     const fetchSurahs = async () => {
@@ -2158,7 +2207,9 @@ export default function App() {
         break;
       }
     }
-    setCurrentPrayer(detected);
+    if (currentPrayer !== detected) {
+      setCurrentPrayer(detected);
+    }
   };
 
   useEffect(() => {
@@ -2334,6 +2385,7 @@ export default function App() {
     
     if (listPlayingId === surah.id) {
       setIsPlaying(!isPlaying);
+      if (isKhatamMode) setIsKhatamMode(false);
       return;
     }
 
@@ -2357,10 +2409,27 @@ export default function App() {
     if (!surahs.length) return;
 
     const currentSurah = surahs[khatamSurahIndex];
-    const isSameSurah = listPlayingId === currentSurah.id && isKhatamMode;
-
-    if (isSameSurah) {
+    
+    // If we're already in Khatam mode and playing this surah, just toggle
+    if (isKhatamMode && listPlayingId === currentSurah.id) {
       setIsPlaying(!isPlaying);
+      return;
+    }
+
+    // If we're switching to Khatam mode but the surah is already loaded (e.g. from Al-Quran)
+    if (listPlayingId === currentSurah.id) {
+      setIsKhatamMode(true);
+      if (audioRef.current) {
+        // Use a small delay to ensure state is updated and audio is ready
+        setTimeout(() => {
+          if (audioRef.current) {
+            audioRef.current.currentTime = khatamTime;
+            setIsPlaying(true);
+          }
+        }, 100);
+      } else {
+        setIsPlaying(true);
+      }
       return;
     }
 
@@ -2368,9 +2437,16 @@ export default function App() {
     setIsKhatamMode(true);
     try {
       const audioData = await quranService.getSurahAudio(currentSurah.id);
+      
+      const isSameUrl = audio?.audio_url === audioData.audio_url;
+      
       setAudio(audioData);
       setListPlayingId(currentSurah.id);
       setIsPlaying(true);
+
+      if (isSameUrl && audioRef.current) {
+        audioRef.current.currentTime = khatamTime;
+      }
     } catch (error) {
       console.error('Error playing Khatam audio:', error);
     } finally {
@@ -3926,7 +4002,7 @@ export default function App() {
                             </div>
                           )}
 
-                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                          <div className="grid grid-cols-3 gap-3">
                             {[
                               "Muharram", "Safar", "Rabi' al-Awwal", "Rabi' al-Thani",
                               "Jumada al-Ula", "Jumada al-Akhirah", "Rajab", "Sha'ban",
@@ -4302,11 +4378,32 @@ export default function App() {
                     </div>
 
                     {/* Hadith Section */}
-                    <div className="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm text-center">
-                      <Heart className="text-red-500 mx-auto mb-4" size={32} />
-                      <h3 className="text-lg font-bold text-slate-900 mb-4">Daily Hadith</h3>
-                      <p className="text-slate-600 italic leading-relaxed mb-6">"{randomHadith?.hadithEnglish}"</p>
-                      <p className="text-xs font-bold text-emerald-600 uppercase tracking-widest">— {randomHadith?.bookSlug.replace('-', ' ')}</p>
+                    <div className="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm text-center min-h-[300px] flex flex-col justify-center">
+                      {isHadithLoading ? (
+                        <div className="py-12">
+                          <Loader2 className="w-8 h-8 text-emerald-600 animate-spin mx-auto mb-4" />
+                          <p className="text-slate-400 text-sm font-medium">Fetching a meaningful Hadith for you...</p>
+                        </div>
+                      ) : randomHadith ? (
+                        <>
+                          <Heart className="text-red-500 mx-auto mb-4" size={32} />
+                          <h3 className="text-lg font-bold text-slate-900 mb-4">Daily Hadith</h3>
+                          <div className="max-h-[400px] overflow-y-auto pr-2 custom-scrollbar mb-6">
+                            <p className="text-slate-600 italic leading-relaxed text-sm md:text-base">"{randomHadith.hadithEnglish}"</p>
+                          </div>
+                          <p className="text-xs font-bold text-emerald-600 uppercase tracking-widest">— {randomHadith.bookSlug.replace(/-/g, ' ')}</p>
+                        </>
+                      ) : (
+                        <div className="py-12">
+                          <p className="text-slate-400 text-sm">Could not load Hadith. Please try again.</p>
+                          <button 
+                            onClick={fetchRandomAmal}
+                            className="mt-4 text-emerald-600 font-bold text-sm hover:underline"
+                          >
+                            Retry
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </motion.div>
                 )}
@@ -4346,7 +4443,7 @@ export default function App() {
                       </div>
 
                       {!selectedDuaCategory ? (
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div className="grid grid-cols-4 gap-3">
                           {DUA_CATEGORIES.map(cat => {
                             const count = DUAS.filter(d => d.category === cat).length;
                             return (
@@ -4507,7 +4604,7 @@ export default function App() {
         onTimeUpdate={() => {
           const currentTime = audioRef.current?.currentTime || 0;
           setAudioCurrentTime(currentTime);
-          if (isKhatamMode) {
+          if (isKhatamMode && listPlayingId === surahs[khatamSurahIndex]?.id) {
             setKhatamTime(currentTime);
             localStorage.setItem('khatam_time', currentTime.toString());
           }
@@ -4515,7 +4612,12 @@ export default function App() {
         onLoadedMetadata={() => {
           setDuration(audioRef.current?.duration || 0);
           if (isKhatamMode && audioRef.current && khatamTime > 0) {
-            audioRef.current.currentTime = khatamTime;
+            // Use a small delay to ensure the browser has loaded enough to seek
+            setTimeout(() => {
+              if (audioRef.current && isKhatamMode) {
+                audioRef.current.currentTime = khatamTime;
+              }
+            }, 50);
           }
         }}
         onEnded={async () => {
@@ -4640,6 +4742,7 @@ export default function App() {
                       if (audioRef.current) audioRef.current.pause();
                       setIsPlaying(false);
                       setListPlayingId(null);
+                      setIsKhatamMode(false);
                     }}
                     className="w-8 h-8 md:w-10 md:h-10 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl flex items-center justify-center transition-all"
                   >

@@ -1,6 +1,5 @@
 
 const HADITH_API_BASE = '/api/hadiths';
-const API_KEY = '$2y$10$oX668r6G9v9Y89rG9v9Y89rG9v9Y89rG9v9Y89rG9v9Y89rG9v9Y8'; 
 
 import { Hadith } from '../types';
 
@@ -13,7 +12,7 @@ export interface HadithBook {
 export const hadithService = {
   async fetchBooks(): Promise<HadithBook[]> {
     try {
-      const url = `/api/books?apiKey=${encodeURIComponent(API_KEY)}`;
+      const url = `/api/books`;
       const response = await fetch(url);
       if (!response.ok) throw new Error('Failed to fetch books');
       const data = await response.json();
@@ -52,7 +51,7 @@ export const hadithService = {
   async getHadiths(book: string, page: number = 1): Promise<Hadith[]> {
     try {
       console.log(`Fetching hadiths for book slug: ${book}, page: ${page}`);
-      const url = `${HADITH_API_BASE}?apiKey=${encodeURIComponent(API_KEY)}&book=${encodeURIComponent(book)}&paginate=20&page=${page}`;
+      const url = `${HADITH_API_BASE}?book=${encodeURIComponent(book)}&paginate=20&page=${page}`;
       console.log(`Fetching hadiths from: ${url}`);
       const response = await fetch(url);
       
@@ -90,7 +89,7 @@ export const hadithService = {
 
   async searchHadith(query: string): Promise<Hadith[]> {
     try {
-      const url = `${HADITH_API_BASE}?apiKey=${encodeURIComponent(API_KEY)}&paginate=20&search=${encodeURIComponent(query)}`;
+      const url = `${HADITH_API_BASE}?paginate=20&search=${encodeURIComponent(query)}`;
       const response = await fetch(url);
       
       if (!response.ok) {

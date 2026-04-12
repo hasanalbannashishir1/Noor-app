@@ -1539,6 +1539,80 @@ const SavedItemsView = ({
   );
 };
 
+const StreakCalendar = ({ visitedDates }: { visitedDates: string[] }) => {
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+  const todayStr = now.toISOString().split('T')[0];
+
+  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+  const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
+
+  const monthName = now.toLocaleString('default', { month: 'long' });
+
+  const days = Array.from({ length: daysInMonth }, (_, i) => {
+    const day = i + 1;
+    const date = new Date(currentYear, currentMonth, day);
+    const dateStr = date.toISOString().split('T')[0];
+    const isVisited = visitedDates.includes(dateStr);
+    const isPast = date < new Date(new Date().setHours(0, 0, 0, 0));
+    const isToday = dateStr === todayStr;
+
+    return { day, dateStr, isVisited, isPast, isToday };
+  });
+
+  return (
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="p-6 border-b border-slate-100">
+        <div className="flex items-center justify-between mb-1">
+          <h3 className="font-bold text-slate-900 flex items-center gap-2">
+            <Flame className="text-orange-500" size={20} />
+            Streak Calendar
+          </h3>
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{monthName} {currentYear}</span>
+        </div>
+        <p className="text-xs text-slate-500 font-medium italic">“Keep going, you’re doing great”</p>
+      </div>
+      <div className="p-6">
+        <div className="grid grid-cols-7 gap-2 mb-4">
+          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
+            <div key={d} className="text-[10px] font-bold text-slate-400 text-center uppercase tracking-tighter">{d}</div>
+          ))}
+        </div>
+        <div className="grid grid-cols-7 gap-2">
+          {Array.from({ length: firstDayOfMonth }).map((_, i) => (
+            <div key={`empty-${i}`} />
+          ))}
+          {days.map(d => (
+            <div key={d.day} className={cn(
+              "relative flex flex-col items-center justify-center p-2 rounded-xl border aspect-square transition-all",
+              d.isToday ? "border-indigo-200 bg-indigo-50/30" : "border-slate-50 bg-slate-50/50"
+            )}>
+              <span className={cn(
+                "text-xs font-bold",
+                d.isToday ? "text-indigo-600" : "text-slate-600"
+              )}>
+                {d.day}
+              </span>
+              <div className="absolute -top-1 -right-1">
+                {d.isVisited ? (
+                  <div className="bg-orange-500 text-white rounded-full p-0.5 shadow-sm">
+                    <Flame size={10} fill="currentColor" />
+                  </div>
+                ) : d.isPast ? (
+                  <div className="bg-rose-500 text-white rounded-full p-0.5 shadow-sm">
+                    <X size={10} />
+                  </div>
+                ) : null}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function App() {
   const [activeTab, setActiveTab] = useState<'home' | 'deen' | 'ai' | 'amal' | 'dashboard'>('home');
   const [deenSubTab, setDeenSubTab] = useState<'grid' | 'quran' | 'zakat' | 'names' | 'hadith' | 'events' | 'prayer' | 'documentary' | 'ramadan' | 'hajj' | 'qibla' | 'calendar' | 'milad' | 'saved'>('grid');
@@ -1551,6 +1625,7 @@ export default function App() {
   // Clock and Calendars
   const [timeString, setTimeString] = useState<string>(new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }));
   const [hijriDate, setHijriDate] = useState<string>('');
+  const [hijriCalendar, setHijriCalendar] = useState<any[]>([]);
 
   // Quran States
   const [surahs, setSurahs] = useState<Surah[]>([]);
@@ -1574,6 +1649,17 @@ export default function App() {
   const [showEmail, setShowEmail] = useState(false);
   const [homeHadith, setHomeHadith] = useState<{ text: string, source: string } | null>(null);
   const [isDashboardSavedItemsExpanded, setIsDashboardSavedItemsExpanded] = useState(false);
+
+  // Khatam Player States
+  const [khatamSurahIndex, setKhatamSurahIndex] = useState<number>(() => {
+    const saved = localStorage.getItem('khatam_surah_index');
+    return saved ? parseInt(saved) : 0;
+  });
+  const [khatamTime, setKhatamTime] = useState<number>(() => {
+    const saved = localStorage.getItem('khatam_time');
+    return saved ? parseFloat(saved) : 0;
+  });
+  const [isKhatamMode, setIsKhatamMode] = useState<boolean>(false);
 
   // Salah Tracker States
   const [salahHistory, setSalahHistory] = useState<{ [date: string]: string[] }>(() => {
@@ -1735,9 +1821,9 @@ export default function App() {
   const [isAiLoading, setIsAiLoading] = useState(false);
 
   // Daily Amal
-  const [randomSurah, setRandomSurah] = useState<Surah | null>(null);
   const [randomHadith, setRandomHadith] = useState<Hadith | null>(null);
   const [amalBookmarks, setAmalBookmarks] = useState<BookmarkType[]>([]);
+  const [selectedDuaCategory, setSelectedDuaCategory] = useState<string | null>(null);
 
   // Dashboard
   const [dashboardHistory, setDashboardHistory] = useState<DashboardStats[]>(() => {
@@ -1766,18 +1852,32 @@ export default function App() {
     return saved ? parseInt(saved) : 0;
   });
 
+  const [visitedDates, setVisitedDates] = useState<string[]>(() => {
+    const saved = localStorage.getItem('visited_dates');
+    return saved ? JSON.parse(saved) : [];
+  });
+
   useEffect(() => {
     const updateStreak = () => {
       const now = new Date();
       const today = now.toISOString().split('T')[0];
       const lastVisit = localStorage.getItem('last_visit_date');
       
+      // Update visited dates
+      setVisitedDates(prev => {
+        if (!prev.includes(today)) {
+          const newDates = [...prev, today];
+          localStorage.setItem('visited_dates', JSON.stringify(newDates));
+          return newDates;
+        }
+        return prev;
+      });
+
       if (!lastVisit) {
         setStreakCount(1);
         localStorage.setItem('user_streak_count', '1');
         localStorage.setItem('last_visit_date', today);
       } else if (lastVisit !== today) {
-        const lastDate = new Date(lastVisit);
         const yesterday = new Date(now);
         yesterday.setDate(yesterday.getDate() - 1);
         const yesterdayStr = yesterday.toISOString().split('T')[0];
@@ -1868,10 +1968,21 @@ export default function App() {
   useEffect(() => {
     const fetchHijri = async () => {
       try {
-        const response = await fetch(`https://api.aladhan.com/v1/gToH?date=${new Date().toLocaleDateString('en-GB').replace(/\//g, '-')}`);
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('en-GB').replace(/\//g, '-');
+        const response = await fetch(`https://api.aladhan.com/v1/gToH?date=${dateStr}`);
         const data = await response.json();
         if (data.data) {
           setHijriDate(`${data.data.hijri.day} ${data.data.hijri.month.en} ${data.data.hijri.year} AH`);
+        }
+
+        // Fetch full month calendar
+        const month = now.getMonth() + 1;
+        const year = now.getFullYear();
+        const calResponse = await fetch(`https://api.aladhan.com/v1/gToHCalendar/${month}/${year}`);
+        const calData = await calResponse.json();
+        if (calData.data) {
+          setHijriCalendar(calData.data);
         }
       } catch (err) {
         console.error("Hijri fetch error:", err);
@@ -1931,10 +2042,6 @@ export default function App() {
   ];
 
   const fetchRandomAmal = async () => {
-    if (surahs.length > 0) {
-      const randomS = surahs[Math.floor(Math.random() * surahs.length)];
-      setRandomSurah(randomS);
-    }
     setRandomHadith({
       id: 1,
       hadithNumber: "5027",
@@ -1966,6 +2073,32 @@ export default function App() {
     };
     fetchSurahs();
   }, []);
+
+  // Safe play function
+  const safePlay = async () => {
+    if (audioRef.current) {
+      try {
+        const playPromise = audioRef.current.play();
+        if (playPromise !== undefined) {
+          await playPromise;
+        }
+      } catch (error: any) {
+        if (error.name !== 'AbortError') {
+          console.error("Playback error:", error);
+          setIsPlaying(false);
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (!audioRef.current) return;
+    if (isPlaying) {
+      safePlay();
+    } else {
+      audioRef.current.pause();
+    }
+  }, [isPlaying, audio?.audio_url]);
 
   useEffect(() => {
     const fetchPrayerTimes = async () => {
@@ -2186,19 +2319,7 @@ export default function App() {
   };
 
   const togglePlay = () => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-      } else {
-        audioRef.current.play();
-        if (selectedSurah) {
-          setListPlayingId(selectedSurah.id);
-          setSurahsListenedCount(prev => prev + 1);
-          logActivity('quran', `Started listening to Surah ${selectedSurah.name_simple}`);
-        }
-      }
-      setIsPlaying(!isPlaying);
-    }
+    setIsPlaying(!isPlaying);
   };
 
   const toggleMute = () => {
@@ -2212,15 +2333,7 @@ export default function App() {
     e.stopPropagation();
     
     if (listPlayingId === surah.id) {
-      if (audioRef.current) {
-        if (isPlaying) {
-          audioRef.current.pause();
-          setIsPlaying(false);
-        } else {
-          audioRef.current.play();
-          setIsPlaying(true);
-        }
-      }
+      setIsPlaying(!isPlaying);
       return;
     }
 
@@ -2230,24 +2343,36 @@ export default function App() {
       setAudio(audioData);
       setListPlayingId(surah.id);
       setIsPlaying(true);
+      setIsKhatamMode(false);
       setSurahsListenedCount(prev => prev + 1);
       logActivity('quran', `Started listening to Surah ${surah.name_simple}`);
-      
-      // We need to wait for the audio source to update
-      if (audioRef.current) {
-        audioRef.current.src = audioData.audio_url;
-        audioRef.current.load(); // Force load the new source
-        const playPromise = audioRef.current.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(error => {
-            console.error("Auto-play was prevented:", error);
-            // If auto-play was prevented, we still want to show the play button
-            setIsPlaying(false);
-          });
-        }
-      }
     } catch (error) {
       console.error('Error playing list audio:', error);
+    } finally {
+      setListAudioLoading(null);
+    }
+  };
+
+  const handleKhatamPlay = async () => {
+    if (!surahs.length) return;
+
+    const currentSurah = surahs[khatamSurahIndex];
+    const isSameSurah = listPlayingId === currentSurah.id && isKhatamMode;
+
+    if (isSameSurah) {
+      setIsPlaying(!isPlaying);
+      return;
+    }
+
+    setListAudioLoading(currentSurah.id);
+    setIsKhatamMode(true);
+    try {
+      const audioData = await quranService.getSurahAudio(currentSurah.id);
+      setAudio(audioData);
+      setListPlayingId(currentSurah.id);
+      setIsPlaying(true);
+    } catch (error) {
+      console.error('Error playing Khatam audio:', error);
     } finally {
       setListAudioLoading(null);
     }
@@ -2767,7 +2892,7 @@ export default function App() {
                         >
                           <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm overflow-hidden border border-slate-100">
                             <img 
-                              src="https://i.postimg.cc/LJfX4fHY/quran.png" 
+                              src="https://i.postimg.cc/mcjXTZVB/quran.png" 
                               alt="Al Quran" 
                               className="w-full h-full object-cover"
                               referrerPolicy="no-referrer"
@@ -2809,6 +2934,22 @@ export default function App() {
                             />
                           </div>
                           <h3 className="text-[10px] font-bold uppercase tracking-tight">99 Names</h3>
+                        </button>
+
+                        {/* Saved Items Option */}
+                        <button 
+                          onClick={() => setDeenSubTab('saved')}
+                          className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
+                        >
+                          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm overflow-hidden border border-slate-100">
+                            <img 
+                              src="https://i.postimg.cc/gnmcqtVr/bookmark.png" 
+                              alt="Saved Items" 
+                              className="w-full h-full object-cover"
+                              referrerPolicy="no-referrer"
+                            />
+                          </div>
+                          <h3 className="text-[10px] font-bold uppercase tracking-tight">Saved Items</h3>
                         </button>
 
                         {/* Zakat Option */}
@@ -2953,22 +3094,6 @@ export default function App() {
                             />
                           </div>
                           <h3 className="text-[10px] font-bold uppercase tracking-tight">Eid e Milladunnabi</h3>
-                        </button>
-
-                        {/* Saved Items Option */}
-                        <button 
-                          onClick={() => setDeenSubTab('saved')}
-                          className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
-                        >
-                          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm overflow-hidden border border-slate-100">
-                            <img 
-                              src="https://i.postimg.cc/gnmcqtVr/bookmark.png" 
-                              alt="Saved Items" 
-                              className="w-full h-full object-cover"
-                              referrerPolicy="no-referrer"
-                            />
-                          </div>
-                          <h3 className="text-[10px] font-bold uppercase tracking-tight">Saved Items</h3>
                         </button>
                       </div>
                   ) : (
@@ -3749,18 +3874,72 @@ export default function App() {
                             <p className="text-sm text-slate-500">{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
                           </div>
 
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          {hijriCalendar.length > 0 && (
+                            <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                              <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                                <h4 className="font-bold text-slate-900">
+                                  {hijriCalendar[0]?.hijri.month.en} {hijriCalendar[0]?.hijri.year} AH
+                                </h4>
+                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                  {hijriCalendar[0]?.gregorian.month.en} {hijriCalendar[0]?.gregorian.year}
+                                </span>
+                              </div>
+                              <div className="p-6">
+                                <div className="grid grid-cols-7 gap-2 mb-4">
+                                  {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
+                                    <div key={d} className="text-[10px] font-bold text-slate-400 text-center uppercase tracking-tighter">{d}</div>
+                                  ))}
+                                </div>
+                                <div className="grid grid-cols-7 gap-2">
+                                  {(() => {
+                                    const firstDay = hijriCalendar[0]?.gregorian.weekday.en;
+                                    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                                    const offset = days.indexOf(firstDay);
+                                    return Array.from({ length: offset >= 0 ? offset : 0 }).map((_, i) => (
+                                      <div key={`empty-${i}`} />
+                                    ));
+                                  })()}
+                                  {hijriCalendar.map((day, i) => {
+                                    const isToday = day.gregorian.date === new Date().toLocaleDateString('en-GB').replace(/\//g, '-');
+                                    return (
+                                      <div key={i} className={cn(
+                                        "relative flex flex-col items-center justify-center p-2 rounded-xl border aspect-square transition-all",
+                                        isToday ? "border-emerald-200 bg-emerald-50/30" : "border-slate-50 bg-slate-50/50"
+                                      )}>
+                                        <span className={cn(
+                                          "text-[10px] font-bold",
+                                          isToday ? "text-emerald-600" : "text-slate-400"
+                                        )}>
+                                          {day.gregorian.day}
+                                        </span>
+                                        <span className={cn(
+                                          "text-sm font-black",
+                                          isToday ? "text-emerald-700" : "text-slate-800"
+                                        )}>
+                                          {day.hijri.day}
+                                        </span>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                             {[
                               "Muharram", "Safar", "Rabi' al-Awwal", "Rabi' al-Thani",
                               "Jumada al-Ula", "Jumada al-Akhirah", "Rajab", "Sha'ban",
                               "Ramadan", "Shawwal", "Dhu al-Qi'dah", "Dhu al-Hijjah"
                             ].map((month, i) => (
-                              <div key={i} className="bg-white p-4 rounded-2xl border border-slate-200 flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                  <span className="w-8 h-8 bg-slate-50 text-slate-400 rounded-lg flex items-center justify-center text-xs font-bold">{i + 1}</span>
-                                  <span className="font-bold text-slate-800">{month}</span>
-                                </div>
-                                {month === "Ramadan" && <span className="px-2 py-1 bg-emerald-100 text-emerald-700 text-[8px] font-bold rounded-full uppercase">Current</span>}
+                              <div key={i} className="bg-white p-3 rounded-xl border border-slate-200 flex flex-col items-center gap-2 text-center relative overflow-hidden">
+                                <span className="w-6 h-6 bg-slate-50 text-slate-400 rounded-lg flex items-center justify-center text-[10px] font-bold">{i + 1}</span>
+                                <span className="text-[10px] font-bold text-slate-800 leading-tight">{month}</span>
+                                {hijriCalendar[0]?.hijri.month.en === month && (
+                                  <div className="absolute top-0 right-0">
+                                    <div className="bg-emerald-500 text-white text-[6px] font-black px-1.5 py-0.5 rounded-bl-lg uppercase">Current</div>
+                                  </div>
+                                )}
                               </div>
                             ))}
                           </div>
@@ -4044,44 +4223,64 @@ export default function App() {
                       <p className="text-[10px] text-slate-400 mt-2">— Prophet Muhammad (PBUH)</p>
                     </div>
 
-                    {/* Random Surah Section */}
+                    {/* Quran Khatam Player */}
                     <div className="bg-emerald-700 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
                       <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-10 -mt-10 blur-2xl" />
-                      <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
-                        <div className="text-center md:text-left">
-                          <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
-                            <Sparkles size={20} className="text-emerald-300" />
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-200">Surah of the Moment</span>
-                          </div>
-                          {randomSurah ? (
-                            <>
-                              <h3 className="text-3xl font-bold mb-2">{randomSurah.name_simple}</h3>
-                              <p className="text-emerald-100/80 mb-6">{randomSurah.translated_name.name}</p>
-                              <div className="flex items-center justify-center md:justify-start gap-4">
-                                <button 
-                                  onClick={(e) => handleListPlay(e, randomSurah)}
-                                  className="bg-white text-emerald-700 px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg hover:scale-105 transition-transform flex items-center gap-2"
-                                  disabled={listAudioLoading === randomSurah.id}
-                                >
-                                  {listAudioLoading === randomSurah.id ? (
-                                    <Loader2 size={18} className="animate-spin" />
-                                  ) : (
-                                    listPlayingId === randomSurah.id && isPlaying ? <Pause size={18} /> : <Play size={18} />
-                                  )}
-                                  {listPlayingId === randomSurah.id && isPlaying ? 'Pause' : 'Play'}
-                                </button>
-                                <button 
-                                  onClick={fetchRandomAmal}
-                                  className="p-2.5 bg-white/10 rounded-xl hover:bg-white/20 transition-colors"
-                                  title="Next Surah"
-                                >
-                                  <SkipForward size={20} />
-                                </button>
-                              </div>
-                            </>
-                          ) : <Loader2 className="animate-spin" />}
+                      <div className="relative z-10">
+                        <div className="flex items-center gap-2 mb-6">
+                          <Headphones size={20} className="text-emerald-300" />
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-200">Quran Khatam Player</span>
                         </div>
-                        <div className="text-6xl font-arabic opacity-80">{randomSurah?.name_arabic}</div>
+                        
+                        {surahs.length > 0 ? (
+                          <div className="flex flex-col gap-6">
+                            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                              <div className="text-center md:text-left">
+                                <h3 className="text-3xl font-bold mb-1">{surahs[khatamSurahIndex].name_simple}</h3>
+                                <p className="text-emerald-100/80 text-sm">Surah {khatamSurahIndex + 1} of 114</p>
+                              </div>
+                              <div className="text-5xl font-arabic opacity-80">{surahs[khatamSurahIndex].name_arabic}</div>
+                            </div>
+
+                            <div className="space-y-3">
+                              <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-emerald-200">
+                                <span>{formatTime(isKhatamMode ? audioCurrentTime : khatamTime)}</span>
+                                <span>{formatTime(isKhatamMode ? duration : 0)}</span>
+                              </div>
+                              <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+                                <div 
+                                  className="h-full bg-white rounded-full transition-all duration-300"
+                                  style={{ width: `${((isKhatamMode ? audioCurrentTime : khatamTime) / (isKhatamMode ? duration || 1 : 1)) * 100}%` }}
+                                />
+                              </div>
+                            </div>
+
+                            <div className="flex flex-col sm:flex-row items-center gap-4">
+                              <button 
+                                onClick={handleKhatamPlay}
+                                className="w-full sm:w-auto bg-white text-emerald-700 px-8 py-3 rounded-2xl font-bold text-sm shadow-lg hover:scale-105 transition-transform flex items-center justify-center gap-2"
+                                disabled={listAudioLoading === surahs[khatamSurahIndex].id}
+                              >
+                                {listAudioLoading === surahs[khatamSurahIndex].id ? (
+                                  <Loader2 size={20} className="animate-spin" />
+                                ) : (
+                                  isKhatamMode && isPlaying ? <Pause size={20} /> : <Play size={20} />
+                                )}
+                                {isKhatamMode && isPlaying ? 'Pause' : khatamTime > 0 ? 'Continue from where I left' : 'Start Journey'}
+                              </button>
+                              
+                              {!isKhatamMode && khatamTime > 0 && (
+                                <p className="text-[10px] font-bold text-emerald-200 uppercase tracking-widest">
+                                  Last left at Surah {khatamSurahIndex + 1}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-center py-12">
+                            <Loader2 className="animate-spin" />
+                          </div>
+                        )}
                       </div>
                     </div>
                   </motion.div>
@@ -4130,41 +4329,64 @@ export default function App() {
 
                     {/* Dua Section */}
                     <div className="space-y-6">
-                      <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                        <Bookmark className="text-emerald-600" size={24} />
-                        Daily Duas
-                      </h3>
-                      <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
-                        {DUA_CATEGORIES.map(cat => (
-                          <button
-                            key={cat}
-                            className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold whitespace-nowrap hover:border-emerald-500 hover:text-emerald-600 transition-all"
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                          <Bookmark className="text-emerald-600" size={24} />
+                          {selectedDuaCategory ? selectedDuaCategory : 'Daily Duas'}
+                        </h3>
+                        {selectedDuaCategory && (
+                          <button 
+                            onClick={() => setSelectedDuaCategory(null)}
+                            className="text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1"
                           >
-                            {cat}
+                            <ChevronLeft size={14} />
+                            Back to Categories
                           </button>
-                        ))}
+                        )}
                       </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {DUAS.map(dua => (
-                          <div key={dua.id} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all relative group">
-                            <div className="flex items-center justify-between mb-4">
-                              <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">{dua.category}</span>
-                              <button 
-                                onClick={() => toggleDuaBookmark(dua.id)}
-                                className={cn(
-                                  "p-2 rounded-lg transition-all",
-                                  bookmarkedDuas.includes(dua.id) ? "bg-emerald-50 text-emerald-600" : "text-slate-300 hover:text-emerald-600 hover:bg-emerald-50"
-                                )}
+
+                      {!selectedDuaCategory ? (
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                          {DUA_CATEGORIES.map(cat => {
+                            const count = DUAS.filter(d => d.category === cat).length;
+                            return (
+                              <button
+                                key={cat}
+                                onClick={() => setSelectedDuaCategory(cat)}
+                                className="bg-white p-4 rounded-2xl border border-slate-200 text-center hover:border-emerald-500 hover:shadow-md transition-all group"
                               >
-                                <Bookmark size={18} fill={bookmarkedDuas.includes(dua.id) ? "currentColor" : "none"} />
+                                <div className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                                  <Bookmark size={20} />
+                                </div>
+                                <span className="block text-xs font-bold text-slate-800 mb-1">{cat}</span>
+                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{count} Duas</span>
                               </button>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {DUAS.filter(d => d.category === selectedDuaCategory).map(dua => (
+                            <div key={dua.id} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all relative group">
+                              <div className="flex items-center justify-between mb-4">
+                                <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">{dua.category}</span>
+                                <button 
+                                  onClick={() => toggleDuaBookmark(dua.id)}
+                                  className={cn(
+                                    "p-2 rounded-lg transition-all",
+                                    bookmarkedDuas.includes(dua.id) ? "bg-emerald-50 text-emerald-600" : "text-slate-300 hover:text-emerald-600 hover:bg-emerald-50"
+                                  )}
+                                >
+                                  <Bookmark size={18} fill={bookmarkedDuas.includes(dua.id) ? "currentColor" : "none"} />
+                                </button>
+                              </div>
+                              <h4 className="font-bold text-slate-900 mb-2">{dua.title}</h4>
+                              <p className="text-right text-lg font-arabic mb-4 leading-relaxed">{dua.arabic}</p>
+                              <p className="text-xs text-slate-500 leading-relaxed">{dua.translation}</p>
                             </div>
-                            <h4 className="font-bold text-slate-900 mb-2">{dua.title}</h4>
-                            <p className="text-right text-lg font-arabic mb-4 leading-relaxed">{dua.arabic}</p>
-                            <p className="text-xs text-slate-500 leading-relaxed">{dua.translation}</p>
-                          </div>
-                        ))}
-                      </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </motion.div>
                 )}
@@ -4180,6 +4402,21 @@ export default function App() {
               exit={{ opacity: 0, y: -20 }}
               className="space-y-6"
             >
+              <SavedItemsView 
+                bookmarkedSurahs={bookmarkedSurahs}
+                surahs={surahs}
+                setActiveTab={setActiveTab}
+                setDeenSubTab={setDeenSubTab}
+                handleSurahClick={handleSurahClick}
+                toggleSurahBookmark={toggleSurahBookmark}
+                bookmarkedDuas={bookmarkedDuas}
+                DUAS={DUAS}
+                toggleDuaBookmark={toggleDuaBookmark}
+                isCollapsible={true}
+                isExpanded={isDashboardSavedItemsExpanded}
+                onToggle={() => setIsDashboardSavedItemsExpanded(!isDashboardSavedItemsExpanded)}
+              />
+
               <SalahDashboard 
                 salahHistory={salahHistory} 
                 selectedDate={selectedDashboardDate}
@@ -4214,10 +4451,6 @@ export default function App() {
                               style={{ width: `${(history.completedRakats / (history.totalRakats || 1)) * 100}%` }}
                             />
                           </div>
-                          <div className="flex items-center justify-between text-[9px] font-bold text-slate-400">
-                            <span className="flex items-center gap-1"><Music size={10} /> {history.surahListens}</span>
-                            <span className="flex items-center gap-1"><History size={10} /> {history.missedPrayers} Missed</span>
-                          </div>
                         </div>
                       ))}
                     </div>
@@ -4225,20 +4458,7 @@ export default function App() {
                 </div>
               </div>
 
-              <SavedItemsView 
-                bookmarkedSurahs={bookmarkedSurahs}
-                surahs={surahs}
-                setActiveTab={setActiveTab}
-                setDeenSubTab={setDeenSubTab}
-                handleSurahClick={handleSurahClick}
-                toggleSurahBookmark={toggleSurahBookmark}
-                bookmarkedDuas={bookmarkedDuas}
-                DUAS={DUAS}
-                toggleDuaBookmark={toggleDuaBookmark}
-                isCollapsible={true}
-                isExpanded={isDashboardSavedItemsExpanded}
-                onToggle={() => setIsDashboardSavedItemsExpanded(!isDashboardSavedItemsExpanded)}
-              />
+              <StreakCalendar visitedDates={visitedDates} />
             </motion.div>
           )}
         </AnimatePresence>
@@ -4284,12 +4504,51 @@ export default function App() {
       <audio 
         ref={audioRef} 
         src={audio?.audio_url} 
-        onTimeUpdate={() => setAudioCurrentTime(audioRef.current?.currentTime || 0)}
-        onLoadedMetadata={() => setDuration(audioRef.current?.duration || 0)}
-        onEnded={() => {
-          setIsPlaying(false);
-          setListPlayingId(null);
-          setAudioCurrentTime(0);
+        onTimeUpdate={() => {
+          const currentTime = audioRef.current?.currentTime || 0;
+          setAudioCurrentTime(currentTime);
+          if (isKhatamMode) {
+            setKhatamTime(currentTime);
+            localStorage.setItem('khatam_time', currentTime.toString());
+          }
+        }}
+        onLoadedMetadata={() => {
+          setDuration(audioRef.current?.duration || 0);
+          if (isKhatamMode && audioRef.current && khatamTime > 0) {
+            audioRef.current.currentTime = khatamTime;
+          }
+        }}
+        onEnded={async () => {
+          if (isKhatamMode && khatamSurahIndex < 113) {
+            const nextIndex = khatamSurahIndex + 1;
+            setKhatamSurahIndex(nextIndex);
+            setKhatamTime(0);
+            localStorage.setItem('khatam_surah_index', nextIndex.toString());
+            localStorage.setItem('khatam_time', '0');
+            
+            // Play next surah
+            try {
+              const nextSurah = surahs[nextIndex];
+              const audioData = await quranService.getSurahAudio(nextSurah.id);
+              setAudio(audioData);
+              setListPlayingId(nextSurah.id);
+            } catch (error) {
+              console.error("Error playing next Khatam surah:", error);
+              setIsPlaying(false);
+            }
+          } else {
+            setIsPlaying(false);
+            setListPlayingId(null);
+            setAudioCurrentTime(0);
+            if (isKhatamMode && khatamSurahIndex === 113) {
+              // Finished Khatam!
+              setIsKhatamMode(false);
+              setKhatamSurahIndex(0);
+              setKhatamTime(0);
+              localStorage.setItem('khatam_surah_index', '0');
+              localStorage.setItem('khatam_time', '0');
+            }
+          }
         }}
         className="hidden"
       />

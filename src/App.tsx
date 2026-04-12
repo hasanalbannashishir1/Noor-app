@@ -859,16 +859,32 @@ const DailySurahReminder = () => {
   );
 };
 
-const SalahDashboard = ({ salahProgress }: { salahProgress: string[] }) => {
+const SalahDashboard = ({ 
+  salahHistory, 
+  selectedDate, 
+  onDateChange 
+}: { 
+  salahHistory: { [date: string]: string[] },
+  selectedDate: string,
+  onDateChange: (date: string) => void
+}) => {
+  const currentProgress = salahHistory[selectedDate] || [];
+  
   const totalRakats = SALAH_REQUIREMENTS.reduce((acc, prayer) => 
     acc + prayer.rakats.reduce((pAcc, r) => pAcc + r.count, 0), 0
   );
   
   const completedRakats = SALAH_REQUIREMENTS.reduce((acc, prayer) => 
     acc + prayer.rakats.reduce((pAcc, r) => 
-      salahProgress.includes(r.id) ? pAcc + r.count : pAcc, 0
+      currentProgress.includes(r.id) ? pAcc + r.count : pAcc, 0
     ), 0
   );
+
+  const last30Days = Array.from({ length: 30 }, (_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    return d.toDateString();
+  });
 
   const headers = [
     { title: 'Sunnah', sub: 'Muakkadah/Ghair' },
@@ -910,7 +926,7 @@ const SalahDashboard = ({ salahProgress }: { salahProgress: string[] }) => {
 
   return (
     <div className="bg-white border-2 border-black rounded-xl overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-8">
-      <div className="p-2 sm:p-3 border-b-2 border-black bg-black text-white flex items-center justify-between">
+      <div className="p-2 sm:p-3 border-b-2 border-black bg-black text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <h3 className="font-normal uppercase text-[10px] sm:text-[11px] flex items-center gap-1.5 sm:gap-2">
             <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
@@ -922,7 +938,24 @@ const SalahDashboard = ({ salahProgress }: { salahProgress: string[] }) => {
             </span>
           </div>
         </div>
-        <span className="text-[8px] sm:text-[9px] font-normal text-black uppercase">Read Only</span>
+        
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <select 
+              value={selectedDate}
+              onChange={(e) => onDateChange(e.target.value)}
+              className="bg-slate-800 text-white text-[9px] sm:text-[10px] font-bold uppercase py-1 pl-2 pr-6 rounded border border-slate-700 outline-none appearance-none cursor-pointer hover:bg-slate-700 transition-colors"
+            >
+              {last30Days.map(date => (
+                <option key={date} value={date}>
+                  {date === new Date().toDateString() ? 'Today' : date}
+                </option>
+              ))}
+            </select>
+            <ChevronDown size={12} className="absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400" />
+          </div>
+          <span className="text-[8px] sm:text-[9px] font-normal text-slate-400 uppercase">Read Only</span>
+        </div>
       </div>
       <div className="w-full overflow-hidden">
         <table className="w-full border-collapse table-fixed">
@@ -951,7 +984,7 @@ const SalahDashboard = ({ salahProgress }: { salahProgress: string[] }) => {
                   const rakat = getRakatForCell(pName, i);
                   if (!rakat) return <td key={i} className="border-b border-r border-black py-2 sm:py-4 px-0.5 bg-slate-100/10" />;
                   
-                  const isCompleted = salahProgress.includes(rakat.id);
+                  const isCompleted = currentProgress.includes(rakat.id);
                   
                   return (
                     <td key={i} className="border-b border-r border-black py-2 sm:py-4 px-0.5 text-center">
@@ -1394,9 +1427,121 @@ const HadithSection = ({ selectedBook, setSelectedBook }: { selectedBook: string
   );
 };
 
+const SavedItemsView = ({ 
+  bookmarkedSurahs, 
+  surahs, 
+  setActiveTab, 
+  setDeenSubTab, 
+  handleSurahClick, 
+  toggleSurahBookmark, 
+  bookmarkedDuas, 
+  DUAS, 
+  toggleDuaBookmark,
+  isCollapsible = false,
+  isExpanded = true,
+  onToggle = () => {}
+}: any) => {
+  return (
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div 
+        className={cn(
+          "p-6 flex items-center justify-between",
+          (isExpanded || !isCollapsible) && "border-b border-slate-100",
+          isCollapsible && "cursor-pointer hover:bg-slate-50 transition-colors"
+        )}
+        onClick={isCollapsible ? onToggle : undefined}
+      >
+        <h3 className="font-bold text-slate-900 flex items-center gap-2">
+          <Bookmark className="text-amber-600" size={20} />
+          Saved Items
+        </h3>
+        {isCollapsible && (
+          <ChevronDown 
+            size={20} 
+            className={cn("text-slate-400 transition-transform duration-300", isExpanded && "rotate-180")} 
+          />
+        )}
+      </div>
+      <AnimatePresence>
+        {(isExpanded || !isCollapsible) && (
+          <motion.div 
+            initial={isCollapsible ? { height: 0, opacity: 0 } : false}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="overflow-hidden"
+          >
+            <div className="p-6 space-y-8">
+              <div>
+                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">Saved Surahs</h4>
+                {bookmarkedSurahs.length === 0 ? (
+                  <p className="text-sm text-slate-400 italic">No saved surahs yet.</p>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {surahs.filter((s: any) => bookmarkedSurahs.includes(s.id)).map((surah: any) => (
+                      <motion.div
+                        key={surah.id}
+                        onClick={() => {
+                          setActiveTab('deen');
+                          setDeenSubTab('quran');
+                          handleSurahClick(surah);
+                        }}
+                        className="bg-slate-50 p-4 rounded-xl border border-slate-100 hover:border-emerald-200 transition-all cursor-pointer flex items-center justify-between group"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-[10px] font-black text-slate-400">
+                            {surah.id}
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-slate-800 text-xs">{surah.name_simple}</h4>
+                            <p className="text-[8px] text-slate-500">{surah.translated_name.name}</p>
+                          </div>
+                        </div>
+                        <button 
+                          onClick={(e) => toggleSurahBookmark(e, surah.id)}
+                          className="text-amber-600 p-1.5"
+                        >
+                          <Bookmark size={14} fill="currentColor" />
+                        </button>
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">Saved Duas</h4>
+                {bookmarkedDuas.length === 0 ? (
+                  <p className="text-sm text-slate-400 italic">No saved duas yet.</p>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {DUAS.filter((d: any) => bookmarkedDuas.includes(d.id)).map((dua: any) => (
+                      <div key={dua.id} className="bg-slate-50 p-5 rounded-xl border border-slate-100">
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-[8px] font-bold text-emerald-600 uppercase tracking-widest">{dua.category}</span>
+                          <button onClick={() => toggleDuaBookmark(dua.id)} className="text-emerald-600">
+                            <Bookmark size={16} fill="currentColor" />
+                          </button>
+                        </div>
+                        <h4 className="font-bold text-slate-900 text-sm mb-2">{dua.title}</h4>
+                        <p className="text-right text-base font-arabic mb-3 leading-relaxed">{dua.arabic}</p>
+                        <p className="text-[10px] text-slate-500 leading-relaxed">{dua.translation}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
 export default function App() {
   const [activeTab, setActiveTab] = useState<'home' | 'deen' | 'ai' | 'amal' | 'dashboard'>('home');
-  const [deenSubTab, setDeenSubTab] = useState<'grid' | 'quran' | 'zakat' | 'names' | 'hadith' | 'events' | 'prayer' | 'documentary' | 'ramadan' | 'hajj' | 'qibla' | 'calendar' | 'milad'>('grid');
+  const [deenSubTab, setDeenSubTab] = useState<'grid' | 'quran' | 'zakat' | 'names' | 'hadith' | 'events' | 'prayer' | 'documentary' | 'ramadan' | 'hajj' | 'qibla' | 'calendar' | 'milad' | 'saved'>('grid');
   const [prayerSubTab, setPrayerSubTab] = useState<'menu' | 'wudu' | 'salah' | 'surah' | 'steps'>('menu');
   const [amalSubTab, setAmalSubTab] = useState<'quran' | 'hadith' | 'dua'>('quran');
   const [selectedSalahDua, setSelectedSalahDua] = useState<string | null>(null);
@@ -1428,18 +1573,37 @@ export default function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showEmail, setShowEmail] = useState(false);
   const [homeHadith, setHomeHadith] = useState<{ text: string, source: string } | null>(null);
+  const [isDashboardSavedItemsExpanded, setIsDashboardSavedItemsExpanded] = useState(false);
 
   // Salah Tracker States
-  const [salahProgress, setSalahProgress] = useState<string[]>(() => {
-    const saved = localStorage.getItem('salah_progress');
-    if (saved) {
-      const { date, completed } = JSON.parse(saved);
-      if (date === new Date().toDateString()) {
-        return completed;
-      }
+  const [salahHistory, setSalahHistory] = useState<{ [date: string]: string[] }>(() => {
+    const saved = localStorage.getItem('salah_history');
+    if (saved) return JSON.parse(saved);
+    
+    // Migration from old salah_progress
+    const oldSaved = localStorage.getItem('salah_progress');
+    if (oldSaved) {
+      const { date, completed } = JSON.parse(oldSaved);
+      return { [date]: completed };
     }
-    return [];
+    return {};
   });
+
+  const [selectedDashboardDate, setSelectedDashboardDate] = useState<string>(new Date().toDateString());
+
+  const salahProgress = salahHistory[new Date().toDateString()] || [];
+  
+  const setSalahProgress = (update: string[] | ((prev: string[]) => string[])) => {
+    setSalahHistory(prevHistory => {
+      const today = new Date().toDateString();
+      const current = prevHistory[today] || [];
+      const next = typeof update === 'function' ? update(current) : update;
+      return {
+        ...prevHistory,
+        [today]: next
+      };
+    });
+  };
 
   // Tasbih Stats
   const [tasbihStats, setTasbihStats] = useState<{
@@ -1697,7 +1861,7 @@ export default function App() {
     
     setDashboardHistory(prev => {
       const filtered = prev.filter(h => h.date !== stats.date);
-      return [stats, ...filtered].slice(0, 7);
+      return [stats, ...filtered].slice(0, 15);
     });
   }, [salahProgress, surahsListenedCount]);
 
@@ -1865,11 +2029,8 @@ export default function App() {
   };
 
   useEffect(() => {
-    localStorage.setItem('salah_progress', JSON.stringify({
-      date: new Date().toDateString(),
-      completed: salahProgress
-    }));
-  }, [salahProgress]);
+    localStorage.setItem('salah_history', JSON.stringify(salahHistory));
+  }, [salahHistory]);
 
   const toggleSalahProgress = (id: string) => {
     const prayer = SALAH_REQUIREMENTS.find(p => p.rakats.some(r => r.id === id));
@@ -1916,19 +2077,21 @@ export default function App() {
     }
   };
 
-  const getPrayerStats = (prayerName: string) => {
+  const getPrayerStats = (prayerName: string, date: string = new Date().toDateString()) => {
+    const progress = salahHistory[date] || [];
     const prayer = SALAH_REQUIREMENTS.find(p => p.name === prayerName);
     if (!prayer) return { total: 0, completed: 0, isMissed: false };
 
     const total = prayer.rakats.reduce((acc, r) => acc + r.count, 0);
-    const completedRakats = prayer.rakats.filter(r => salahProgress.includes(r.id));
+    const completedRakats = prayer.rakats.filter(r => progress.includes(r.id));
     const completed = completedRakats.reduce((acc, r) => acc + r.count, 0);
 
     let isMissed = false;
-    if (prayerTimes) {
-      const now = new Date();
-      const currentTimeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-      
+    const isPastDate = new Date(date) < new Date(new Date().toDateString());
+
+    if (isPastDate) {
+      if (completed < total) isMissed = true;
+    } else if (prayerTimes) {
       const prayers = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
       const currentIndex = prayers.indexOf(currentPrayer || '');
       const prayerIndex = prayers.indexOf(prayerName);
@@ -1942,14 +2105,15 @@ export default function App() {
     return { total, completed, isMissed };
   };
 
-  const getDailyStats = () => {
+  const getDailyStats = (date: string = new Date().toDateString()) => {
+    const progress = salahHistory[date] || [];
     let total = 0;
     let completed = 0;
 
     SALAH_REQUIREMENTS.forEach(prayer => {
       total += prayer.rakats.reduce((acc, r) => acc + r.count, 0);
       completed += prayer.rakats
-        .filter(r => salahProgress.includes(r.id))
+        .filter(r => progress.includes(r.id))
         .reduce((acc, r) => acc + r.count, 0);
     });
 
@@ -2790,6 +2954,22 @@ export default function App() {
                           </div>
                           <h3 className="text-[10px] font-bold uppercase tracking-tight">Eid e Milladunnabi</h3>
                         </button>
+
+                        {/* Saved Items Option */}
+                        <button 
+                          onClick={() => setDeenSubTab('saved')}
+                          className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
+                        >
+                          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm overflow-hidden border border-slate-100">
+                            <img 
+                              src="https://i.postimg.cc/gnmcqtVr/bookmark.png" 
+                              alt="Saved Items" 
+                              className="w-full h-full object-cover"
+                              referrerPolicy="no-referrer"
+                            />
+                          </div>
+                          <h3 className="text-[10px] font-bold uppercase tracking-tight">Saved Items</h3>
+                        </button>
                       </div>
                   ) : (
                     <div className="space-y-8">
@@ -3614,6 +3794,20 @@ export default function App() {
                           </div>
                         </div>
                       )}
+
+                      {deenSubTab === 'saved' && (
+                        <SavedItemsView 
+                          bookmarkedSurahs={bookmarkedSurahs}
+                          surahs={surahs}
+                          setActiveTab={setActiveTab}
+                          setDeenSubTab={setDeenSubTab}
+                          handleSurahClick={handleSurahClick}
+                          toggleSurahBookmark={toggleSurahBookmark}
+                          bookmarkedDuas={bookmarkedDuas}
+                          DUAS={DUAS}
+                          toggleDuaBookmark={toggleDuaBookmark}
+                        />
+                      )}
                     </div>
                   )}
                 </div>
@@ -3986,62 +4180,42 @@ export default function App() {
               exit={{ opacity: 0, y: -20 }}
               className="space-y-6"
             >
-              <SalahDashboard salahProgress={salahProgress} />
+              <SalahDashboard 
+                salahHistory={salahHistory} 
+                selectedDate={selectedDashboardDate}
+                onDateChange={setSelectedDashboardDate}
+              />
               <TasbihDashboard stats={tasbihStats} />
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-emerald-600 p-8 rounded-3xl text-white shadow-xl shadow-emerald-100">
-                  <BarChart3 size={32} className="mb-4 opacity-80" />
-                  <h3 className="text-3xl font-black mb-1">{getDailyStats().completed}</h3>
-                  <p className="text-emerald-100 text-xs font-bold uppercase tracking-widest">Total Rakats Today</p>
-                </div>
-                <div className="bg-blue-600 p-8 rounded-3xl text-white shadow-xl shadow-blue-100">
-                  <User size={32} className="mb-4 opacity-80" />
-                  <h3 className="text-3xl font-black mb-1">{surahsListenedCount}</h3>
-                  <p className="text-blue-100 text-xs font-bold uppercase tracking-widest">Surah Listened</p>
-                </div>
-                <div className="bg-amber-600 p-8 rounded-3xl text-white shadow-xl shadow-amber-100">
-                  <History size={32} className="mb-4 opacity-80" />
-                  <h3 className="text-3xl font-black mb-1">
-                    {(() => {
-                      let missed = 0;
-                      ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'].forEach(p => {
-                        if (getPrayerStats(p).isMissed) missed++;
-                      });
-                      return missed;
-                    })()}
-                  </h3>
-                  <p className="text-amber-100 text-xs font-bold uppercase tracking-widest">Missed Prayers</p>
-                </div>
-              </div>
 
               <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                 <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-                  <h3 className="font-bold text-slate-900">Weekly Progress</h3>
-                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Last 7 Days</p>
+                  <h3 className="font-bold text-slate-900">Progress History</h3>
+                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Last 15 Days</p>
                 </div>
                 <div className="p-6">
-                  {dashboardHistory.length <= 1 ? (
+                  {dashboardHistory.length === 0 ? (
                     <div className="py-12 text-center">
                       <BarChart3 size={48} className="text-slate-100 mx-auto mb-4" />
-                      <p className="text-slate-400 text-sm">Keep using the app to see your weekly trends.</p>
+                      <p className="text-slate-400 text-sm">Keep using the app to see your trends.</p>
                     </div>
                   ) : (
-                    <div className="space-y-6">
-                      {dashboardHistory.slice(1).map((history) => (
-                        <div key={history.date} className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs font-bold text-slate-600">{history.date}</span>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      {dashboardHistory.map((history) => (
+                        <div key={history.date} className="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-3">
+                          <div className="flex flex-col gap-1">
+                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider truncate">
+                              {history.date === new Date().toDateString() ? 'Today' : history.date}
+                            </span>
                             <span className="text-xs font-black text-emerald-600">{history.completedRakats}/{history.totalRakats} Rakats</span>
                           </div>
-                          <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                          <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
                             <div 
                               className="h-full bg-emerald-500 rounded-full transition-all"
-                              style={{ width: `${(history.completedRakats / history.totalRakats) * 100}%` }}
+                              style={{ width: `${(history.completedRakats / (history.totalRakats || 1)) * 100}%` }}
                             />
                           </div>
-                          <div className="flex items-center gap-4 text-[10px] font-bold text-slate-400">
-                            <span className="flex items-center gap-1"><Music size={10} /> {history.surahListens} Listens</span>
+                          <div className="flex items-center justify-between text-[9px] font-bold text-slate-400">
+                            <span className="flex items-center gap-1"><Music size={10} /> {history.surahListens}</span>
                             <span className="flex items-center gap-1"><History size={10} /> {history.missedPrayers} Missed</span>
                           </div>
                         </div>
@@ -4051,116 +4225,20 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-                  <h3 className="font-bold text-slate-900">Recent Activity</h3>
-                  <button 
-                    onClick={() => setRecentActivity([])}
-                    className="text-red-600 text-xs font-bold hover:underline"
-                  >
-                    Clear All
-                  </button>
-                </div>
-                <div className="p-6">
-                  {recentActivity.length === 0 ? (
-                    <div className="py-12 text-center">
-                      <History size={48} className="text-slate-100 mx-auto mb-4" />
-                      <p className="text-slate-400 text-sm">No activity recorded yet.</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {recentActivity.map((activity) => (
-                        <div key={activity.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
-                          <div className="flex items-center gap-3">
-                            <div className={cn(
-                              "w-8 h-8 rounded-lg flex items-center justify-center",
-                              activity.type === 'salah' ? "bg-emerald-100 text-emerald-600" : "bg-blue-100 text-blue-600"
-                            )}>
-                              {activity.type === 'salah' ? <CheckCircle2 size={16} /> : <Music size={16} />}
-                            </div>
-                            <div>
-                              <p className="text-sm font-bold text-slate-800">{activity.title}</p>
-                              <p className="text-[10px] text-slate-500 font-medium">{activity.type === 'salah' ? 'Salah' : 'Quran'}</p>
-                            </div>
-                          </div>
-                          <span className="text-[10px] font-bold text-slate-400">{activity.time}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Saved Section */}
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-                  <h3 className="font-bold text-slate-900 flex items-center gap-2">
-                    <Bookmark className="text-amber-600" size={20} />
-                    Saved Items
-                  </h3>
-                </div>
-                <div className="p-6 space-y-8">
-                  <div>
-                    <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">Saved Surahs</h4>
-                    {bookmarkedSurahs.length === 0 ? (
-                      <p className="text-sm text-slate-400 italic">No saved surahs yet.</p>
-                    ) : (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {surahs.filter(s => bookmarkedSurahs.includes(s.id)).map(surah => (
-                          <motion.div
-                            key={surah.id}
-                            onClick={() => {
-                              setActiveTab('deen');
-                              setDeenSubTab('quran');
-                              handleSurahClick(surah);
-                            }}
-                            className="bg-slate-50 p-4 rounded-xl border border-slate-100 hover:border-emerald-200 transition-all cursor-pointer flex items-center justify-between group"
-                          >
-                            <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-[10px] font-black text-slate-400">
-                                {surah.id}
-                              </div>
-                              <div>
-                                <h4 className="font-bold text-slate-800 text-xs">{surah.name_simple}</h4>
-                                <p className="text-[8px] text-slate-500">{surah.translated_name.name}</p>
-                              </div>
-                            </div>
-                            <button 
-                              onClick={(e) => toggleSurahBookmark(e, surah.id)}
-                              className="text-amber-600 p-1.5"
-                            >
-                              <Bookmark size={14} fill="currentColor" />
-                            </button>
-                          </motion.div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  <div>
-                    <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">Saved Duas</h4>
-                    {bookmarkedDuas.length === 0 ? (
-                      <p className="text-sm text-slate-400 italic">No saved duas yet.</p>
-                    ) : (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {DUAS.filter(d => bookmarkedDuas.includes(d.id)).map(dua => (
-                          <div key={dua.id} className="bg-slate-50 p-5 rounded-xl border border-slate-100">
-                            <div className="flex items-center justify-between mb-3">
-                              <span className="text-[8px] font-bold text-emerald-600 uppercase tracking-widest">{dua.category}</span>
-                              <button onClick={() => toggleDuaBookmark(dua.id)} className="text-emerald-600">
-                                <Bookmark size={16} fill="currentColor" />
-                              </button>
-                            </div>
-                            <h4 className="font-bold text-slate-900 text-sm mb-2">{dua.title}</h4>
-                            <p className="text-right text-base font-arabic mb-3 leading-relaxed">{dua.arabic}</p>
-                            <p className="text-[10px] text-slate-500 leading-relaxed">{dua.translation}</p>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
+              <SavedItemsView 
+                bookmarkedSurahs={bookmarkedSurahs}
+                surahs={surahs}
+                setActiveTab={setActiveTab}
+                setDeenSubTab={setDeenSubTab}
+                handleSurahClick={handleSurahClick}
+                toggleSurahBookmark={toggleSurahBookmark}
+                bookmarkedDuas={bookmarkedDuas}
+                DUAS={DUAS}
+                toggleDuaBookmark={toggleDuaBookmark}
+                isCollapsible={true}
+                isExpanded={isDashboardSavedItemsExpanded}
+                onToggle={() => setIsDashboardSavedItemsExpanded(!isDashboardSavedItemsExpanded)}
+              />
             </motion.div>
           )}
         </AnimatePresence>

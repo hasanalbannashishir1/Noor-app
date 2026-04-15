@@ -156,23 +156,35 @@ export const hadithService = {
         }
         
         if (data.message?.includes('Hadiths not found')) {
-          // Try a few more fallbacks if it's Musnad Ahmad
+          // Try a few more fallbacks if it's Musnad Ahmad or Al-Adab al-Mufrad
+          const fallbacks: string[] = [];
           if (currentBook === 'musnad-ahmad') {
-            const fallbacks = ['musnad-ahmed', 'ahmad', 'musnad-ahmad-bin-hanbal'];
+            fallbacks.push('musnad-ahmed', 'ahmad', 'musnad-ahmad-bin-hanbal');
+          } else if (currentBook === 'al-adab-al-mufrad') {
+            fallbacks.push('adab-mufrad', 'al-adab');
+          }
+
+          if (fallbacks.length > 0) {
             for (const fallback of fallbacks) {
-              const fallbackUrl = `${HADITH_API_BASE}?book=${fallback}&paginate=20&page=${page}`;
-              const fallbackResponse = await fetchWithRetry(fallbackUrl);
-              if (fallbackResponse.ok) {
-                const fallbackData = await fallbackResponse.json();
-                if (fallbackData.status === 200) {
-                  const result = this.normalizeHadiths(fallbackData, fallback);
-                  cache[cacheKey] = { data: result, timestamp: Date.now() };
-                  return result;
+              try {
+                const fallbackUrl = `${HADITH_API_BASE}?book=${fallback}&paginate=20&page=${page}`;
+                const fallbackResponse = await fetchWithRetry(fallbackUrl);
+                if (fallbackResponse.ok) {
+                  const fallbackData = await fallbackResponse.json();
+                  if (fallbackData.status === 200) {
+                    const result = this.normalizeHadiths(fallbackData, fallback);
+                    cache[cacheKey] = { data: result, timestamp: Date.now() };
+                    return result;
+                  }
                 }
+              } catch (e) {
+                console.warn(`Fallback ${fallback} failed:`, e);
               }
             }
           }
-          throw new Error(`No hadiths found for "${book}" on page ${page}. This collection might have fewer pages or the book slug is incorrect.`);
+          
+          console.warn(`No hadiths found for "${book}" on page ${page}. Returning empty array.`);
+          return [];
         }
         throw new Error(data.message || `API Error: ${data.status}`);
       }

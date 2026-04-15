@@ -2323,15 +2323,19 @@ export default function App() {
       
       // We'll try up to 3 different random pages to find a substantial hadith
       while (!foundHadith && attempts < 3) {
-        const randomPage = Math.floor(Math.random() * 20) + 1; 
-        const hadiths = await hadithService.getHadiths(randomBook.id, randomPage);
-        
-        // Filter for hadiths with at least 500 characters (roughly 80-100 words)
-        // This usually takes about 1-2 minutes to read carefully.
-        const substantialHadiths = hadiths.filter(h => h.hadithEnglish.length > 500);
-        
-        if (substantialHadiths.length > 0) {
-          foundHadith = substantialHadiths[Math.floor(Math.random() * substantialHadiths.length)];
+        try {
+          const randomPage = Math.floor(Math.random() * 20) + 1; 
+          const hadiths = await hadithService.getHadiths(randomBook.id, randomPage);
+          
+          // Filter for hadiths with at least 500 characters (roughly 80-100 words)
+          // This usually takes about 1-2 minutes to read carefully.
+          const substantialHadiths = hadiths.filter(h => h.hadithEnglish.length > 500);
+          
+          if (substantialHadiths.length > 0) {
+            foundHadith = substantialHadiths[Math.floor(Math.random() * substantialHadiths.length)];
+          }
+        } catch (err) {
+          console.warn(`Attempt ${attempts + 1} failed for ${randomBook.id}:`, err);
         }
         attempts++;
       }
@@ -2344,14 +2348,18 @@ export default function App() {
         setRandomHadith(foundHadith);
       } else {
         // Fallback: if no long hadith found, just get any hadith from the first page
-        const hadiths = await hadithService.getHadiths(randomBook.id, 1);
-        if (hadiths.length > 0) {
-          const fallbackHadith = hadiths[Math.floor(Math.random() * hadiths.length)];
-          if (!fallbackHadith.hadithEnglish && fallbackHadith.hadithArabic) {
-            const translated = await translateHadith(fallbackHadith);
-            if (translated) fallbackHadith.hadithEnglish = translated;
+        try {
+          const hadiths = await hadithService.getHadiths(randomBook.id, 1);
+          if (hadiths.length > 0) {
+            const fallbackHadith = hadiths[Math.floor(Math.random() * hadiths.length)];
+            if (!fallbackHadith.hadithEnglish && fallbackHadith.hadithArabic) {
+              const translated = await translateHadith(fallbackHadith);
+              if (translated) fallbackHadith.hadithEnglish = translated;
+            }
+            setRandomHadith(fallbackHadith);
           }
-          setRandomHadith(fallbackHadith);
+        } catch (err) {
+          console.error(`Fallback failed for ${randomBook.id}:`, err);
         }
       }
     } catch (error) {

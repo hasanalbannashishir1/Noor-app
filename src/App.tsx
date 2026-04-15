@@ -53,6 +53,10 @@ import {
   Video,
   Book,
   Headphones,
+  AlertCircle,
+  XCircle,
+  ArrowRight,
+  ShieldAlert,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { quranService } from './services/quranService';
@@ -1121,7 +1125,7 @@ const NamesOfAllah = () => {
     { ar: 'ٱلْحَيُّ', en: 'Al-Hayy', tr: 'The Ever-Living' },
     { ar: 'ٱلْقَيُّومُ', en: 'Al-Qayyum', tr: 'The Self-Subsisting' },
     { ar: 'ٱلْوَاجِدُ', en: 'Al-Wajid', tr: 'The Finder' },
-    { ar: 'ٱلْمَاجِدُ', en: 'Al-Majid', tr: 'The Noble' },
+    { ar: 'ٱلْمَاجِدُ', en: 'Al-Maajid', tr: 'The Noble' },
     { ar: 'ٱلْوَاحِدُ', en: 'Al-Wahid', tr: 'The Unique' },
     { ar: 'ٱلْأَحَدُ', en: 'Al-Ahad', tr: 'The One' },
     { ar: 'ٱلصَّمَدُ', en: 'As-Samad', tr: 'The Eternal' },
@@ -1183,7 +1187,19 @@ const NamesOfAllah = () => {
   );
 };
 
-const HadithSection = ({ selectedBook, setSelectedBook }: { selectedBook: string | null, setSelectedBook: (id: string | null) => void }) => {
+const HadithSection = ({ 
+  selectedBook, 
+  setSelectedBook,
+  translateHadith,
+  translatingId,
+  setTranslatingId
+}: { 
+  selectedBook: string | null, 
+  setSelectedBook: (id: string | null) => void,
+  translateHadith: (hadith: Hadith) => Promise<string | null>,
+  translatingId: number | null,
+  setTranslatingId: (id: number | null) => void
+}) => {
   const [hadiths, setHadiths] = useState<Hadith[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -1194,6 +1210,23 @@ const HadithSection = ({ selectedBook, setSelectedBook }: { selectedBook: string
   });
   const [showBookmarks, setShowBookmarks] = useState(false);
   const [books, setBooks] = useState<HadithBook[]>(hadithService.getBooks());
+
+  const handleTranslate = async (hadith: Hadith) => {
+    setTranslatingId(hadith.id);
+    const translatedText = await translateHadith(hadith);
+    if (translatedText) {
+      setHadiths(prev => prev.map(h => h.id === hadith.id ? { ...h, hadithEnglish: translatedText } : h));
+      // Also update bookmarks if needed
+      setBookmarkedHadiths(prev => {
+        const updated = prev.map(h => h.id === hadith.id ? { ...h, hadithEnglish: translatedText } : h);
+        if (JSON.stringify(prev) !== JSON.stringify(updated)) {
+          localStorage.setItem('bookmarked_hadiths', JSON.stringify(updated));
+        }
+        return updated;
+      });
+    }
+    setTranslatingId(null);
+  };
 
   useEffect(() => {
     const loadBooks = async () => {
@@ -1252,23 +1285,31 @@ const HadithSection = ({ selectedBook, setSelectedBook }: { selectedBook: string
     else if (slug.includes('tirmidhi')) sunnahSlug = 'tirmidhi';
     else if (slug.includes('majah')) sunnahSlug = 'ibnmajah';
     else if (slug.includes('malik')) sunnahSlug = 'malik';
+    else if (slug.includes('ahmad')) sunnahSlug = 'ahmad';
     
     return `https://sunnah.com/${sunnahSlug}:${hadith.hadithNumber}`;
   };
 
   return (
     <div className="space-y-6">
-      {/* Daily Reminder */}
-      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
-        <h4 className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mb-2">Daily Reminder</h4>
-        <p className="text-slate-700 font-medium italic">"I have left among you two things; you will never go astray as long as you hold fast to them; the book of Allah and my Sunnah."</p>
-        <p className="text-[10px] text-slate-400 mt-2">— Prophet Muhammad (PBUH) (Al-Muwatta, Imam Malik)</p>
-      </div>
+      {/* Daily Reminder - Only show on main collections list */}
+      {!selectedBook && !showBookmarks && (
+        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
+          <h4 className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mb-2">Daily Reminder</h4>
+          <p className="text-slate-700 font-medium italic">"I have left among you two things; you will never go astray as long as you hold fast to them; the book of Allah and my Sunnah."</p>
+          <p className="text-[10px] text-slate-400 mt-2">— Prophet Muhammad (PBUH) (Al-Muwatta, Imam Malik)</p>
+        </div>
+      )}
 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-indigo-100 text-indigo-700 rounded-xl flex items-center justify-center">
-            <ScrollText size={20} />
+          <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center overflow-hidden">
+            <img 
+              src="https://i.postimg.cc/5XXFJb6m/hadith-collection-icon.png" 
+              alt="Hadith Collection" 
+              className="w-6 h-6 object-contain" 
+              referrerPolicy="no-referrer" 
+            />
           </div>
           <div>
             <h3 className="text-lg font-bold text-slate-900">Hadith Collections</h3>
@@ -1290,7 +1331,7 @@ const HadithSection = ({ selectedBook, setSelectedBook }: { selectedBook: string
       {!showBookmarks ? (
         <>
           {!selectedBook ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {books.map(book => (
                 <button
                   key={book.id}
@@ -1298,8 +1339,13 @@ const HadithSection = ({ selectedBook, setSelectedBook }: { selectedBook: string
                   className="bg-white p-6 rounded-2xl border border-slate-200 text-left hover:border-indigo-500 hover:shadow-md transition-all group"
                 >
                   <div className="flex items-center justify-between mb-4">
-                    <div className="w-8 h-8 bg-slate-50 rounded-lg flex items-center justify-center text-indigo-600 group-hover:bg-indigo-50 transition-colors">
-                      <BookOpen size={16} />
+                    <div className="w-8 h-8 bg-slate-50 rounded-lg flex items-center justify-center group-hover:bg-indigo-50 transition-colors overflow-hidden">
+                      <img 
+                        src="https://i.postimg.cc/mzf9VJZY/hadith-icon.png" 
+                        alt={book.name} 
+                        className="w-5 h-5 object-contain" 
+                        referrerPolicy="no-referrer" 
+                      />
                     </div>
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{book.totalHadiths} Hadiths</span>
                   </div>
@@ -1318,22 +1364,38 @@ const HadithSection = ({ selectedBook, setSelectedBook }: { selectedBook: string
                   <ChevronLeft size={20} />
                   Back to Collections
                 </button>
-                <div className="flex items-center gap-2">
-                  <button 
-                    disabled={page === 1}
-                    onClick={() => setPage(prev => Math.max(1, prev - 1))}
-                    className="p-2 bg-white border border-slate-200 rounded-lg disabled:opacity-50 hover:border-indigo-500 transition-colors"
-                  >
-                    <ChevronLeft size={16} />
-                  </button>
-                  <span className="text-xs font-bold text-slate-600">Page {page}</span>
-                  <button 
-                    onClick={() => setPage(prev => prev + 1)}
-                    className="p-2 bg-white border border-slate-200 rounded-lg hover:border-indigo-500 transition-colors"
-                  >
-                    <ChevronLeft size={16} className="rotate-180" />
-                  </button>
-                </div>
+                  <div className="flex items-center gap-2">
+                    <button 
+                      disabled={page === 1}
+                      onClick={() => setPage(prev => Math.max(1, prev - 1))}
+                      className="p-2 bg-white border border-slate-200 rounded-lg disabled:opacity-50 hover:border-indigo-500 transition-colors"
+                    >
+                      <ChevronLeft size={16} />
+                    </button>
+                    
+                    <div className="relative flex items-center gap-2">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Jump to:</span>
+                      <div className="relative">
+                        <select 
+                          value={page}
+                          onChange={(e) => setPage(parseInt(e.target.value))}
+                          className="appearance-none pl-3 pr-8 py-1.5 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-bold hover:bg-indigo-100 transition-all outline-none cursor-pointer border border-indigo-100"
+                        >
+                          {Array.from({ length: Math.ceil((books.find(b => b.id === selectedBook)?.totalHadiths || 1) / 20) }, (_, i) => i + 1).map(p => (
+                            <option key={p} value={p}>Page {p}</option>
+                          ))}
+                        </select>
+                        <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-indigo-700" />
+                      </div>
+                    </div>
+
+                    <button 
+                      onClick={() => setPage(prev => prev + 1)}
+                      className="p-2 bg-white border border-slate-200 rounded-lg hover:border-indigo-500 transition-colors"
+                    >
+                      <ChevronLeft size={16} className="rotate-180" />
+                    </button>
+                  </div>
               </div>
 
               {loading ? (
@@ -1384,8 +1446,36 @@ const HadithSection = ({ selectedBook, setSelectedBook }: { selectedBook: string
                       </div>
                       <p className="text-right text-xl font-arabic leading-loose">{hadith.hadithArabic}</p>
                       <div className="pt-4 border-t border-slate-50">
-                        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Narrated by {hadith.englishNarrator}</p>
-                        <p className="text-sm text-slate-600 leading-relaxed">{hadith.hadithEnglish}</p>
+                        {hadith.englishNarrator && hadith.englishNarrator !== 'Unknown' && (
+                          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Narrated by {hadith.englishNarrator}</p>
+                        )}
+                        {hadith.hadithEnglish ? (
+                          <p className="text-sm text-slate-600 leading-relaxed">{hadith.hadithEnglish}</p>
+                        ) : (
+                          <div className="space-y-3">
+                            {hadith.hadithUrdu && (
+                              <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Urdu Translation</p>
+                                <p className="text-sm text-slate-600 leading-relaxed font-arabic text-right">{hadith.hadithUrdu}</p>
+                              </div>
+                            )}
+                            <div className="flex items-center justify-between gap-4">
+                              <p className="text-sm text-slate-400 italic leading-relaxed">English translation not available.</p>
+                              <button 
+                                onClick={() => handleTranslate(hadith)}
+                                disabled={translatingId === hadith.id}
+                                className="flex items-center gap-2 px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-lg text-xs font-bold hover:bg-indigo-100 transition-all disabled:opacity-50"
+                              >
+                                {translatingId === hadith.id ? (
+                                  <Loader2 size={12} className="animate-spin" />
+                                ) : (
+                                  <Languages size={12} />
+                                )}
+                                Translate to English
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   )))}
@@ -1415,8 +1505,36 @@ const HadithSection = ({ selectedBook, setSelectedBook }: { selectedBook: string
                 </div>
                 <p className="text-right text-xl font-arabic leading-loose">{hadith.hadithArabic}</p>
                 <div className="pt-4 border-t border-slate-50">
-                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Narrated by {hadith.englishNarrator}</p>
-                  <p className="text-sm text-slate-600 leading-relaxed">{hadith.hadithEnglish}</p>
+                  {hadith.englishNarrator && hadith.englishNarrator !== 'Unknown' && (
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Narrated by {hadith.englishNarrator}</p>
+                  )}
+                  {hadith.hadithEnglish ? (
+                    <p className="text-sm text-slate-600 leading-relaxed">{hadith.hadithEnglish}</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {hadith.hadithUrdu && (
+                        <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Urdu Translation</p>
+                          <p className="text-sm text-slate-600 leading-relaxed font-arabic text-right">{hadith.hadithUrdu}</p>
+                        </div>
+                      )}
+                      <div className="flex items-center justify-between gap-4">
+                        <p className="text-sm text-slate-400 italic leading-relaxed">English translation not available.</p>
+                        <button 
+                          onClick={() => handleTranslate(hadith)}
+                          disabled={translatingId === hadith.id}
+                          className="flex items-center gap-2 px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-lg text-xs font-bold hover:bg-indigo-100 transition-all disabled:opacity-50"
+                        >
+                          {translatingId === hadith.id ? (
+                            <Loader2 size={12} className="animate-spin" />
+                          ) : (
+                            <Languages size={12} />
+                          )}
+                          Translate to English
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             ))
@@ -1477,7 +1595,7 @@ const SavedItemsView = ({
                 {bookmarkedSurahs.length === 0 ? (
                   <p className="text-sm text-slate-400 italic">No saved surahs yet.</p>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     {surahs.filter((s: any) => bookmarkedSurahs.includes(s.id)).map((surah: any) => (
                       <motion.div
                         key={surah.id}
@@ -1615,9 +1733,39 @@ const StreakCalendar = ({ visitedDates }: { visitedDates: string[] }) => {
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'home' | 'deen' | 'ai' | 'amal' | 'dashboard'>('home');
-  const [deenSubTab, setDeenSubTab] = useState<'grid' | 'quran' | 'zakat' | 'names' | 'hadith' | 'events' | 'prayer' | 'documentary' | 'ramadan' | 'hajj' | 'qibla' | 'calendar' | 'milad' | 'saved'>('grid');
+  const [deenSubTab, setDeenSubTab] = useState<'grid' | 'quran' | 'names' | 'hadith' | 'prayer' | 'saved' | 'zakat' | 'events' | 'documentary' | 'ramadan' | 'hajj' | 'qibla' | 'calendar' | 'milad'>('grid');
   const [prayerSubTab, setPrayerSubTab] = useState<'menu' | 'wudu' | 'salah' | 'surah' | 'steps'>('menu');
   const [amalSubTab, setAmalSubTab] = useState<'quran' | 'hadith' | 'dua'>('quran');
+  const [translatingId, setTranslatingId] = useState<number | null>(null);
+
+  const translateHadith = React.useCallback(async (hadith: Hadith): Promise<string | null> => {
+    if (!process.env.GEMINI_API_KEY) return null;
+    try {
+      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      const response = await ai.models.generateContent({
+        model: "gemini-3.1-pro-preview",
+        contents: [
+          { 
+            role: 'user', 
+            parts: [{ 
+              text: `Translate the following Hadith to English. 
+              Arabic: ${hadith.hadithArabic}
+              ${hadith.hadithUrdu ? `Urdu Translation: ${hadith.hadithUrdu}` : ""}
+              
+              Provide only the English translation text, nothing else.` 
+            }] 
+          }
+        ],
+        config: {
+          systemInstruction: "You are a professional translator specializing in Islamic texts. Translate Hadiths accurately into clear, modern English while preserving the original meaning and reverence.",
+        }
+      });
+      return response.text || null;
+    } catch (error) {
+      console.error("Translation error:", error);
+      return null;
+    }
+  }, []);
   const [selectedSalahDua, setSelectedSalahDua] = useState<string | null>(null);
   const [selectedBook, setSelectedBook] = useState<string | null>(null);
   const [selectedEssentialSurah, setSelectedEssentialSurah] = useState<number | null>(null);
@@ -1676,6 +1824,7 @@ export default function App() {
   });
 
   const [selectedDashboardDate, setSelectedDashboardDate] = useState<string>(new Date().toDateString());
+  const [selectedRamadanGuide, setSelectedRamadanGuide] = useState<number | null>(null);
 
   const salahProgress = salahHistory[new Date().toDateString()] || [];
   
@@ -2061,7 +2210,7 @@ export default function App() {
     'Rabbana Dua', 'Allahumma', 'Morning and Evening', 'Purity', 'Illness', 'Good News - Bad News'
   ];
 
-  const fetchRandomAmal = async () => {
+  const fetchRandomAmal = React.useCallback(async () => {
     setIsHadithLoading(true);
     try {
       const books = hadithService.getBooks();
@@ -2087,12 +2236,21 @@ export default function App() {
       }
       
       if (foundHadith) {
+        if (!foundHadith.hadithEnglish && foundHadith.hadithArabic) {
+          const translated = await translateHadith(foundHadith);
+          if (translated) foundHadith.hadithEnglish = translated;
+        }
         setRandomHadith(foundHadith);
       } else {
         // Fallback: if no long hadith found, just get any hadith from the first page
         const hadiths = await hadithService.getHadiths(randomBook.id, 1);
         if (hadiths.length > 0) {
-          setRandomHadith(hadiths[Math.floor(Math.random() * hadiths.length)]);
+          const fallbackHadith = hadiths[Math.floor(Math.random() * hadiths.length)];
+          if (!fallbackHadith.hadithEnglish && fallbackHadith.hadithArabic) {
+            const translated = await translateHadith(fallbackHadith);
+            if (translated) fallbackHadith.hadithEnglish = translated;
+          }
+          setRandomHadith(fallbackHadith);
         }
       }
     } catch (error) {
@@ -2100,7 +2258,7 @@ export default function App() {
     } finally {
       setIsHadithLoading(false);
     }
-  };
+  }, [translateHadith]);
 
   useEffect(() => {
     if (activeTab === 'amal') {
@@ -2520,7 +2678,18 @@ export default function App() {
               ].map((tab) => (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
+                  onClick={() => {
+                    if (tab.id === 'deen') {
+                      setDeenSubTab('grid');
+                      setSelectedRamadanGuide(null);
+                      setSelectedBook(null);
+                      setPrayerSubTab('menu');
+                      setSelectedSalahDua(null);
+                      setSelectedEssentialSurah(null);
+                      setSelectedSurah(null);
+                    }
+                    setActiveTab(tab.id as any);
+                  }}
                   className={cn(
                     "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all",
                     activeTab === tab.id ? "bg-white text-emerald-700 shadow-sm" : "text-slate-500 hover:text-slate-700"
@@ -2961,7 +3130,7 @@ export default function App() {
                 <div className="space-y-8">
                   {deenSubTab === 'grid' ? (
                       <div className="grid grid-cols-3 gap-3">
-                        {/* Al Quran Option */}
+                        {/* 1. Al Quran Option */}
                         <button 
                           onClick={() => setDeenSubTab('quran')}
                           className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
@@ -2977,7 +3146,39 @@ export default function App() {
                           <h3 className="text-[10px] font-bold uppercase tracking-tight">Al-Quran</h3>
                         </button>
 
-                        {/* Prayer Learning Option */}
+                        {/* 2. Hadith Option */}
+                        <button 
+                          onClick={() => setDeenSubTab('hadith')}
+                          className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
+                        >
+                          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm overflow-hidden border border-slate-100">
+                            <img 
+                              src="https://i.postimg.cc/LJCnbR6X/quran-2.png" 
+                              alt="Hadith" 
+                              className="w-full h-full object-cover"
+                              referrerPolicy="no-referrer"
+                            />
+                          </div>
+                          <h3 className="text-[10px] font-bold uppercase tracking-tight">Hadith</h3>
+                        </button>
+
+                        {/* 3. 99 Names Option */}
+                        <button 
+                          onClick={() => setDeenSubTab('names')}
+                          className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
+                        >
+                          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm overflow-hidden border border-slate-100">
+                            <img 
+                              src="https://i.postimg.cc/LJCnbR6J/islamic.png" 
+                              alt="99 Names" 
+                              className="w-full h-full object-cover"
+                              referrerPolicy="no-referrer"
+                            />
+                          </div>
+                          <h3 className="text-[10px] font-bold uppercase tracking-tight">99 Names</h3>
+                        </button>
+
+                        {/* 4. Prayer Learning Option */}
                         <button 
                           onClick={() => {
                             setDeenSubTab('prayer');
@@ -2996,103 +3197,7 @@ export default function App() {
                           <h3 className="text-[10px] font-bold uppercase tracking-tight">Prayer learning</h3>
                         </button>
 
-                        {/* 99 Names Option */}
-                        <button 
-                          onClick={() => setDeenSubTab('names')}
-                          className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
-                        >
-                          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm overflow-hidden border border-slate-100">
-                            <img 
-                              src="https://i.postimg.cc/LJCnbR6J/islamic.png" 
-                              alt="99 Names" 
-                              className="w-full h-full object-cover"
-                              referrerPolicy="no-referrer"
-                            />
-                          </div>
-                          <h3 className="text-[10px] font-bold uppercase tracking-tight">99 Names</h3>
-                        </button>
-
-                        {/* Saved Items Option */}
-                        <button 
-                          onClick={() => setDeenSubTab('saved')}
-                          className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
-                        >
-                          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm overflow-hidden border border-slate-100">
-                            <img 
-                              src="https://i.postimg.cc/gnmcqtVr/bookmark.png" 
-                              alt="Saved Items" 
-                              className="w-full h-full object-cover"
-                              referrerPolicy="no-referrer"
-                            />
-                          </div>
-                          <h3 className="text-[10px] font-bold uppercase tracking-tight">Saved Items</h3>
-                        </button>
-
-                        {/* Zakat Option */}
-                        <button 
-                          onClick={() => setDeenSubTab('zakat')}
-                          className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
-                        >
-                          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm overflow-hidden border border-slate-100">
-                            <img 
-                              src="https://i.postimg.cc/XXB5TrTH/zakat.png" 
-                              alt="Zakat" 
-                              className="w-full h-full object-cover"
-                              referrerPolicy="no-referrer"
-                            />
-                          </div>
-                          <h3 className="text-[10px] font-bold uppercase tracking-tight">Zakat</h3>
-                        </button>
-
-                        {/* Hadith Option */}
-                        <button 
-                          onClick={() => setDeenSubTab('hadith')}
-                          className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
-                        >
-                          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm overflow-hidden border border-slate-100">
-                            <img 
-                              src="https://i.postimg.cc/LJCnbR6X/quran-2.png" 
-                              alt="Hadith" 
-                              className="w-full h-full object-cover"
-                              referrerPolicy="no-referrer"
-                            />
-                          </div>
-                          <h3 className="text-[10px] font-bold uppercase tracking-tight">Hadith</h3>
-                        </button>
-
-                        {/* Upcoming Events Option */}
-                        <button 
-                          onClick={() => setDeenSubTab('events')}
-                          className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
-                        >
-                          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm overflow-hidden border border-slate-100">
-                            <img 
-                              src="https://i.postimg.cc/bZCsB8ND/calendar.png" 
-                              alt="Upcoming Events" 
-                              className="w-full h-full object-cover"
-                              referrerPolicy="no-referrer"
-                            />
-                          </div>
-                          <h3 className="text-[10px] font-bold uppercase tracking-tight leading-tight">Upcoming Islamic Events</h3>
-                        </button>
-
-                        {/* Islamic Documentary Option */}
-                        <button 
-                          onClick={() => setDeenSubTab('documentary')}
-                          className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
-                        >
-                          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm overflow-hidden border border-slate-100">
-                            <img 
-                              src="https://i.postimg.cc/HVppbK46/documentary.png" 
-                              alt="Documentary" 
-                              className="w-full h-full object-cover"
-                              referrerPolicy="no-referrer"
-                            />
-                          </div>
-                          <h3 className="text-[10px] font-bold uppercase tracking-tight">Documentary</h3>
-                        </button>
-
-                        {/* Ramadan Option */}
+                        {/* 5. Ramadan Option */}
                         <button 
                           onClick={() => setDeenSubTab('ramadan')}
                           className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
@@ -3108,7 +3213,7 @@ export default function App() {
                           <h3 className="text-[10px] font-bold uppercase tracking-tight">Ramadan</h3>
                         </button>
 
-                        {/* Hajj & Umrah Option */}
+                        {/* 6. Hajj & Umrah Option */}
                         <button 
                           onClick={() => setDeenSubTab('hajj')}
                           className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
@@ -3124,7 +3229,29 @@ export default function App() {
                           <h3 className="text-[10px] font-bold uppercase tracking-tight">Hajj & Umrah</h3>
                         </button>
 
-                        {/* Qibla Option */}
+                        {/* 7. Zakat Option */}
+                        <button 
+                          onClick={() => setDeenSubTab('zakat')}
+                          className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
+                        >
+                          <div className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm border border-slate-100">
+                            <Calculator size={20} />
+                          </div>
+                          <h3 className="text-[10px] font-bold uppercase tracking-tight">Zakat</h3>
+                        </button>
+
+                        {/* 8. Islamic Calendar Option */}
+                        <button 
+                          onClick={() => setDeenSubTab('calendar')}
+                          className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
+                        >
+                          <div className="w-10 h-10 bg-slate-50 text-slate-600 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm border border-slate-100">
+                            <Calendar size={20} />
+                          </div>
+                          <h3 className="text-[10px] font-bold uppercase tracking-tight">Islamic Calendar</h3>
+                        </button>
+
+                        {/* 9. Qibla Option */}
                         <button 
                           onClick={() => setDeenSubTab('qibla')}
                           className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
@@ -3140,23 +3267,18 @@ export default function App() {
                           <h3 className="text-[10px] font-bold uppercase tracking-tight">Qibla</h3>
                         </button>
 
-                        {/* Islamic Calendar Option */}
+                        {/* 10. Events Option */}
                         <button 
-                          onClick={() => setDeenSubTab('calendar')}
+                          onClick={() => setDeenSubTab('events')}
                           className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
                         >
-                          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm overflow-hidden border border-slate-100">
-                            <img 
-                              src="https://i.postimg.cc/XG3bzvJm/calendar.png" 
-                              alt="Islamic Calendar" 
-                              className="w-full h-full object-cover"
-                              referrerPolicy="no-referrer"
-                            />
+                          <div className="w-10 h-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm border border-slate-100">
+                            <Calendar size={20} />
                           </div>
-                          <h3 className="text-[10px] font-bold uppercase tracking-tight">Islamic Calendar</h3>
+                          <h3 className="text-[10px] font-bold uppercase tracking-tight">Events</h3>
                         </button>
 
-                        {/* Eid e Milladunnabi Option */}
+                        {/* 11. Eid e Milladunnabi Option */}
                         <button 
                           onClick={() => setDeenSubTab('milad')}
                           className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
@@ -3171,6 +3293,33 @@ export default function App() {
                           </div>
                           <h3 className="text-[10px] font-bold uppercase tracking-tight">Eid e Milladunnabi</h3>
                         </button>
+
+                        {/* 12. Documentary Option */}
+                        <button 
+                          onClick={() => setDeenSubTab('documentary')}
+                          className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
+                        >
+                          <div className="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm border border-slate-100">
+                            <Video size={20} />
+                          </div>
+                          <h3 className="text-[10px] font-bold uppercase tracking-tight">Documentary</h3>
+                        </button>
+
+                        {/* 13. Saved Items Option */}
+                        <button 
+                          onClick={() => setDeenSubTab('saved')}
+                          className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
+                        >
+                          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm overflow-hidden border border-slate-100">
+                            <img 
+                              src="https://i.postimg.cc/gnmcqtVr/bookmark.png" 
+                              alt="Saved Items" 
+                              className="w-full h-full object-cover"
+                              referrerPolicy="no-referrer"
+                            />
+                          </div>
+                          <h3 className="text-[10px] font-bold uppercase tracking-tight">Saved Items</h3>
+                        </button>
                       </div>
                   ) : (
                     <div className="space-y-8">
@@ -3178,7 +3327,16 @@ export default function App() {
                       {((deenSubTab === 'prayer' && prayerSubTab === 'menu') || 
                         (deenSubTab === 'hadith' && !selectedBook) || 
                         (deenSubTab === 'quran') ||
-                        (!['prayer', 'hadith', 'quran'].includes(deenSubTab))) && (
+                        (deenSubTab === 'names') ||
+                        (deenSubTab === 'saved') ||
+                        (deenSubTab === 'zakat') ||
+                        (deenSubTab === 'events') ||
+                        (deenSubTab === 'documentary') ||
+                        (deenSubTab === 'ramadan' && selectedRamadanGuide === null) ||
+                        (deenSubTab === 'hajj') ||
+                        (deenSubTab === 'qibla') ||
+                        (deenSubTab === 'calendar') ||
+                        (deenSubTab === 'milad')) && (
                         <button 
                           onClick={() => {
                             setDeenSubTab('grid');
@@ -3219,7 +3377,7 @@ export default function App() {
                               />
                             </div>
                           </div>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                             {filteredSurahs.map((surah) => (
                               <motion.div
                                 key={surah.id}
@@ -3277,7 +3435,15 @@ export default function App() {
 
                       {deenSubTab === 'zakat' && <ZakatCalculator />}
                       {deenSubTab === 'names' && <NamesOfAllah />}
-                      {deenSubTab === 'hadith' && <HadithSection selectedBook={selectedBook} setSelectedBook={setSelectedBook} />}
+                      {deenSubTab === 'hadith' && (
+                        <HadithSection 
+                          selectedBook={selectedBook} 
+                          setSelectedBook={setSelectedBook} 
+                          translateHadith={translateHadith}
+                          translatingId={translatingId}
+                          setTranslatingId={setTranslatingId}
+                        />
+                      )}
 
                       {deenSubTab === 'events' && (
                         <div className="space-y-6">
@@ -3808,39 +3974,653 @@ export default function App() {
 
                       {deenSubTab === 'ramadan' && (
                         <div className="space-y-6">
-                          <div className="bg-emerald-700 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
-                            <div className="relative z-10">
-                              <h3 className="text-3xl font-black mb-2">Ramadan Mubarak</h3>
-                              <p className="text-emerald-100/80 text-sm max-w-md">The month of mercy, forgiveness, and salvation. A time for spiritual reflection and growth.</p>
-                            </div>
-                            <div className="absolute top-0 right-0 p-4 opacity-10">
-                              <img src="https://i.postimg.cc/Mc1w5B6x/ramadan.png" alt="" className="w-32 h-32 object-contain" />
-                            </div>
-                          </div>
+                          {selectedRamadanGuide === null ? (
+                            <>
+                              <div className="bg-emerald-700 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
+                                <div className="relative z-10">
+                                  <h3 className="text-3xl font-black mb-4">Ramadan Mubarak</h3>
+                                  <div className="space-y-4 max-w-2xl">
+                                    <p className="text-emerald-50 text-sm leading-relaxed italic">
+                                      "Ramadan is the month on which the Quran was revealed as a guide for humanity with clear proofs of guidance and the standard ˹to distinguish between right and wrong˺. So whoever is present this month, let them fast. But whoever is ill or on a journey, then ˹let them fast˺ an equal number of days ˹after Ramaḍân˺. Allah intends ease for you, not hardship, so that you may complete the prescribed period and proclaim the greatness of Allah for guiding you, and perhaps you will be grateful."
+                                    </p>
+                                    <p className="text-emerald-200 text-xs font-bold uppercase tracking-widest">
+                                      — Surah Al-Baqara 2:185
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="absolute top-0 right-0 p-4 opacity-10">
+                                  <img src="https://i.postimg.cc/Mc1w5B6x/ramadan.png" alt="" className="w-32 h-32 object-contain" />
+                                </div>
+                              </div>
 
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                              <h4 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
-                                <span className="w-8 h-8 bg-amber-100 text-amber-600 rounded-lg flex items-center justify-center text-lg">🥣</span>
-                                Suhoor Dua
-                              </h4>
-                              <p className="text-xl font-arabic text-emerald-700 leading-loose mb-4 text-center">
-                                وَبِصَوْمِ غَدٍ نَّوَيْتُ مِنْ شَهْرِ رَمَضَانَ
-                              </p>
-                              <p className="text-xs text-slate-500 italic text-center">"I intend to keep the fast for tomorrow in the month of Ramadan."</p>
-                            </div>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                                  <h4 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
+                                    <span className="w-8 h-8 bg-amber-100 text-amber-600 rounded-lg flex items-center justify-center text-lg">🥣</span>
+                                    Dua at Sahur
+                                  </h4>
+                                  <p className="text-xl font-arabic text-emerald-700 leading-loose mb-3 text-center">
+                                    وَبِصَوْمِ غَدٍ نَّوَيْتُ مِنْ شَهْرِ رَمَضَانَ
+                                  </p>
+                                  <div className="space-y-2">
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">Transliteration</p>
+                                    <p className="text-sm text-slate-700 font-medium text-center">Wa bisawmi ghadin nawaytu min shahri Ramadan.</p>
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center mt-2">Meaning</p>
+                                    <p className="text-xs text-slate-500 italic text-center">“I intend to keep the fast for tomorrow in Ramadan.”</p>
+                                  </div>
+                                </div>
 
-                            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                              <h4 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
-                                <span className="w-8 h-8 bg-rose-100 text-rose-600 rounded-lg flex items-center justify-center text-lg">🌅</span>
-                                Iftar Dua
-                              </h4>
-                              <p className="text-xl font-arabic text-emerald-700 leading-loose mb-4 text-center">
-                                اللَّهُمَّ اِنِّى لَكَ صُمْتُ وَبِكَ امنْتُ [وَعَلَيْكَ تَوَكَّلْتُ] وَعَلَى رِزْقِكَ اَفْطَرْتُ
-                              </p>
-                              <p className="text-xs text-slate-500 italic text-center">"O Allah! I fasted for You and I believe in You and I put my trust in You and I break my fast with Your sustenance."</p>
+                                <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                                  <h4 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
+                                    <span className="w-8 h-8 bg-rose-100 text-rose-600 rounded-lg flex items-center justify-center text-lg">🌅</span>
+                                    Iftar Dua
+                                  </h4>
+                                  <p className="text-xl font-arabic text-emerald-700 leading-loose mb-3 text-center">
+                                    اللَّهُمَّ لَكَ صُمْتُ وَعَلَى رِزْقِكَ أَفْطَرْتُ
+                                  </p>
+                                  <div className="space-y-2">
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">Transliteration</p>
+                                    <p className="text-sm text-slate-700 font-medium text-center">Allahumma inni laka sumtu wa ala rizq-ika-aftartu</p>
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center mt-2">Meaning</p>
+                                    <p className="text-xs text-slate-500 italic text-center">"O Allah! For You I have fasted and upon your provision, I have broken my fast."</p>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                                <h4 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
+                                  <span className="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center text-lg">📚</span>
+                                  Ramadan Guide & Rulings
+                                </h4>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                  {[
+                                    "Description of fasting, importance, intention, obligations and sunnahs of fasting",
+                                    "Reasons for breaking the fast and the dislikes of fasting",
+                                    "Things that break the fast, things that don't break the fast",
+                                    "Making up for missed fasts and expiating them",
+                                    "Introduction and virtues of various types of virtuous fasting",
+                                    "Prohibited days for fasting, moon sighting masala",
+                                    "Taraweeh prayer details, rules, intentions, prayers and supplications",
+                                    "Description of Sahur and Iftar",
+                                    "Details of Itikaaf"
+                                  ].map((title, index) => (
+                                    <div 
+                                      key={index}
+                                      onClick={() => setSelectedRamadanGuide(index + 1)}
+                                      className="p-4 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-emerald-50 hover:border-emerald-200 transition-all cursor-pointer group"
+                                    >
+                                    <div className="flex items-start justify-between gap-3">
+                                      <div className="flex items-start gap-3">
+                                        <span className="w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center text-[10px] font-bold text-slate-400 group-hover:border-emerald-300 group-hover:text-emerald-600 transition-colors flex-shrink-0">
+                                          {index + 1}
+                                        </span>
+                                        <p className="text-sm font-medium text-slate-700 group-hover:text-emerald-900 transition-colors leading-snug">
+                                          {title}
+                                        </p>
+                                      </div>
+                                      <ChevronRight size={16} className="text-slate-300 group-hover:text-emerald-500 transition-colors flex-shrink-0 mt-0.5" />
+                                    </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            </>
+                          ) : (
+                            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                              <div className="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                                <button 
+                                  onClick={() => setSelectedRamadanGuide(null)}
+                                  className="flex items-center gap-2 text-slate-600 hover:text-emerald-600 font-bold transition-colors text-xs uppercase tracking-widest"
+                                >
+                                  <ChevronLeft size={16} />
+                                  Back to Guide
+                                </button>
+                                <span className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em]">Point {selectedRamadanGuide}</span>
+                              </div>
+                              <div className="p-8 max-w-2xl mx-auto">
+                                {selectedRamadanGuide === 1 && (
+                                  <div className="space-y-8">
+                                    <section>
+                                      <h4 className="text-2xl font-black text-slate-900 mb-4">What is Fasting?</h4>
+                                      <p className="text-slate-600 mb-4">Fasting (Sawm) in Ramadan means abstaining from dawn (Fajr) until sunset (Maghrib) from:</p>
+                                      <ul className="grid grid-cols-2 gap-3">
+                                        {['Food', 'Drink', 'Sexual relations', 'All actions that invalidate the fast'].map((item, i) => (
+                                          <li key={i} className="flex items-center gap-2 text-sm text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
+                                            {item}
+                                          </li>
+                                        ))}
+                                      </ul>
+                                      <p className="mt-4 text-sm text-slate-500 font-medium">While maintaining: Good character & Worship of Allah</p>
+                                    </section>
+
+                                    <hr className="border-slate-100" />
+
+                                    <section>
+                                      <h4 className="text-xl font-bold text-slate-900 mb-4">Importance of Fasting</h4>
+                                      <p className="text-slate-600 mb-4">Fasting is one of the Five Pillars of Islam.</p>
+                                      <div className="bg-emerald-50 p-6 rounded-2xl border border-emerald-100">
+                                        <h5 className="font-bold text-emerald-900 mb-3 text-sm uppercase tracking-wider">Benefits & Virtues</h5>
+                                        <ul className="space-y-3">
+                                          {[
+                                            'Teaches self-control and patience',
+                                            'Purifies the soul',
+                                            'Increases taqwa (God-consciousness)',
+                                            'Builds empathy for the poor',
+                                            'Multiplies rewards'
+                                          ].map((v, i) => (
+                                            <li key={i} className="flex items-start gap-3 text-sm text-emerald-800">
+                                              <CheckCircle2 size={16} className="mt-0.5 flex-shrink-0" />
+                                              {v}
+                                            </li>
+                                          ))}
+                                        </ul>
+                                        <div className="mt-6 pt-4 border-t border-emerald-200/50">
+                                          <p className="text-sm font-bold text-emerald-900">Special virtue:</p>
+                                          <p className="text-emerald-700 italic">“Fasting is for Me, and I will reward it.”</p>
+                                        </div>
+                                      </div>
+                                    </section>
+
+                                    <hr className="border-slate-100" />
+
+                                    <section>
+                                      <h4 className="text-xl font-bold text-slate-900 mb-4">Intention (Niyyah)</h4>
+                                      <p className="text-slate-600 mb-4">Intention must be made before Fajr.</p>
+                                      <div className="bg-amber-50 p-5 rounded-2xl border border-amber-100">
+                                        <p className="text-amber-900 font-medium text-center italic">“I intend to fast tomorrow for the sake of Allah.”</p>
+                                        <p className="text-[10px] text-amber-600 font-bold uppercase tracking-widest text-center mt-3">Simple intention in heart • No need to say it aloud</p>
+                                      </div>
+                                    </section>
+
+                                    <hr className="border-slate-100" />
+
+                                    <section>
+                                      <h4 className="text-xl font-bold text-slate-900 mb-4">Who must fast? (Obligations)</h4>
+                                      <div className="grid grid-cols-2 gap-3">
+                                        {['Adult Muslims', 'Sane persons', 'Physically able', 'Not travelling (optional concession)'].map((item, i) => (
+                                          <div key={i} className="p-4 rounded-2xl border border-slate-100 bg-white shadow-sm flex items-center gap-3">
+                                            <div className="w-8 h-8 bg-slate-50 rounded-lg flex items-center justify-center text-slate-400">
+                                              <User size={16} />
+                                            </div>
+                                            <span className="text-sm font-bold text-slate-700">{item}</span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </section>
+
+                                    <hr className="border-slate-100" />
+
+                                    <section>
+                                      <h4 className="text-xl font-bold text-slate-900 mb-4">Sunnahs of Fasting</h4>
+                                      <div className="space-y-3">
+                                        {[
+                                          'Eating Suhoor (pre-dawn meal)',
+                                          'Delaying Suhoor',
+                                          'Breaking fast immediately at Maghrib',
+                                          'Breaking fast with dates or water',
+                                          'Making dua at Iftar',
+                                          'Increasing Quran recitation',
+                                          'Giving charity',
+                                          'Avoiding arguments and sins'
+                                        ].map((item, i) => (
+                                          <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 text-sm text-slate-700">
+                                            <div className="w-2 h-2 bg-emerald-400 rounded-full" />
+                                            {item}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </section>
+                                  </div>
+                                )}
+
+                                {selectedRamadanGuide === 2 && (
+                                  <div className="space-y-8">
+                                    <section>
+                                      <h4 className="text-2xl font-black text-slate-900 mb-4">Valid excuses to break fast</h4>
+                                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        {[
+                                          { title: 'Illness', icon: '🤒' },
+                                          { title: 'Travelling', icon: '✈️' },
+                                          { title: 'Pregnancy', icon: '🤰' },
+                                          { title: 'Breastfeeding', icon: '🤱' },
+                                          { title: 'Severe hunger/thirst', icon: '🆘' },
+                                          { title: 'Old age', icon: '👴' }
+                                        ].map((item, i) => (
+                                          <div key={i} className="p-4 rounded-2xl border border-slate-100 bg-white shadow-sm flex items-center gap-4">
+                                            <span className="text-2xl">{item.icon}</span>
+                                            <span className="text-sm font-bold text-slate-700">{item.title}</span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </section>
+
+                                    <hr className="border-slate-100" />
+
+                                    <section>
+                                      <h4 className="text-xl font-bold text-slate-900 mb-4">Disliked actions (Makruh)</h4>
+                                      <p className="text-sm text-slate-500 mb-6">These do NOT break fast but reduce reward:</p>
+                                      <div className="space-y-3">
+                                        {[
+                                          'Lying or gossiping',
+                                          'Arguing or fighting',
+                                          'Wasting time excessively',
+                                          'Brushing teeth with strong flavored toothpaste',
+                                          'Smelling strong fragrances deliberately',
+                                          'Watching sinful content'
+                                        ].map((item, i) => (
+                                          <div key={i} className="flex items-center gap-3 p-4 rounded-2xl bg-rose-50 border border-rose-100 text-sm text-rose-900">
+                                            <AlertCircle size={18} className="text-rose-400 flex-shrink-0" />
+                                            <span className="font-medium">{item}</span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </section>
+                                  </div>
+                                )}
+
+                                {selectedRamadanGuide === 3 && (
+                                  <div className="space-y-8">
+                                    <section>
+                                      <h4 className="text-2xl font-black text-rose-600 mb-4">Things that BREAK the fast</h4>
+                                      <p className="text-sm text-slate-500 mb-4">If done intentionally:</p>
+                                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        {[
+                                          'Eating or drinking',
+                                          'Sexual intercourse',
+                                          'Masturbation causing ejaculation',
+                                          'Vomiting intentionally',
+                                          'Menstruation or post-natal bleeding',
+                                          'Nutritional injections or IV fluids'
+                                        ].map((item, i) => (
+                                          <div key={i} className="flex items-center gap-3 p-4 rounded-2xl bg-rose-50 border border-rose-100 text-sm text-rose-900">
+                                            <XCircle size={18} className="text-rose-400 flex-shrink-0" />
+                                            <span className="font-bold">{i + 1}. {item}</span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </section>
+
+                                    <hr className="border-slate-100" />
+
+                                    <section>
+                                      <h4 className="text-xl font-bold text-emerald-600 mb-4">Things that DO NOT break the fast</h4>
+                                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        {[
+                                          'Forgetfully eating or drinking',
+                                          'Swallowing saliva',
+                                          'Showering or swimming',
+                                          'Using miswak (tooth stick)',
+                                          'Blood test or injection (non-nutritive)',
+                                          'Eye drops or ear drops',
+                                          'Accidental vomiting',
+                                          'Perfume or deodorant'
+                                        ].map((item, i) => (
+                                          <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-emerald-50 border border-emerald-100 text-sm text-emerald-900">
+                                            <CheckCircle2 size={16} className="text-emerald-500 flex-shrink-0" />
+                                            <span className="font-medium">{item}</span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </section>
+                                  </div>
+                                )}
+
+                                {selectedRamadanGuide === 4 && (
+                                  <div className="space-y-8">
+                                    <section>
+                                      <div className="flex items-center gap-3 mb-4">
+                                        <div className="w-10 h-10 bg-amber-100 text-amber-700 rounded-xl flex items-center justify-center">
+                                          <Calendar size={20} />
+                                        </div>
+                                        <h4 className="text-2xl font-black text-slate-900">Qadha (Make-up fast)</h4>
+                                      </div>
+                                      <p className="text-slate-600 mb-4">If fast is missed due to:</p>
+                                      <div className="flex flex-wrap gap-2 mb-4">
+                                        {['Illness', 'Travel', 'Menstruation'].map((item, i) => (
+                                          <span key={i} className="px-4 py-2 bg-slate-100 text-slate-700 rounded-full text-sm font-bold border border-slate-200">{item}</span>
+                                        ))}
+                                      </div>
+                                      <div className="p-4 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center gap-3 text-emerald-800 font-bold">
+                                        <ArrowRight size={18} />
+                                        Must fast later after Ramadan.
+                                      </div>
+                                    </section>
+
+                                    <hr className="border-slate-100" />
+
+                                    <section>
+                                      <div className="flex items-center gap-3 mb-4">
+                                        <div className="w-10 h-10 bg-rose-100 text-rose-700 rounded-xl flex items-center justify-center">
+                                          <ShieldAlert size={20} />
+                                        </div>
+                                        <h4 className="text-2xl font-black text-slate-900">Kaffarah (Expiation)</h4>
+                                      </div>
+                                      <div className="bg-rose-50 p-6 rounded-2xl border border-rose-100 mb-6">
+                                        <p className="text-rose-900 font-medium leading-relaxed">
+                                          Required when fast is broken intentionally without valid excuse. 
+                                          <span className="block mt-2 text-xs font-bold uppercase tracking-widest text-rose-400">Mainly applies to breaking fast by sexual intercourse.</span>
+                                        </p>
+                                      </div>
+                                      <h5 className="font-bold text-slate-900 mb-3 text-sm uppercase tracking-wider">Kaffarah Options:</h5>
+                                      <div className="space-y-3">
+                                        <div className="p-4 rounded-2xl border border-slate-200 bg-white shadow-sm flex items-center gap-4">
+                                          <div className="w-8 h-8 bg-slate-900 text-white rounded-lg flex items-center justify-center font-black text-xs">1</div>
+                                          <span className="text-sm font-bold text-slate-700">Fast 60 consecutive days</span>
+                                        </div>
+                                        <div className="flex items-center justify-center py-1">
+                                          <span className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em]">OR</span>
+                                        </div>
+                                        <div className="p-4 rounded-2xl border border-slate-200 bg-white shadow-sm flex items-center gap-4">
+                                          <div className="w-8 h-8 bg-slate-900 text-white rounded-lg flex items-center justify-center font-black text-xs">2</div>
+                                          <span className="text-sm font-bold text-slate-700">Feed 60 poor people</span>
+                                        </div>
+                                      </div>
+                                    </section>
+                                  </div>
+                                )}
+
+                                {selectedRamadanGuide === 5 && (
+                                  <div className="space-y-8">
+                                    <section>
+                                      <h4 className="text-2xl font-black text-slate-900 mb-4">Types of Voluntary (Nafl) Fasting</h4>
+                                      <h5 className="font-bold text-emerald-600 mb-4 text-sm uppercase tracking-wider">Highly recommended fasts</h5>
+                                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        {[
+                                          'Mondays & Thursdays',
+                                          '13th, 14th, 15th of every Islamic month (White days)',
+                                          'Day of Arafah (9 Dhul Hijjah)',
+                                          'Day of Ashura (10 Muharram)',
+                                          '6 days of Shawwal',
+                                          'Fasting of Prophet Dawud (alternate days)'
+                                        ].map((item, i) => (
+                                          <div key={i} className="p-4 rounded-2xl border border-slate-100 bg-slate-50 flex items-center gap-3">
+                                            <div className="w-2 h-2 bg-emerald-500 rounded-full" />
+                                            <span className="text-sm font-bold text-slate-700">{item}</span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </section>
+
+                                    <hr className="border-slate-100" />
+
+                                    <section>
+                                      <h4 className="text-xl font-bold text-slate-900 mb-4">Virtues</h4>
+                                      <div className="space-y-4">
+                                        {[
+                                          { title: 'Erases sins', icon: '✨' },
+                                          { title: 'Raises rank in Jannah', icon: '🏔️' },
+                                          { title: 'Protects from Hellfire', icon: '🛡️' }
+                                        ].map((v, i) => (
+                                          <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-emerald-50 border border-emerald-100">
+                                            <span className="text-2xl">{v.icon}</span>
+                                            <span className="font-bold text-emerald-900">{v.title}</span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </section>
+                                  </div>
+                                )}
+
+                                {selectedRamadanGuide === 6 && (
+                                  <div className="space-y-8">
+                                    <section>
+                                      <h4 className="text-2xl font-black text-rose-600 mb-4">Forbidden fasting days</h4>
+                                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        {[
+                                          'Eid al-Fitr (1 Shawwal)',
+                                          'Eid al-Adha (10 Dhul Hijjah)',
+                                          '11–13 Dhul Hijjah (Days of Tashreeq)',
+                                          'Doubt day before Ramadan (without confirmation)'
+                                        ].map((item, i) => (
+                                          <div key={i} className="flex items-center gap-3 p-4 rounded-2xl bg-rose-50 border border-rose-100 text-sm text-rose-900">
+                                            <XCircle size={18} className="text-rose-400 flex-shrink-0" />
+                                            <span className="font-bold">{item}</span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </section>
+
+                                    <hr className="border-slate-100" />
+
+                                    <section>
+                                      <h4 className="text-xl font-bold text-slate-900 mb-4">Moon sighting rules</h4>
+                                      <div className="space-y-6">
+                                        <div className="bg-emerald-50 p-6 rounded-2xl border border-emerald-100">
+                                          <h5 className="font-bold text-emerald-900 mb-3 text-sm uppercase tracking-wider">Ramadan begins when:</h5>
+                                          <ul className="space-y-2">
+                                            <li className="flex items-center gap-2 text-sm text-emerald-800">
+                                              <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
+                                              Crescent moon is sighted OR
+                                            </li>
+                                            <li className="flex items-center gap-2 text-sm text-emerald-800">
+                                              <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
+                                              30 days of Sha’ban completed
+                                            </li>
+                                          </ul>
+                                        </div>
+                                        <div className="bg-amber-50 p-6 rounded-2xl border border-amber-100">
+                                          <h5 className="font-bold text-amber-900 mb-3 text-sm uppercase tracking-wider">Ramadan ends when:</h5>
+                                          <p className="text-sm text-amber-800">Shawwal moon is sighted.</p>
+                                        </div>
+                                      </div>
+                                    </section>
+                                  </div>
+                                )}
+
+                                {selectedRamadanGuide === 7 && (
+                                  <div className="space-y-8">
+                                    <section>
+                                      <h4 className="text-2xl font-black text-slate-900 mb-4">What is Taraweeh?</h4>
+                                      <div className="bg-indigo-50 p-6 rounded-2xl border border-indigo-100">
+                                        <p className="text-indigo-900 font-medium leading-relaxed">
+                                          Special night prayer during Ramadan performed after Isha prayer.
+                                        </p>
+                                      </div>
+                                    </section>
+
+                                    <hr className="border-slate-100" />
+
+                                    <section>
+                                      <h4 className="text-xl font-bold text-slate-900 mb-4">Rakats</h4>
+                                      <p className="text-sm text-slate-500 mb-4">Common practices (Both are acceptable):</p>
+                                      <div className="grid grid-cols-2 gap-4">
+                                        <div className="p-4 rounded-2xl border border-slate-200 bg-white shadow-sm text-center">
+                                          <p className="text-2xl font-black text-slate-900">8</p>
+                                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Rakats + Witr</p>
+                                        </div>
+                                        <div className="p-4 rounded-2xl border border-slate-200 bg-white shadow-sm text-center">
+                                          <p className="text-2xl font-black text-slate-900">20</p>
+                                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Rakats + Witr</p>
+                                        </div>
+                                      </div>
+                                    </section>
+
+                                    <hr className="border-slate-100" />
+
+                                    <section>
+                                      <h4 className="text-xl font-bold text-slate-900 mb-4">Taraweeh Intention</h4>
+                                      <div className="bg-slate-900 p-6 rounded-2xl text-center">
+                                        <p className="text-white font-medium italic">“I intend to pray Taraweeh for Allah.”</p>
+                                      </div>
+                                    </section>
+
+                                    <hr className="border-slate-100" />
+
+                                    <section>
+                                      <h4 className="text-xl font-bold text-slate-900 mb-4">Benefits</h4>
+                                      <div className="space-y-3">
+                                        {[
+                                          'Forgiveness of past sins',
+                                          'Reward of praying entire night'
+                                        ].map((v, i) => (
+                                          <div key={i} className="flex items-center gap-3 p-4 rounded-2xl bg-emerald-50 border border-emerald-100 text-sm text-emerald-900">
+                                            <CheckCircle2 size={18} className="text-emerald-500 flex-shrink-0" />
+                                            <span className="font-bold">{v}</span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </section>
+                                  </div>
+                                )}
+
+                                {selectedRamadanGuide === 8 && (
+                                  <div className="space-y-8">
+                                    <section>
+                                      <h4 className="text-2xl font-black text-slate-900 mb-4">Sahur (Pre-dawn meal)</h4>
+                                      <p className="text-slate-600 mb-6">Blessed meal before Fajr.</p>
+                                      
+                                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+                                        <div className="bg-amber-50 p-5 rounded-2xl border border-amber-100">
+                                          <h5 className="font-bold text-amber-900 mb-3 text-xs uppercase tracking-wider">Benefits</h5>
+                                          <ul className="space-y-2">
+                                            {['Provides strength', 'Sunnah of Prophet'].map((v, i) => (
+                                              <li key={i} className="flex items-center gap-2 text-sm text-amber-800">
+                                                <div className="w-1.5 h-1.5 bg-amber-400 rounded-full" />
+                                                {v}
+                                              </li>
+                                            ))}
+                                          </ul>
+                                        </div>
+                                        <div className="bg-emerald-50 p-5 rounded-2xl border border-emerald-100">
+                                          <h5 className="font-bold text-emerald-900 mb-3 text-xs uppercase tracking-wider">Recommended Foods</h5>
+                                          <div className="flex flex-wrap gap-2">
+                                            {['Dates', 'Water', 'Fruits', 'Oats / whole grains'].map((v, i) => (
+                                              <span key={i} className="px-3 py-1 bg-white rounded-full text-[10px] font-bold text-emerald-700 border border-emerald-200">{v}</span>
+                                            ))}
+                                          </div>
+                                        </div>
+                                      </div>
+
+                                      <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                                        <h5 className="font-bold text-slate-900 mb-4 text-center text-sm uppercase tracking-widest">Dua at Sahur</h5>
+                                        <p className="text-2xl font-arabic text-emerald-700 leading-loose mb-4 text-center">
+                                          وَبِصَوْمِ غَدٍ نَّوَيْتُ مِنْ شَهْرِ رَمَضَانَ
+                                        </p>
+                                        <div className="space-y-2 text-center">
+                                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Transliteration</p>
+                                          <p className="text-sm text-slate-700 font-medium">Wa bisawmi ghadin nawaytu min shahri Ramadan.</p>
+                                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">Meaning</p>
+                                          <p className="text-xs text-slate-500 italic">“I intend to keep the fast for tomorrow in Ramadan.”</p>
+                                        </div>
+                                      </div>
+                                    </section>
+
+                                    <hr className="border-slate-100" />
+
+                                    <section>
+                                      <h4 className="text-2xl font-black text-slate-900 mb-4">Iftar (Breaking fast)</h4>
+                                      <p className="text-slate-600 mb-6">Break fast immediately at sunset.</p>
+                                      
+                                      <div className="bg-rose-50 p-5 rounded-2xl border border-rose-100 mb-8">
+                                        <h5 className="font-bold text-rose-900 mb-3 text-xs uppercase tracking-wider">Sunnah Method</h5>
+                                        <div className="flex items-center justify-around">
+                                          {['Dates', 'Water', 'Maghrib prayer'].map((v, i) => (
+                                            <div key={i} className="flex flex-col items-center gap-2">
+                                              <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-lg shadow-sm">{i === 0 ? '🌴' : i === 1 ? '💧' : '🕌'}</div>
+                                              <span className="text-[10px] font-bold text-rose-700 uppercase">{v}</span>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+
+                                      <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                                        <h5 className="font-bold text-slate-900 mb-4 text-center text-sm uppercase tracking-widest">Dua at Iftar</h5>
+                                        <p className="text-2xl font-arabic text-emerald-700 leading-loose mb-4 text-center">
+                                          اللَّهُمَّ لَكَ صُمْتُ وَعَلَى رِزْقِكَ أَفْطَرْتُ
+                                        </p>
+                                        <div className="space-y-2 text-center">
+                                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Transliteration</p>
+                                          <p className="text-sm text-slate-700 font-medium">Allahumma inni laka sumtu wa ala rizq-ika-aftartu</p>
+                                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">Meaning</p>
+                                          <p className="text-xs text-slate-500 italic">"O Allah! For You I have fasted and upon your provision, I have broken my fast."</p>
+                                        </div>
+                                      </div>
+                                    </section>
+                                  </div>
+                                )}
+
+                                {selectedRamadanGuide === 9 && (
+                                  <div className="space-y-8">
+                                    <section>
+                                      <h4 className="text-2xl font-black text-slate-900 mb-4">What is Itikaf?</h4>
+                                      <div className="bg-emerald-700 rounded-3xl p-6 text-white shadow-lg">
+                                        <p className="font-medium leading-relaxed">
+                                          Staying in the mosque during the last 10 days of Ramadan specifically for worship and spiritual seclusion.
+                                        </p>
+                                      </div>
+                                    </section>
+
+                                    <hr className="border-slate-100" />
+
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                      <section>
+                                        <h4 className="text-xl font-bold text-slate-900 mb-4">Purpose</h4>
+                                        <ul className="space-y-3">
+                                          {[
+                                            'Seek Laylatul Qadr',
+                                            'Disconnect from worldly distractions',
+                                            'Increase worship'
+                                          ].map((v, i) => (
+                                            <li key={i} className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 text-sm text-slate-700 border border-slate-100">
+                                              <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
+                                              {v}
+                                            </li>
+                                          ))}
+                                        </ul>
+                                      </section>
+
+                                      <section>
+                                        <h4 className="text-xl font-bold text-slate-900 mb-4">Conditions</h4>
+                                        <ul className="space-y-3">
+                                          {[
+                                            'Stay in mosque',
+                                            'Leave only for necessities',
+                                            'Avoid worldly talk',
+                                            'Focus on worship'
+                                          ].map((v, i) => (
+                                            <li key={i} className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 text-sm text-slate-700 border border-slate-100">
+                                              <div className="w-1.5 h-1.5 bg-amber-500 rounded-full" />
+                                              {v}
+                                            </li>
+                                          ))}
+                                        </ul>
+                                      </section>
+                                    </div>
+
+                                    <hr className="border-slate-100" />
+
+                                    <section>
+                                      <h4 className="text-xl font-bold text-slate-900 mb-4">Acts during Itikaf</h4>
+                                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                        {[
+                                          { title: 'Quran', icon: '📖' },
+                                          { title: 'Dhikr', icon: '📿' },
+                                          { title: 'Dua', icon: '🤲' },
+                                          { title: 'Night Prayer', icon: '🌙' }
+                                        ].map((v, i) => (
+                                          <div key={i} className="flex flex-col items-center gap-3 p-4 rounded-2xl bg-white border border-slate-200 shadow-sm">
+                                            <span className="text-2xl">{v.icon}</span>
+                                            <span className="text-[10px] font-bold text-slate-900 uppercase tracking-widest">{v.title}</span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </section>
+                                  </div>
+                                )}
+
+                                {selectedRamadanGuide > 9 && (
+                                  <div className="py-20 text-center space-y-4">
+                                    <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto text-slate-400">
+                                      <BookOpen size={32} />
+                                    </div>
+                                    <h4 className="text-lg font-bold text-slate-900">Coming Soon</h4>
+                                    <p className="text-sm text-slate-500 max-w-xs mx-auto">Detailed information for this point is being prepared. Please check back later.</p>
+                                  </div>
+                                )}
+                              </div>
                             </div>
-                          </div>
+                          )}
 
                           <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                             <h4 className="font-bold text-slate-900 mb-4">Virtues of Ramadan</h4>
@@ -4389,7 +5169,38 @@ export default function App() {
                           <Heart className="text-red-500 mx-auto mb-4" size={32} />
                           <h3 className="text-lg font-bold text-slate-900 mb-4">Daily Hadith</h3>
                           <div className="max-h-[400px] overflow-y-auto pr-2 custom-scrollbar mb-6">
-                            <p className="text-slate-600 italic leading-relaxed text-sm md:text-base">"{randomHadith.hadithEnglish}"</p>
+                            {randomHadith.hadithEnglish ? (
+                              <p className="text-slate-600 italic leading-relaxed text-sm md:text-base">"{randomHadith.hadithEnglish}"</p>
+                            ) : (
+                              <div className="space-y-4">
+                                {randomHadith.hadithUrdu && (
+                                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Urdu Translation</p>
+                                    <p className="text-sm md:text-base text-slate-600 leading-relaxed font-arabic text-right">{randomHadith.hadithUrdu}</p>
+                                  </div>
+                                )}
+                                <div className="flex flex-col items-center gap-3">
+                                  <p className="text-sm text-slate-400 italic">English translation not available.</p>
+                                  <button 
+                                    onClick={async () => {
+                                      const translated = await translateHadith(randomHadith);
+                                      if (translated) {
+                                        setRandomHadith({ ...randomHadith, hadithEnglish: translated });
+                                      }
+                                    }}
+                                    disabled={translatingId === randomHadith.id}
+                                    className="flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-600 rounded-xl text-xs font-bold hover:bg-emerald-100 transition-all disabled:opacity-50"
+                                  >
+                                    {translatingId === randomHadith.id ? (
+                                      <Loader2 size={14} className="animate-spin" />
+                                    ) : (
+                                      <Languages size={14} />
+                                    )}
+                                    Translate to English
+                                  </button>
+                                </div>
+                              </div>
+                            )}
                           </div>
                           <p className="text-xs font-bold text-emerald-600 uppercase tracking-widest">— {randomHadith.bookSlug.replace(/-/g, ' ')}</p>
                         </>
@@ -4573,7 +5384,18 @@ export default function App() {
           ].map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
+              onClick={() => {
+                if (tab.id === 'deen') {
+                  setDeenSubTab('grid');
+                  setSelectedRamadanGuide(null);
+                  setSelectedBook(null);
+                  setPrayerSubTab('menu');
+                  setSelectedSalahDua(null);
+                  setSelectedEssentialSurah(null);
+                  setSelectedSurah(null);
+                }
+                setActiveTab(tab.id as any);
+              }}
               className={cn(
                 "flex flex-col items-center gap-1 transition-all min-w-[60px]",
                 activeTab === tab.id ? "text-emerald-600" : "text-slate-400"

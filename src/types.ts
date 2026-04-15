@@ -87,6 +87,7 @@ export interface Hadith {
   englishNarrator: string;
   hadithArabic: string;
   hadithEnglish: string;
+  hadithUrdu?: string;
   bookSlug: string;
   status: string;
 }

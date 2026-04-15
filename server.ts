@@ -25,12 +25,24 @@ async function startServer() {
       if (search) params.append('search', search as string);
 
       const url = `https://www.hadithapi.com/public/api/hadiths?${params.toString()}`;
-      const response = await fetch(url);
+      console.log(`Proxying Hadith request: ${url.replace(apiKey, 'HIDDEN')}`);
+      
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
+      const response = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeoutId);
+      
       const data = await response.json();
       res.json(data);
     } catch (error) {
-      console.error("Proxy error:", error);
-      res.status(500).json({ error: "Failed to fetch from Hadith API" });
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.error("Proxy timeout (hadiths)");
+        res.status(504).json({ error: "Hadith API request timed out" });
+      } else {
+        console.error("Proxy error (hadiths):", error);
+        res.status(500).json({ error: "Failed to fetch from Hadith API" });
+      }
     }
   });
 
@@ -38,12 +50,24 @@ async function startServer() {
     try {
       const apiKey = process.env.HADITH_API_KEY || '$2y$10$oX668r6G9v9Y89rG9v9Y89rG9v9Y89rG9v9Y89rG9v9Y89rG9v9Y8';
       const url = `https://www.hadithapi.com/public/api/books?apiKey=${apiKey}`;
-      const response = await fetch(url);
+      console.log(`Proxying Books request: ${url.replace(apiKey, 'HIDDEN')}`);
+      
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
+      const response = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeoutId);
+
       const data = await response.json();
       res.json(data);
     } catch (error) {
-      console.error("Proxy error (books):", error);
-      res.status(500).json({ error: "Failed to fetch books from Hadith API" });
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.error("Proxy timeout (books)");
+        res.status(504).json({ error: "Books API request timed out" });
+      } else {
+        console.error("Proxy error (books):", error);
+        res.status(500).json({ error: "Failed to fetch books from Hadith API" });
+      }
     }
   });
 

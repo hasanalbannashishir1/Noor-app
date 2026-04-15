@@ -309,6 +309,107 @@ const DOCUMENTARIES = [
   { title: "The Sultan and the Saint", description: "The story of St. Francis of Assisi and the Sultan of Egypt.", link: "https://www.youtube.com/results?search_query=the+sultan+and+the+saint+documentary" }
 ];
 
+const KALIMAS = [
+  {
+    id: 1,
+    title: "First Kalima (Tayyaba)",
+    arabic: "لَا إِلٰهَ إِلَّا اللهُ مُحَمَّدٌ رَسُولُ اللهِ",
+    transliteration: "La ilaha illallahu Muhammadur Rasulullah",
+    translation: "There is no god but Allah, and Muhammad is the messenger of Allah."
+  },
+  {
+    id: 2,
+    title: "Second Kalima (Shahadat)",
+    arabic: "أَشْهَدُ أَنْ لَا إِلٰهَ إِلَّا اللهُ وَحْدَهُ لَا شَرِيكَ لَهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ",
+    transliteration: "Ash-hadu an la ilaha illallahu wahdahu la sharika lahu wa ash-hadu anna Muhammadan abduhu wa Rasuluhu",
+    translation: "I bear witness that there is no god but Allah, He is alone and has no partner, and I bear witness that Muhammad is His servant and messenger."
+  },
+  {
+    id: 3,
+    title: "Third Kalima (Tamjeed)",
+    arabic: "سُبْحَانَ اللهِ وَالْحَمْدُ لِلهِ وَلَا إِلٰهَ إِلَّا اللهُ وَاللهُ أَكْبَرُ وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللهِ الْعَلِيِّ الْعَظِيمِ",
+    transliteration: "Subhanallahi wal-hamdu lillahi wa la ilaha illallahu wallahu akbar wa la hawla wa la quwwata illa billahil-aliyyil-azim",
+    translation: "Glory be to Allah, and all praise be to Allah, and there is no god but Allah, and Allah is the Greatest. And there is no power and no strength except with Allah, the Most High, the Most Great."
+  },
+  {
+    id: 4,
+    title: "Fourth Kalima (Tauheed)",
+    arabic: "لَا إِلٰهَ إِلَّا اللهُ وَحْدَهُ لَا شَرِيكَ لَهُ لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ يُحْيِي وَيُمِيتُ وَهُوَ حَيٌّ لَا يَمُوتُ أَبَدًا أَبَدًا ذُو الْجَلَالِ وَالْإِكْرَامِ بِيَدِهِ الْخَيْرُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+    transliteration: "La ilaha illallahu wahdahu la sharika lahu lahul-mulku wa lahul-hamdu yuhyi wa yumitu wa huwa hayyul-la yamutu abadan abada dhul-jalali wal-ikram biyadihil-khayr wa huwa ala kulli shay'in qadir",
+    translation: "There is no god but Allah, He is alone and has no partner. For Him is the kingdom and for Him is the praise. He gives life and causes death, and He is living, He never dies, never ever. Possessor of Majesty and Honor. In His hand is all good, and He has power over all things."
+  },
+  {
+    id: 5,
+    title: "Fifth Kalima (Istighfar)",
+    arabic: "أَسْتَغْفِرُ اللهَ رَبِّي مِنْ كُلِّ ذَنْبٍ أَذْنَبْتُهُ عَمَدًا أَوْ خَطَأً سِرًّا أَوْ عَلَانِيَةً وَأَتُوبُ إِلَيْهِ مِنَ الذَّنْبِ الَّذِي أَعْلَمُ وَمِنَ الذَّنْبِ الَّذِي لَا أَعْلَمُ إِنَّكَ أَنْتَ عَلَّامُ الْغُيُوبِ وَسَتَّارُ الْعُيُوبِ وَغَفَّارُ الذُّنُوبِ وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللهِ الْعَلِيِّ الْعَظِيمِ",
+    transliteration: "Astaghfirullaha rabbi min kulli dhanbin adhnabtuhu amadan aw khata'an sirran aw alaniyatan wa atubu ilayhi minadh-dhanbilladhi alamu wa minadh-dhanbilladhi la alamu innaka anta allamul-ghuyubi wa sattarul-uyubi wa ghaffarudh-dhunubi wa la hawla wa la quwwata illa billahil-aliyyil-azim",
+    translation: "I seek forgiveness from Allah, my Lord, from every sin I committed knowingly or unknowingly, secretly or openly, and I turn to Him from the sin that I know and from the sin that I do not know. Indeed You, You are the Knower of the unseen, and the Concealer of faults, and the Forgiver of sins. And there is no power and no strength except with Allah, the Most High, the Most Great."
+  },
+  {
+    id: 6,
+    title: "Sixth Kalima (Radde Kufr)",
+    arabic: "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ أَنْ أُشْرِكَ بِكَ شَيْئًا وَأَنَا أَعْلَمُ بِهِ وَأَسْتَغْفِرُكَ لِمَا لَا أَعْلَمُ بِهِ تُبْتُ عَنْهُ وَتَبَرَّأْتُ مِنَ الْكُفْرِ وَالشِّرْكِ وَالْكِذْبِ وَالْغِيبَةِ وَالْبِدْعَةِ وَالنَّمِيمَةِ وَالْفَوَاحِشِ وَالْبُهْتَانِ وَالْمَعَاصِي كُلِّهَا وَأَسْلَمْتُ وَأَقُولُ لَا إِلٰهَ إِلَّا اللهُ مُحَمَّدٌ رَسُولُ اللهِ",
+    transliteration: "Allahumma inni audhu bika min an ushrika bika shay'an wa ana alamu bihi wa astaghfiruka lima la alamu bihi tubtu anhu wa tabarratu minal-kufri wash-shirki wal-kidhbi wal-ghibati wal-bidati wan-namimati wal-fawahishi wal-buhtani wal-maasi kulliha wa aslamtu wa aqulu la ilaha illallahu Muhammadur Rasulullah",
+    translation: "O Allah! I seek refuge in You from that I should associate anything with You while I know it. And I seek Your forgiveness for that which I do not know. I repent from it and I disassociate myself from disbelief and polytheism and lies and backbiting and innovation and slander and lewdness and calumny and all sins. And I submit and I say: There is no god but Allah, Muhammad is the messenger of Allah."
+  }
+];
+
+const PILLARS_OF_ISLAM = [
+  {
+    title: "Shahada (Faith)",
+    description: "The declaration of faith in the oneness of Allah and the prophethood of Muhammad (PBUH).",
+    details: "The Shahada is the most fundamental pillar. It is the sincere recitation of the statement: 'There is no god but Allah, and Muhammad is the messenger of Allah.' This declaration is the entry point into Islam."
+  },
+  {
+    title: "Salah (Prayer)",
+    description: "The performance of five daily prayers at specific times.",
+    details: "Muslims perform five prayers a day: Fajr (dawn), Dhuhr (noon), Asr (afternoon), Maghrib (sunset), and Isha (night). Prayer establishes a direct connection between the believer and Allah."
+  },
+  {
+    title: "Zakat (Almsgiving)",
+    description: "The giving of a portion of one's wealth to those in need.",
+    details: "Zakat is a mandatory charitable contribution, typically 2.5% of a Muslim's accumulated wealth. It is intended to purify wealth and provide social support for the poor and needy."
+  },
+  {
+    title: "Sawm (Fasting)",
+    description: "Fasting during the month of Ramadan from dawn to sunset.",
+    details: "During Ramadan, Muslims abstain from food, drink, and other physical needs during daylight hours. Fasting teaches self-discipline, patience, and empathy for the less fortunate."
+  },
+  {
+    title: "Hajj (Pilgrimage)",
+    description: "The pilgrimage to the holy city of Mecca at least once in a lifetime.",
+    details: "Hajj is required for every adult Muslim who is physically and financially able to make the journey. It takes place during the Islamic month of Dhu al-Hijjah and brings together millions of Muslims from around the world."
+  }
+];
+
+const ISLAMIC_FESTIVALS = [
+  {
+    title: "Eid-ul-Fitr",
+    description: "The 'Festival of Breaking the Fast' celebrated at the end of Ramadan.",
+    details: "Eid-ul-Fitr is a day of joy and thanksgiving. Muslims perform a special prayer in the morning, give charity (Zakat al-Fitr), visit family and friends, and enjoy festive meals."
+  },
+  {
+    title: "Eid-ul-Adha",
+    description: "The 'Festival of Sacrifice' commemorating Prophet Ibrahim's (AS) willingness to sacrifice his son.",
+    details: "Eid-ul-Adha coincides with the completion of Hajj. Muslims sacrifice an animal (usually a sheep, goat, or cow) and distribute the meat among family, friends, and the poor."
+  },
+  {
+    title: "Laylat al-Qadr",
+    description: "The 'Night of Power' when the first verses of the Quran were revealed.",
+    details: "This night falls within the last ten days of Ramadan. It is considered the holiest night of the year, and worship performed on this night is better than a thousand months of worship."
+  },
+  {
+    title: "Ashura",
+    description: "The 10th day of Muharram, observed with fasting and remembrance.",
+    details: "Ashura marks several historical events, including the day Prophet Musa (AS) and the Israelites were saved from Pharaoh. For Shia Muslims, it is a day of mourning for the martyrdom of Imam Hussain (RA)."
+  },
+  {
+    title: "Mawlid al-Nabi",
+    description: "The celebration of the birth of Prophet Muhammad (PBUH).",
+    details: "Observed on the 12th of Rabi' al-Awwal, this day is marked by gatherings where stories of the Prophet's life and character are shared, and poems are recited in his honor."
+  }
+];
+
 const ZakatCalculator = () => {
   const [step, setStep] = useState(1);
   
@@ -1733,7 +1834,7 @@ const StreakCalendar = ({ visitedDates }: { visitedDates: string[] }) => {
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'home' | 'deen' | 'ai' | 'amal' | 'dashboard'>('home');
-  const [deenSubTab, setDeenSubTab] = useState<'grid' | 'quran' | 'names' | 'hadith' | 'prayer' | 'saved' | 'zakat' | 'events' | 'documentary' | 'ramadan' | 'hajj' | 'qibla' | 'calendar' | 'milad'>('grid');
+  const [deenSubTab, setDeenSubTab] = useState<'grid' | 'quran' | 'names' | 'hadith' | 'prayer' | 'saved' | 'zakat' | 'events' | 'documentary' | 'ramadan' | 'hajj' | 'qibla' | 'calendar' | 'milad' | 'dua_deen' | 'kalima' | 'pillars' | 'festivals'>('grid');
   const [prayerSubTab, setPrayerSubTab] = useState<'menu' | 'wudu' | 'salah' | 'surah' | 'steps'>('menu');
   const [amalSubTab, setAmalSubTab] = useState<'quran' | 'hadith' | 'dua'>('quran');
   const [translatingId, setTranslatingId] = useState<number | null>(null);
@@ -2644,9 +2745,9 @@ export default function App() {
       <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-200 px-4 py-2">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2 md:gap-3">
-            <div className="w-8 h-8 md:w-10 md:h-10 bg-white rounded-xl flex items-center justify-center shadow-lg shadow-emerald-100 overflow-hidden border border-slate-100">
+            <div className="w-8 h-8 md:w-10 md:h-10 bg-white rounded-xl flex items-center justify-center overflow-hidden border border-slate-100">
               <img 
-                src="https://i.postimg.cc/QF5tN5XB/quran-1.png" 
+                src="https://i.postimg.cc/JsqDDRFR/star.png" 
                 alt="Noor App Logo" 
                 className="w-full h-full object-cover"
                 referrerPolicy="no-referrer"
@@ -3309,6 +3410,70 @@ export default function App() {
                           <h3 className="text-[10px] font-bold uppercase tracking-tight">Documentary</h3>
                         </button>
 
+                        {/* 14. Dua Option */}
+                        <button 
+                          onClick={() => setDeenSubTab('dua_deen')}
+                          className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
+                        >
+                          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm overflow-hidden border border-slate-100">
+                            <img 
+                              src="https://i.postimg.cc/sGZ6syrV/open-hands.png" 
+                              alt="Dua" 
+                              className="w-full h-full object-cover"
+                              referrerPolicy="no-referrer"
+                            />
+                          </div>
+                          <h3 className="text-[10px] font-bold uppercase tracking-tight">Dua</h3>
+                        </button>
+
+                        {/* 15. Kalima Option */}
+                        <button 
+                          onClick={() => setDeenSubTab('kalima')}
+                          className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
+                        >
+                          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm overflow-hidden border border-slate-100">
+                            <img 
+                              src="https://i.postimg.cc/GHnwtgSJ/ornament.png" 
+                              alt="Kalima" 
+                              className="w-full h-full object-cover"
+                              referrerPolicy="no-referrer"
+                            />
+                          </div>
+                          <h3 className="text-[10px] font-bold uppercase tracking-tight">Kalima</h3>
+                        </button>
+
+                        {/* 16. Pillar of Islam Option */}
+                        <button 
+                          onClick={() => setDeenSubTab('pillars')}
+                          className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
+                        >
+                          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm overflow-hidden border border-slate-100">
+                            <img 
+                              src="https://i.postimg.cc/rRtnMckw/window.png" 
+                              alt="Pillar of Islam" 
+                              className="w-full h-full object-cover"
+                              referrerPolicy="no-referrer"
+                            />
+                          </div>
+                          <h3 className="text-[10px] font-bold uppercase tracking-tight">Pillar of Islam</h3>
+                        </button>
+
+                        {/* 17. Festivals in Islam Option */}
+                        <button 
+                          onClick={() => setDeenSubTab('festivals')}
+                          className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
+                        >
+                          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm overflow-hidden border border-slate-100">
+                            <img 
+                              src="https://i.postimg.cc/LgZC2Rp4/eid-al-fitr.png" 
+                              alt="Festivals in Islam" 
+                              className="w-full h-full object-cover"
+                              referrerPolicy="no-referrer"
+                            />
+                          </div>
+                          <h3 className="text-[10px] font-bold uppercase tracking-tight">Festivals in Islam</h3>
+                        </button>
+
                         {/* 13. Saved Items Option */}
                         <button 
                           onClick={() => setDeenSubTab('saved')}
@@ -3335,6 +3500,10 @@ export default function App() {
                         (deenSubTab === 'saved') ||
                         (deenSubTab === 'zakat') ||
                         (deenSubTab === 'documentary') ||
+                        (deenSubTab === 'dua_deen') ||
+                        (deenSubTab === 'kalima') ||
+                        (deenSubTab === 'pillars') ||
+                        (deenSubTab === 'festivals') ||
                         (deenSubTab === 'ramadan' && selectedRamadanGuide === null) ||
                         (deenSubTab === 'hajj') ||
                         (deenSubTab === 'qibla') ||
@@ -4832,6 +5001,116 @@ export default function App() {
                               <p className="text-xs text-emerald-600 italic text-center">"And We have not sent you, [O Muhammad], except as a mercy to the worlds."</p>
                               <p className="text-[10px] text-emerald-400 font-bold uppercase tracking-widest mt-2 text-center">— Surah Al-Anbiya [21:107]</p>
                             </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {deenSubTab === 'dua_deen' && (
+                        <div className="space-y-6">
+                          <div className="bg-emerald-600 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
+                            <div className="relative z-10">
+                              <h3 className="text-3xl font-black mb-2">Dua & Supplications</h3>
+                              <p className="text-emerald-100 text-sm max-w-md">"Dua is the essence of worship." Connect with Allah through these beautiful supplications.</p>
+                            </div>
+                            <div className="absolute top-0 right-0 p-4 opacity-10">
+                              <img src="https://i.postimg.cc/sGZ6syrV/open-hands.png" alt="" className="w-32 h-32 object-contain" />
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 gap-4">
+                            {DUAS.map((dua) => (
+                              <div key={dua.id} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest bg-emerald-50 px-2 py-1 rounded-md">{dua.category}</span>
+                                  <h4 className="font-bold text-slate-900">{dua.title}</h4>
+                                </div>
+                                <p className="text-xl font-arabic text-right leading-loose text-slate-800">{dua.arabic}</p>
+                                <p className="text-sm text-slate-600 leading-relaxed italic">{dua.translation}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {deenSubTab === 'kalima' && (
+                        <div className="space-y-6">
+                          <div className="bg-slate-900 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
+                            <div className="relative z-10">
+                              <h3 className="text-3xl font-black mb-2">The Six Kalimas</h3>
+                              <p className="text-slate-400 text-sm max-w-md">The fundamental declarations of faith in Islam. Essential for every Muslim to know and understand.</p>
+                            </div>
+                            <div className="absolute top-0 right-0 p-4 opacity-10">
+                              <img src="https://i.postimg.cc/GHnwtgSJ/ornament.png" alt="" className="w-32 h-32 object-contain" />
+                            </div>
+                          </div>
+
+                          <div className="space-y-4">
+                            {KALIMAS.map((kalima) => (
+                              <div key={kalima.id} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                                <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                                  <h4 className="font-black text-slate-900">{kalima.title}</h4>
+                                  <span className="w-8 h-8 bg-slate-50 text-slate-400 rounded-lg flex items-center justify-center text-xs font-bold">{kalima.id}</span>
+                                </div>
+                                <p className="text-2xl font-arabic text-right leading-loose text-slate-900 py-2">{kalima.arabic}</p>
+                                <div className="space-y-2">
+                                  <p className="text-xs font-medium text-emerald-600 italic">{kalima.transliteration}</p>
+                                  <p className="text-sm text-slate-600 leading-relaxed">{kalima.translation}</p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {deenSubTab === 'pillars' && (
+                        <div className="space-y-6">
+                          <div className="bg-emerald-800 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
+                            <div className="relative z-10">
+                              <h3 className="text-3xl font-black mb-2">Pillars of Islam</h3>
+                              <p className="text-emerald-100 text-sm max-w-md">The five basic acts in Islam, considered mandatory by believers and are the foundation of Muslim life.</p>
+                            </div>
+                            <div className="absolute top-0 right-0 p-4 opacity-10">
+                              <img src="https://i.postimg.cc/rRtnMckw/window.png" alt="" className="w-32 h-32 object-contain" />
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 gap-4">
+                            {PILLARS_OF_ISLAM.map((pillar, i) => (
+                              <div key={i} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex gap-6">
+                                <div className="w-12 h-12 bg-emerald-50 text-emerald-700 rounded-2xl flex items-center justify-center font-black text-xl flex-shrink-0">
+                                  {i + 1}
+                                </div>
+                                <div>
+                                  <h4 className="font-bold text-slate-900 text-lg mb-1">{pillar.title}</h4>
+                                  <p className="text-sm text-emerald-600 font-medium mb-2">{pillar.description}</p>
+                                  <p className="text-sm text-slate-500 leading-relaxed">{pillar.details}</p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {deenSubTab === 'festivals' && (
+                        <div className="space-y-6">
+                          <div className="bg-amber-600 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
+                            <div className="relative z-10">
+                              <h3 className="text-3xl font-black mb-2">Islamic Festivals</h3>
+                              <p className="text-amber-100 text-sm max-w-md">Key religious observances and celebrations in the Islamic calendar that bring the community together.</p>
+                            </div>
+                            <div className="absolute top-0 right-0 p-4 opacity-10">
+                              <img src="https://i.postimg.cc/LgZC2Rp4/eid-al-fitr.png" alt="" className="w-32 h-32 object-contain" />
+                            </div>
+                          </div>
+
+                          <div className="space-y-4">
+                            {ISLAMIC_FESTIVALS.map((festival, i) => (
+                              <div key={i} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                                <h4 className="font-bold text-slate-900 text-lg mb-1">{festival.title}</h4>
+                                <p className="text-sm text-amber-600 font-medium mb-3">{festival.description}</p>
+                                <p className="text-sm text-slate-500 leading-relaxed">{festival.details}</p>
+                              </div>
+                            ))}
                           </div>
                         </div>
                       )}

@@ -3234,8 +3234,13 @@ export default function App() {
                           onClick={() => setDeenSubTab('zakat')}
                           className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
                         >
-                          <div className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm border border-slate-100">
-                            <Calculator size={20} />
+                          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm overflow-hidden border border-slate-100">
+                            <img 
+                              src="https://i.postimg.cc/XXB5TrTH/zakat.png" 
+                              alt="Zakat" 
+                              className="w-full h-full object-cover"
+                              referrerPolicy="no-referrer"
+                            />
                           </div>
                           <h3 className="text-[10px] font-bold uppercase tracking-tight">Zakat</h3>
                         </button>
@@ -3245,13 +3250,18 @@ export default function App() {
                           onClick={() => setDeenSubTab('calendar')}
                           className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
                         >
-                          <div className="w-10 h-10 bg-slate-50 text-slate-600 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm border border-slate-100">
-                            <Calendar size={20} />
+                          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm overflow-hidden border border-slate-100">
+                            <img 
+                              src="https://i.postimg.cc/bZCsB8ND/calendar.png" 
+                              alt="Islamic Calendar" 
+                              className="w-full h-full object-cover"
+                              referrerPolicy="no-referrer"
+                            />
                           </div>
                           <h3 className="text-[10px] font-bold uppercase tracking-tight">Islamic Calendar</h3>
                         </button>
 
-                        {/* 9. Qibla Option */}
+                        {/* 10. Qibla Option */}
                         <button 
                           onClick={() => setDeenSubTab('qibla')}
                           className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
@@ -3265,17 +3275,6 @@ export default function App() {
                             />
                           </div>
                           <h3 className="text-[10px] font-bold uppercase tracking-tight">Qibla</h3>
-                        </button>
-
-                        {/* 10. Events Option */}
-                        <button 
-                          onClick={() => setDeenSubTab('events')}
-                          className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
-                        >
-                          <div className="w-10 h-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm border border-slate-100">
-                            <Calendar size={20} />
-                          </div>
-                          <h3 className="text-[10px] font-bold uppercase tracking-tight">Events</h3>
                         </button>
 
                         {/* 11. Eid e Milladunnabi Option */}
@@ -3299,8 +3298,13 @@ export default function App() {
                           onClick={() => setDeenSubTab('documentary')}
                           className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
                         >
-                          <div className="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm border border-slate-100">
-                            <Video size={20} />
+                          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm overflow-hidden border border-slate-100">
+                            <img 
+                              src="https://i.postimg.cc/HVppbK46/documentary.png" 
+                              alt="Documentary" 
+                              className="w-full h-full object-cover"
+                              referrerPolicy="no-referrer"
+                            />
                           </div>
                           <h3 className="text-[10px] font-bold uppercase tracking-tight">Documentary</h3>
                         </button>
@@ -3330,7 +3334,6 @@ export default function App() {
                         (deenSubTab === 'names') ||
                         (deenSubTab === 'saved') ||
                         (deenSubTab === 'zakat') ||
-                        (deenSubTab === 'events') ||
                         (deenSubTab === 'documentary') ||
                         (deenSubTab === 'ramadan' && selectedRamadanGuide === null) ||
                         (deenSubTab === 'hajj') ||
@@ -3445,25 +3448,7 @@ export default function App() {
                         />
                       )}
 
-                      {deenSubTab === 'events' && (
-                        <div className="space-y-6">
-                          <h3 className="text-2xl font-black text-slate-900">Upcoming Islamic Events</h3>
-                          <div className="grid grid-cols-1 gap-4">
-                            {UPCOMING_EVENTS.map((event, i) => (
-                              <div key={i} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-6">
-                                <div className="w-16 h-16 bg-emerald-100 text-emerald-700 rounded-2xl flex flex-col items-center justify-center flex-shrink-0">
-                                  <Calendar size={24} />
-                                </div>
-                                <div>
-                                  <h4 className="font-bold text-slate-900">{event.name}</h4>
-                                  <p className="text-xs text-emerald-600 font-bold uppercase tracking-widest mb-1">{event.date}</p>
-                                  <p className="text-sm text-slate-500 leading-relaxed">{event.description}</p>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
+
 
                       {deenSubTab === 'prayer' && (
                         <div className="space-y-6">
@@ -4722,7 +4707,7 @@ export default function App() {
 
                       {deenSubTab === 'calendar' && (
                         <div className="space-y-6">
-                          <h3 className="text-2xl font-black text-slate-900">Islamic Calendar</h3>
+                          <h3 className="text-2xl font-black text-slate-900">Islamic Calendar & Events</h3>
                           
                           <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm text-center">
                             <h4 className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-2">Current Hijri Date</h4>
@@ -4798,6 +4783,27 @@ export default function App() {
                                 )}
                               </div>
                             ))}
+                          </div>
+
+                          <div className="space-y-4">
+                            <h4 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                              <Calendar size={20} className="text-emerald-600" />
+                              Upcoming Islamic Events
+                            </h4>
+                            <div className="grid grid-cols-1 gap-4">
+                              {UPCOMING_EVENTS.map((event, i) => (
+                                <div key={i} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-6">
+                                  <div className="w-16 h-16 bg-emerald-100 text-emerald-700 rounded-2xl flex flex-col items-center justify-center flex-shrink-0">
+                                    <Calendar size={24} />
+                                  </div>
+                                  <div>
+                                    <h4 className="font-bold text-slate-900">{event.name}</h4>
+                                    <p className="text-xs text-emerald-600 font-bold uppercase tracking-widest mb-1">{event.date}</p>
+                                    <p className="text-sm text-slate-500 leading-relaxed">{event.description}</p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
                           </div>
                         </div>
                       )}

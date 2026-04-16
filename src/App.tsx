@@ -56,7 +56,6 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { quranService } from './services/quranService';
-import { hadithService, HadithBook } from './services/hadithService';
 import { 
   Surah, 
   Recitation, 
@@ -65,7 +64,6 @@ import {
   PrayerRequirement, 
   RakatDetail,
   Bookmark as BookmarkType,
-  Hadith,
   Dua,
   DashboardStats
 } from './types';
@@ -214,6 +212,172 @@ const ESSENTIAL_SURAHS = [
     name: "Surah An-Nas", 
     arabic: "قُلْ أَعُوذُ بِرَبِّ النَّاسِ (1) مَلِكِ النَّاسِ (2) إِلَهِ النَّاسِ (3) مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ (4) الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ (5) مِنَ الْجِنَّةِ وَالنَّاسِ (6)",
     pronunciation: "Qul a'oodhu bi rabbin-naas. Malikin-naas. Ilaahin-naas. Min sharril waswaasil khannaas. Alladhee yuwaswisu fee sudoorin-naas. Minal jinnati wannaas."
+  }
+];
+
+const HAJJ_GUIDES = [
+  {
+    title: "1. Description of Hajj, types and conditions",
+    desc: "Understanding the pilgrimage types and when it becomes mandatory.",
+    content: (
+      <div className="space-y-4">
+        <section>
+          <h5 className="font-bold text-slate-900 border-b pb-1 mb-2">Conditions (Shurut) for Hajj</h5>
+          <ul className="list-disc list-inside text-sm text-slate-600 space-y-1">
+            <li><strong>Islam:</strong> Must be a Muslim.</li>
+            <li><strong>Sanity:</strong> Mentally capable of making intention.</li>
+            <li><strong>Puberty:</strong> Reached the age of maturity.</li>
+            <li><strong>Financial Capability:</strong> Sufficient funds for the journey and family back home.</li>
+            <li><strong>Physical Capability:</strong> Health and safety of travel.</li>
+          </ul>
+        </section>
+        <section>
+          <h5 className="font-bold text-slate-900 border-b pb-1 mb-2">Types of Hajj</h5>
+          <div className="space-y-3">
+            <div className="bg-emerald-50 p-3 rounded-xl">
+              <p className="font-bold text-emerald-800 text-sm italic">Hajj al-Ifrad</p>
+              <p className="text-xs text-emerald-700">Performing Hajj only, without Umrah in the same journey.</p>
+            </div>
+            <div className="bg-amber-50 p-3 rounded-xl">
+              <p className="font-bold text-amber-800 text-sm italic">Hajj al-Qiran</p>
+              <p className="text-xs text-amber-700">Performing both Umrah and Hajj together in one Ihram state.</p>
+            </div>
+            <div className="bg-indigo-50 p-3 rounded-xl">
+              <p className="font-bold text-indigo-800 text-sm italic">Hajj al-Tamattu</p>
+              <p className="text-xs text-indigo-700">Performing Umrah first, exiting Ihram, then entering Ihram again for Hajj.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+    )
+  },
+  {
+    title: "2. Obligatory and Sunnah acts of Hajj",
+    desc: "Distinguishing between Pillars, Requirements, and Sunnahs.",
+    content: (
+      <div className="space-y-4 text-sm text-slate-600">
+        <section>
+          <h5 className="font-bold text-slate-900 border-b pb-1 mb-2">Pillars (Arkan) - Hajj is invalid without these</h5>
+          <ol className="list-decimal list-inside space-y-1">
+            <li>Ihram (Intention)</li>
+            <li>Standing at Arafat</li>
+            <li>Tawaf al-Ifadah</li>
+            <li>Sa'i between Safa & Marwa</li>
+          </ol>
+        </section>
+        <section>
+          <h5 className="font-bold text-slate-900 border-b pb-1 mb-2">Compulsory (Wajib) - Sacrifice required if missed</h5>
+          <ul className="list-disc list-inside space-y-1">
+            <li>Ihram from the Miqat</li>
+            <li>Staying at Muzdalifah</li>
+            <li>Stoning the Jamarat</li>
+            <li>Shaving or cutting hair (Halq/Taqsir)</li>
+            <li>Farewell Tawaf (Tawaf al-Wada)</li>
+          </ul>
+        </section>
+      </div>
+    )
+  },
+  {
+    title: "3. Prohibited acts (Mahdurat al-Ihram)",
+    desc: "Actions to avoid while in the state of Ihram.",
+    content: (
+      <div className="bg-rose-50 p-4 rounded-2xl border border-rose-100">
+        <ul className="grid grid-cols-1 gap-3">
+          {[
+            "Trimming hair or nails",
+            "Using scented products or perfume",
+            "Hunting or killing wild animals",
+            "Marriage contracts or proposals",
+            "Marital relations (nullifies Hajj)",
+            "Men: Wearing stitched clothes (tailored to body)",
+            "Men: Covering the head with a hat or turban"
+          ].map((item, i) => (
+            <li key={i} className="flex items-center gap-2 text-sm text-rose-800 font-medium">
+              <div className="w-1.5 h-1.5 bg-rose-400 rounded-full shrink-0" />
+              {item}
+            </li>
+          ))}
+        </ul>
+      </div>
+    )
+  },
+  {
+    title: "4. Description and Rules of Umrah",
+    desc: "The 'Minor Pilgrimage' guide and its steps.",
+    content: (
+      <div className="space-y-4">
+        <div className="relative border-l-2 border-emerald-200 ml-4 pl-6 space-y-6 py-2">
+          <div className="relative">
+            <div className="absolute -left-8 top-0 w-4 h-4 rounded-full bg-emerald-500 border-4 border-white shadow-sm" />
+            <h6 className="font-bold text-slate-900 text-sm">1. Ihram</h6>
+            <p className="text-xs text-slate-500">Purify, put on garments, and make intention at the Miqat.</p>
+          </div>
+          <div className="relative">
+            <div className="absolute -left-8 top-0 w-4 h-4 rounded-full bg-emerald-500 border-4 border-white shadow-sm" />
+            <h6 className="font-bold text-slate-900 text-sm">2. Tawaf</h6>
+            <p className="text-xs text-slate-500">Circle the Kaaba seven times starting from the Black Stone.</p>
+          </div>
+          <div className="relative">
+            <div className="absolute -left-8 top-0 w-4 h-4 rounded-full bg-emerald-500 border-4 border-white shadow-sm" />
+            <h6 className="font-bold text-slate-900 text-sm">3. Sa'i</h6>
+            <p className="text-xs text-slate-500">Walk seven times between the hills of Safa and Marwa.</p>
+          </div>
+          <div className="relative">
+            <div className="absolute -left-8 top-0 w-4 h-4 rounded-full bg-emerald-500 border-4 border-white shadow-sm" />
+            <h6 className="font-bold text-slate-900 text-sm">4. Release (Taqsir)</h6>
+            <p className="text-xs text-slate-500">Men shorten or shave hair; women cut a finger-tip length.</p>
+          </div>
+        </div>
+      </div>
+    )
+  },
+  {
+    title: "5. Rules for Hajj Clothes and Ihram",
+    desc: "Correct attire for the state of pilgrimage.",
+    content: (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200">
+          <h6 className="font-black text-slate-900 text-xs uppercase mb-3 text-center">For Men</h6>
+          <div className="space-y-2">
+            <div className="aspect-[3/4] bg-white rounded-xl border border-slate-200 flex items-center justify-center p-4">
+              <p className="text-[10px] text-slate-400 text-center">Two white unstitched sheets (Rida & Izar). No underwear, hats, or socks.</p>
+            </div>
+            <p className="text-[10px] text-slate-500 italic">Shoulders should be covered except during Tawaf (Idtiba).</p>
+          </div>
+        </div>
+        <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200">
+          <h6 className="font-black text-slate-900 text-xs uppercase mb-3 text-center">For Women</h6>
+          <div className="space-y-2">
+            <div className="aspect-[3/4] bg-white rounded-xl border border-slate-200 flex items-center justify-center p-4">
+              <p className="text-[10px] text-slate-400 text-center">Standard loose Islamic clothing. Must not cover face (Niqab) or hands (Gloves).</p>
+            </div>
+            <p className="text-[10px] text-slate-500 italic">Modesty and simplicity are the keys.</p>
+          </div>
+        </div>
+      </div>
+    )
+  },
+  {
+    title: "6. Pilgrimage to Madinah",
+    desc: "Visiting Masjid an-Nabawi and the Prophet (PBUH).",
+    content: (
+      <div className="space-y-4">
+        <div className="bg-emerald-900 rounded-2xl p-6 text-white text-center">
+          <h5 className="font-black text-lg mb-2">City of the Prophet</h5>
+          <p className="text-emerald-200 text-xs leading-relaxed italic">"Whoever visits my grave after my death, it is as if he visited me while I was alive." (Hadith)</p>
+        </div>
+        <div className="space-y-3 text-sm text-slate-600">
+          <p>Visiting Madinah is not a pillar of Hajj, but is highly recommended for every pilgrim.</p>
+          <ul className="list-disc list-inside space-y-1">
+            <li>Praying in the Rawdah (Garden from Paradise).</li>
+            <li>Offering greetings (Salam) to the Prophet (PBUH) and his companions.</li>
+            <li>Visiting Masjid Quba (the first mosque).</li>
+            <li>Reflecting on the Seerah in the streets of Madinah.</li>
+          </ul>
+        </div>
+      </div>
+    )
   }
 ];
 
@@ -1216,14 +1380,14 @@ const NamesOfAllah = () => {
     { ar: 'ٱلْمُبْدِئُ', en: 'Al-Mubdi\'', tr: 'The Originator' },
     { ar: 'ٱلْمُعِيدُ', en: 'Al-Mu\'id', tr: 'The Restorer' },
     { ar: 'ٱلْمُحْيِي', en: 'Al-Muhyi', tr: 'The Giver of Life' },
-    { ar: 'ٱلْمُمِيتُ', en: 'Al-Mumit', tr: 'The Bringer of Death' },
+    { ar: 'ٱلْمُممِيتُ', en: 'Al-Mumit', tr: 'The Bringer of Death' },
     { ar: 'ٱلْحَيُّ', en: 'Al-Hayy', tr: 'The Ever-Living' },
     { ar: 'ٱلْقَيُّومُ', en: 'Al-Qayyum', tr: 'The Self-Subsisting' },
     { ar: 'ٱلْوَاجِدُ', en: 'Al-Wajid', tr: 'The Finder' },
     { ar: 'ٱلْمَاجِدُ', en: 'Al-Maajid', tr: 'The Noble' },
     { ar: 'ٱلْوَاحِدُ', en: 'Al-Wahid', tr: 'The Unique' },
     { ar: 'ٱلْأَحَدُ', en: 'Al-Ahad', tr: 'The One' },
-    { ar: 'ٱلصَّمَدُ', en: 'As-Samad', tr: 'The Eternal' },
+    { ar: 'ٱصَّمَدُ', en: 'As-Samad', tr: 'The Eternal' },
     { ar: 'ٱلْقَادِرُ', en: 'Al-Qadir', tr: 'The Able' },
     { ar: 'ٱلْمُقْتَدِرُ', en: 'Al-Muqtadir', tr: 'The Powerful' },
     { ar: 'ٱلْمُقَدِّمُ', en: 'Al-Muqaddim', tr: 'The Expediter' },
@@ -1281,99 +1445,37 @@ const NamesOfAllah = () => {
     </div>
   );
 };
+const MAJOR_HADITH_COLLECTIONS = [
+  { name: 'Sahih al-Bukhari', link: 'https://sunnah.com/bukhari' },
+  { name: 'Sahih Muslim', link: 'https://sunnah.com/muslim' },
+  { name: 'Sunan Abu Dawud', link: 'https://sunnah.com/abudawud' },
+  { name: 'Jami` at-Tirmidhi', link: 'https://sunnah.com/tirmidhi' },
+  { name: 'Sunan an-Nasa\'i', link: 'https://sunnah.com/nasai' },
+  { name: 'Sunan Ibn Majah', link: 'https://sunnah.com/ibnmajah' },
+];
 
-const HadithSection = ({ 
-  selectedBook, 
-  setSelectedBook
-}: { 
-  selectedBook: string | null, 
-  setSelectedBook: (id: string | null) => void
-}) => {
-  const [hadiths, setHadiths] = useState<Hadith[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
-  const [bookmarkedHadiths, setBookmarkedHadiths] = useState<Hadith[]>(() => {
-    const saved = localStorage.getItem('bookmarked_hadiths');
-    return saved ? JSON.parse(saved) : [];
-  });
-  const [showBookmarks, setShowBookmarks] = useState(false);
-  const [books, setBooks] = useState<HadithBook[]>(hadithService.getBooks());
+const OTHER_HADITH_COLLECTIONS = [
+  { name: 'Muwatta Malik', link: 'https://sunnah.com/malik' },
+  { name: 'Riyad as-Salihin', link: 'https://sunnah.com/riyad' },
+  { name: 'Forty Hadith Nawawi', link: 'https://sunnah.com/nawawi40' },
+  { name: 'Al-Adab al-Mufrad', link: 'https://sunnah.com/adab' },
+  { name: 'Bulugh al-Maram', link: 'https://sunnah.com/bulugh' },
+  { name: 'Shama\'il Muhammadiyah', link: 'https://sunnah.com/shamail' },
+  { name: 'Musnad Ahmad', link: 'https://sunnah.com/ahmad' },
+  { name: 'Sunan ad-Darimi', link: 'https://sunnah.com/darimi' },
+  { name: 'Sahih (Darussalam)', link: 'https://sunnah.com/darusalam' },
+];
 
-  useEffect(() => {
-    const loadBooks = async () => {
-      const dynamicBooks = await hadithService.fetchBooks();
-      if (dynamicBooks.length > 0) {
-        setBooks(dynamicBooks);
-      }
-    };
-    loadBooks();
-  }, []);
-
-  useEffect(() => {
-    if (selectedBook && !showBookmarks) {
-      fetchHadiths();
-    }
-  }, [selectedBook, page, showBookmarks]);
-
-  const fetchHadiths = async () => {
-    if (!selectedBook) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await hadithService.getHadiths(selectedBook, page);
-      setHadiths(data);
-    } catch (error) {
-      console.error('Error fetching hadiths:', error);
-      setError('Failed to load hadiths. This might be due to a network issue or API limit. Please try again later.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const toggleBookmark = (hadith: Hadith) => {
-    setBookmarkedHadiths(prev => {
-      const isBookmarked = prev.some(h => h.id === hadith.id);
-      let next;
-      if (isBookmarked) {
-        next = prev.filter(h => h.id !== hadith.id);
-      } else {
-        next = [...prev, hadith];
-      }
-      localStorage.setItem('bookmarked_hadiths', JSON.stringify(next));
-      return next;
-    });
-  };
-
-  const isBookmarked = (id: number) => bookmarkedHadiths.some(h => h.id === id);
-
-  const getSunnahLink = (hadith: Hadith) => {
-    const slug = hadith.bookSlug.toLowerCase();
-    let sunnahSlug = slug;
-    if (slug.includes('bukhari')) sunnahSlug = 'bukhari';
-    else if (slug.includes('muslim')) sunnahSlug = 'muslim';
-    else if (slug.includes('nasai')) sunnahSlug = 'nasai';
-    else if (slug.includes('dawud')) sunnahSlug = 'abudawud';
-    else if (slug.includes('tirmidhi')) sunnahSlug = 'tirmidhi';
-    else if (slug.includes('majah')) sunnahSlug = 'ibnmajah';
-    else if (slug.includes('malik')) sunnahSlug = 'malik';
-    else if (slug.includes('ahmad')) sunnahSlug = 'ahmad';
-    
-    return `https://sunnah.com/${sunnahSlug}:${hadith.hadithNumber}`;
-  };
-
+const HadithSection = () => {
   return (
-    <div className="space-y-6">
-      {/* Daily Reminder - Only show on main collections list */}
-      {!selectedBook && !showBookmarks && (
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
-          <h4 className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mb-2">Daily Reminder</h4>
-          <p className="text-slate-700 font-medium italic">"I have left among you two things; you will never go astray as long as you hold fast to them; the book of Allah and my Sunnah."</p>
-          <p className="text-[10px] text-slate-400 mt-2">— Prophet Muhammad (PBUH) (Al-Muwatta, Imam Malik)</p>
-        </div>
-      )}
+    <div className="space-y-8">
+      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
+        <h4 className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mb-2">Daily Reminder</h4>
+        <p className="text-slate-700 font-medium italic">"I have left among you two things; you will never go astray as long as you hold fast to them; the book of Allah and my Sunnah."</p>
+        <p className="text-[10px] text-slate-400 mt-2">— Prophet Muhammad (PBUH) (Al-Muwatta, Imam Malik)</p>
+      </div>
 
-      <div className="flex items-center justify-between">
+      <div className="space-y-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center overflow-hidden">
             <img 
@@ -1384,211 +1486,79 @@ const HadithSection = ({
             />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-slate-900">Hadith Collections</h3>
-            <p className="text-xs text-slate-500">Authentic sayings of the Prophet (PBUH)</p>
+            <h3 className="text-lg font-bold text-slate-900">Major Collections</h3>
+            <p className="text-xs text-slate-500">The Six Authentic Books (Kutub al-Sittah)</p>
           </div>
         </div>
-        <button 
-          onClick={() => setShowBookmarks(!showBookmarks)}
-          className={cn(
-            "px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2",
-            showBookmarks ? "bg-indigo-600 text-white" : "bg-white border border-slate-200 text-slate-600 hover:border-indigo-500"
-          )}
-        >
-          <Bookmark size={14} fill={showBookmarks ? "currentColor" : "none"} />
-          {showBookmarks ? "Show Collections" : "My Bookmarks"}
-        </button>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {MAJOR_HADITH_COLLECTIONS.map(book => (
+            <a
+              key={book.name}
+              href={book.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-white p-6 rounded-2xl border border-slate-200 text-left hover:border-indigo-500 hover:shadow-md transition-all group flex flex-col items-center justify-center text-center gap-4"
+            >
+              <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center group-hover:bg-indigo-600 transition-all duration-300 overflow-hidden">
+                <img 
+                  src="https://i.postimg.cc/mzf9VJZY/hadith-icon.png" 
+                  alt={book.name} 
+                  className="w-8 h-8 object-contain group-hover:brightness-0 group-hover:invert transition-all duration-300" 
+                  referrerPolicy="no-referrer"
+                />
+              </div>
+              <div>
+                <h4 className="font-bold text-slate-900 mb-1 group-hover:text-indigo-600 transition-colors uppercase tracking-tight text-sm">{book.name}</h4>
+                <div className="flex items-center justify-center gap-1.5 text-slate-400 group-hover:text-indigo-400 transition-colors">
+                  <span className="text-[10px] font-bold uppercase tracking-widest">Read Collection</span>
+                  <ExternalLink size={10} />
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
       </div>
 
-      {!showBookmarks ? (
-        <>
-          {!selectedBook ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {books.map(book => (
-                <button
-                  key={book.id}
-                  onClick={() => setSelectedBook(book.id)}
-                  className="bg-white p-6 rounded-2xl border border-slate-200 text-left hover:border-indigo-500 hover:shadow-md transition-all group"
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="w-8 h-8 bg-slate-50 rounded-lg flex items-center justify-center group-hover:bg-indigo-50 transition-colors overflow-hidden">
-                      <img 
-                        src="https://i.postimg.cc/mzf9VJZY/hadith-icon.png" 
-                        alt={book.name} 
-                        className="w-5 h-5 object-contain" 
-                        referrerPolicy="no-referrer" 
-                      />
-                    </div>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{book.totalHadiths} Hadiths</span>
-                  </div>
-                  <h4 className="font-bold text-slate-900 mb-1">{book.name}</h4>
-                  <p className="text-xs text-slate-500">Explore authentic narrations from this collection.</p>
-                </button>
-              ))}
-            </div>
-          ) : (
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <button 
-                  onClick={() => setSelectedBook(null)}
-                  className="flex items-center gap-2 text-slate-600 hover:text-indigo-600 font-medium transition-colors text-sm"
-                >
-                  <ChevronLeft size={20} />
-                  Back to Collections
-                </button>
-                  <div className="flex items-center gap-2">
-                    <button 
-                      disabled={page === 1}
-                      onClick={() => setPage(prev => Math.max(1, prev - 1))}
-                      className="p-2 bg-white border border-slate-200 rounded-lg disabled:opacity-50 hover:border-indigo-500 transition-colors"
-                    >
-                      <ChevronLeft size={16} />
-                    </button>
-                    
-                    <div className="relative flex items-center gap-2">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Jump to:</span>
-                      <div className="relative">
-                        <select 
-                          value={page}
-                          onChange={(e) => setPage(parseInt(e.target.value))}
-                          className="appearance-none pl-3 pr-8 py-1.5 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-bold hover:bg-indigo-100 transition-all outline-none cursor-pointer border border-indigo-100"
-                        >
-                          {Array.from({ length: Math.ceil((books.find(b => b.id === selectedBook)?.totalHadiths || 1) / 20) }, (_, i) => i + 1).map(p => (
-                            <option key={p} value={p}>Page {p}</option>
-                          ))}
-                        </select>
-                        <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-indigo-700" />
-                      </div>
-                    </div>
-
-                    <button 
-                      onClick={() => setPage(prev => prev + 1)}
-                      className="p-2 bg-white border border-slate-200 rounded-lg hover:border-indigo-500 transition-colors"
-                    >
-                      <ChevronLeft size={16} className="rotate-180" />
-                    </button>
-                  </div>
-              </div>
-
-              {loading ? (
-                <div className="py-12 text-center"><Loader2 className="animate-spin mx-auto text-indigo-600" /></div>
-              ) : error ? (
-                <div className="py-12 text-center bg-red-50 rounded-2xl border border-red-100">
-                  <Info className="text-red-500 mx-auto mb-4" size={32} />
-                  <p className="text-red-600 text-sm font-medium mb-4">{error}</p>
-                  <button 
-                    onClick={fetchHadiths}
-                    className="px-6 py-2 bg-red-600 text-white rounded-xl text-xs font-bold hover:bg-red-700 transition-colors"
-                  >
-                    Retry
-                  </button>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {hadiths.length === 0 ? (
-                    <div className="py-12 text-center bg-white rounded-2xl border border-slate-200">
-                      <ScrollText size={48} className="text-slate-100 mx-auto mb-4" />
-                      <p className="text-slate-400 text-sm">No hadiths found in this collection.</p>
-                    </div>
-                  ) : (
-                    hadiths.map(hadith => (
-                      <div key={hadith.id} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest">Hadith #{hadith.hadithNumber}</span>
-                          <a 
-                            href={getSunnahLink(hadith)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[10px] font-bold text-slate-400 hover:text-indigo-600 uppercase tracking-widest flex items-center gap-1 transition-colors"
-                          >
-                            <ExternalLink size={10} />
-                            Sunnah.com
-                          </a>
-                        </div>
-                        <button 
-                          onClick={() => toggleBookmark(hadith)}
-                          className={cn(
-                            "p-2 rounded-lg transition-all",
-                            isBookmarked(hadith.id) ? "bg-indigo-50 text-indigo-600" : "text-slate-300 hover:text-indigo-600"
-                          )}
-                        >
-                          <Bookmark size={18} fill={isBookmarked(hadith.id) ? "currentColor" : "none"} />
-                        </button>
-                      </div>
-                      <p className="text-right text-xl font-arabic leading-loose">{hadith.hadithArabic}</p>
-                      <div className="pt-4 border-t border-slate-50">
-                        {hadith.englishNarrator && hadith.englishNarrator !== 'Unknown' && (
-                          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Narrated by {hadith.englishNarrator}</p>
-                        )}
-                        {hadith.hadithEnglish ? (
-                          <p className="text-sm text-slate-600 leading-relaxed">{hadith.hadithEnglish}</p>
-                        ) : (
-                          <div className="space-y-3">
-                            {hadith.hadithUrdu && (
-                              <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Urdu Translation</p>
-                                <p className="text-sm text-slate-600 leading-relaxed font-arabic text-right">{hadith.hadithUrdu}</p>
-                              </div>
-                            )}
-                            <div className="flex items-center justify-between gap-4">
-                              <p className="text-sm text-slate-400 italic leading-relaxed">English translation not available.</p>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )))}
-                </div>
-              )}
-            </div>
-          )}
-        </>
-      ) : (
-        <div className="space-y-4">
-          {bookmarkedHadiths.length === 0 ? (
-            <div className="py-12 text-center bg-white rounded-2xl border border-slate-200">
-              <Bookmark size={48} className="text-slate-100 mx-auto mb-4" />
-              <p className="text-slate-400 text-sm">No bookmarked hadiths yet.</p>
-            </div>
-          ) : (
-            bookmarkedHadiths.map(hadith => (
-              <div key={hadith.id} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest">{hadith.bookSlug.replace('-', ' ')} - #{hadith.hadithNumber}</span>
-                  <button 
-                    onClick={() => toggleBookmark(hadith)}
-                    className="p-2 bg-indigo-50 text-indigo-600 rounded-lg"
-                  >
-                    <Bookmark size={18} fill="currentColor" />
-                  </button>
-                </div>
-                <p className="text-right text-xl font-arabic leading-loose">{hadith.hadithArabic}</p>
-                <div className="pt-4 border-t border-slate-50">
-                  {hadith.englishNarrator && hadith.englishNarrator !== 'Unknown' && (
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Narrated by {hadith.englishNarrator}</p>
-                  )}
-                  {hadith.hadithEnglish ? (
-                    <p className="text-sm text-slate-600 leading-relaxed">{hadith.hadithEnglish}</p>
-                  ) : (
-                    <div className="space-y-3">
-                      {hadith.hadithUrdu && (
-                        <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Urdu Translation</p>
-                          <p className="text-sm text-slate-600 leading-relaxed font-arabic text-right">{hadith.hadithUrdu}</p>
-                        </div>
-                      )}
-                      <div className="flex items-center justify-between gap-4">
-                        <p className="text-sm text-slate-400 italic leading-relaxed">English translation not available.</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))
-          )}
+      <div className="space-y-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center">
+            <ScrollText size={20} className="text-slate-600" />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-slate-900">Other Collections</h3>
+            <p className="text-xs text-slate-500">Additional authentic Hadith compilations</p>
+          </div>
         </div>
-      )}
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {OTHER_HADITH_COLLECTIONS.map(book => (
+            <a
+              key={book.name}
+              href={book.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-white p-6 rounded-2xl border border-slate-200 text-left hover:border-emerald-500 hover:shadow-md transition-all group flex flex-col items-center justify-center text-center gap-4"
+            >
+              <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center group-hover:bg-emerald-600 transition-all duration-300 overflow-hidden">
+                <img 
+                  src="https://i.postimg.cc/mzf9VJZY/hadith-icon.png" 
+                  alt={book.name} 
+                  className="w-8 h-8 object-contain group-hover:brightness-0 group-hover:invert transition-all duration-300" 
+                  referrerPolicy="no-referrer"
+                />
+              </div>
+              <div>
+                <h4 className="font-bold text-slate-900 mb-1 group-hover:text-emerald-600 transition-colors uppercase tracking-tight text-sm">{book.name}</h4>
+                <div className="flex items-center justify-center gap-1.5 text-slate-400 group-hover:text-emerald-400 transition-colors">
+                  <span className="text-[10px] font-bold uppercase tracking-widest">Read Collection</span>
+                  <ExternalLink size={10} />
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
@@ -1785,8 +1755,8 @@ export default function App() {
   const [prayerSubTab, setPrayerSubTab] = useState<'menu' | 'wudu' | 'salah' | 'surah' | 'steps'>('menu');
   const [amalSubTab, setAmalSubTab] = useState<'quran' | 'dua'>('quran');
   const [selectedSalahDua, setSelectedSalahDua] = useState<string | null>(null);
-  const [selectedBook, setSelectedBook] = useState<string | null>(null);
   const [selectedEssentialSurah, setSelectedEssentialSurah] = useState<number | null>(null);
+  const [selectedHajjGuide, setSelectedHajjGuide] = useState<number | null>(null);
   
   // Clock and Calendars
   const [timeString, setTimeString] = useState<string>(new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }));
@@ -2602,7 +2572,6 @@ export default function App() {
                     if (tab.id === 'deen') {
                       setDeenSubTab('grid');
                       setSelectedRamadanGuide(null);
-                      setSelectedBook(null);
                       setPrayerSubTab('menu');
                       setSelectedSalahDua(null);
                       setSelectedEssentialSurah(null);
@@ -3313,7 +3282,7 @@ export default function App() {
                     <div className="space-y-8">
                       {/* Only show "Back to Options" if we are at the root of a sub-tab */}
                       {((deenSubTab === 'prayer' && prayerSubTab === 'menu') || 
-                        (deenSubTab === 'hadith' && !selectedBook) || 
+                        (deenSubTab === 'hadith') || 
                         (deenSubTab === 'quran') ||
                         (deenSubTab === 'names') ||
                         (deenSubTab === 'saved') ||
@@ -3324,7 +3293,7 @@ export default function App() {
                         (deenSubTab === 'pillars') ||
                         (deenSubTab === 'festivals') ||
                         (deenSubTab === 'ramadan' && selectedRamadanGuide === null) ||
-                        (deenSubTab === 'hajj') ||
+                        (deenSubTab === 'hajj' && selectedHajjGuide === null) ||
                         (deenSubTab === 'qibla') ||
                         (deenSubTab === 'calendar') ||
                         (deenSubTab === 'milad')) && (
@@ -3333,8 +3302,8 @@ export default function App() {
                             setDeenSubTab('grid');
                             setPrayerSubTab('menu');
                             setSelectedSalahDua(null);
-                            setSelectedBook(null);
                             setSelectedEssentialSurah(null);
+                            setSelectedHajjGuide(null);
                           }}
                           className="flex items-center gap-2 text-slate-600 hover:text-emerald-600 font-medium transition-colors text-sm mb-4"
                         >
@@ -3427,10 +3396,7 @@ export default function App() {
                       {deenSubTab === 'zakat' && <ZakatCalculator />}
                       {deenSubTab === 'names' && <NamesOfAllah />}
                       {deenSubTab === 'hadith' && (
-                        <HadithSection 
-                          selectedBook={selectedBook} 
-                          setSelectedBook={setSelectedBook} 
-                        />
+                        <HadithSection />
                       )}
 
 
@@ -4613,36 +4579,57 @@ export default function App() {
 
                       {deenSubTab === 'hajj' && (
                         <div className="space-y-6">
-                          <div className="bg-slate-900 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
-                            <div className="relative z-10">
-                              <h3 className="text-3xl font-black mb-2">Hajj & Umrah</h3>
-                              <p className="text-slate-400 text-sm max-w-md">The sacred journey to the House of Allah. A lifetime spiritual experience for every Muslim.</p>
-                            </div>
-                            <div className="absolute top-0 right-0 p-4 opacity-10">
-                              <img src="https://i.postimg.cc/bGgCqYLP/hajj.png" alt="" className="w-32 h-32 object-contain" />
-                            </div>
-                          </div>
-
-                          <div className="grid grid-cols-1 gap-4">
-                            {[
-                              { title: "Ihram", desc: "The sacred state of purity and intention." },
-                              { title: "Tawaf", desc: "Circling the Kaaba seven times." },
-                              { title: "Sa'i", desc: "Walking between Safa and Marwa seven times." },
-                              { title: "Arafat", desc: "The pinnacle of Hajj, standing in prayer." },
-                              { title: "Muzdalifah", desc: "Spending the night and collecting pebbles." },
-                              { title: "Jamarat", desc: "Stoning the pillars representing the devil." }
-                            ].map((step, i) => (
-                              <div key={i} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
-                                <div className="w-10 h-10 bg-emerald-50 text-emerald-700 rounded-xl flex items-center justify-center font-black">
-                                  {i + 1}
+                          {selectedHajjGuide === null ? (
+                            <>
+                              <div className="bg-slate-900 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
+                                <div className="relative z-10">
+                                  <h3 className="text-3xl font-black mb-2">Hajj & Umrah</h3>
+                                  <p className="text-slate-400 text-sm max-w-md">The sacred journey to the House of Allah. A comprehensive guide for pilgrims.</p>
                                 </div>
-                                <div>
-                                  <h4 className="font-bold text-slate-900">{step.title}</h4>
-                                  <p className="text-xs text-slate-500">{step.desc}</p>
+                                <div className="absolute top-0 right-0 p-4 opacity-10">
+                                  <img src="https://i.postimg.cc/bGgCqYLP/hajj.png" alt="" className="w-32 h-32 object-contain" />
                                 </div>
                               </div>
-                            ))}
-                          </div>
+
+                              <div className="grid grid-cols-1 gap-4">
+                                {HAJJ_GUIDES.map((guide, i) => (
+                                  <button 
+                                    key={i} 
+                                    onClick={() => setSelectedHajjGuide(i)}
+                                    className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4 hover:border-emerald-500 hover:shadow-md transition-all text-left group"
+                                  >
+                                    <div className="w-12 h-12 bg-emerald-50 text-emerald-700 rounded-2xl flex items-center justify-center font-black group-hover:bg-emerald-600 group-hover:text-white transition-all">
+                                      {i + 1}
+                                    </div>
+                                    <div className="flex-1">
+                                      <h4 className="font-bold text-slate-900 group-hover:text-emerald-600 transition-colors uppercase tracking-tight text-sm">{guide.title}</h4>
+                                      <p className="text-xs text-slate-500">{guide.desc}</p>
+                                    </div>
+                                    <ChevronRight size={18} className="text-slate-300 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all" />
+                                  </button>
+                                ))}
+                              </div>
+                            </>
+                          ) : (
+                            <motion.div 
+                              initial={{ opacity: 0, x: 20 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              className="space-y-6"
+                            >
+                              <button 
+                                onClick={() => setSelectedHajjGuide(null)}
+                                className="flex items-center gap-2 text-slate-500 hover:text-emerald-600 font-bold text-[10px] uppercase tracking-widest transition-colors mb-4"
+                              >
+                                <ChevronLeft size={16} />
+                                Back to Topics
+                              </button>
+
+                              <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
+                                <h3 className="text-xl font-black text-slate-900 mb-6 uppercase tracking-tight">{HAJJ_GUIDES[selectedHajjGuide].title}</h3>
+                                {HAJJ_GUIDES[selectedHajjGuide].content}
+                              </div>
+                            </motion.div>
+                          )}
                         </div>
                       )}
 
@@ -5330,7 +5317,7 @@ export default function App() {
                 if (tab.id === 'deen') {
                   setDeenSubTab('grid');
                   setSelectedRamadanGuide(null);
-                  setSelectedBook(null);
+                  setSelectedHajjGuide(null);
                   setPrayerSubTab('menu');
                   setSelectedSalahDua(null);
                   setSelectedEssentialSurah(null);

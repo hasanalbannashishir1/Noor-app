@@ -12,65 +12,6 @@ async function startServer() {
 
   app.use(express.json());
 
-  // API Proxy for Hadith API to bypass CORS
-  app.get("/api/hadiths", async (req, res) => {
-    try {
-      const apiKey = process.env.HADITH_API_KEY || '$2y$10$oX668r6G9v9Y89rG9v9Y89rG9v9Y89rG9v9Y89rG9v9Y89rG9v9Y8';
-      const { book, paginate, page, search } = req.query;
-      const params = new URLSearchParams();
-      params.append('apiKey', apiKey);
-      if (book) params.append('book', book as string);
-      if (paginate) params.append('paginate', paginate as string);
-      if (page) params.append('page', page as string);
-      if (search) params.append('search', search as string);
-
-      const url = `https://www.hadithapi.com/public/api/hadiths?${params.toString()}`;
-      console.log(`Proxying Hadith request: ${url.replace(apiKey, 'HIDDEN')}`);
-      
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
-
-      const response = await fetch(url, { signal: controller.signal });
-      clearTimeout(timeoutId);
-      
-      const data = await response.json();
-      res.json(data);
-    } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') {
-        console.error("Proxy timeout (hadiths)");
-        res.status(504).json({ error: "Hadith API request timed out" });
-      } else {
-        console.error("Proxy error (hadiths):", error);
-        res.status(500).json({ error: "Failed to fetch from Hadith API" });
-      }
-    }
-  });
-
-  app.get("/api/books", async (req, res) => {
-    try {
-      const apiKey = process.env.HADITH_API_KEY || '$2y$10$oX668r6G9v9Y89rG9v9Y89rG9v9Y89rG9v9Y89rG9v9Y89rG9v9Y8';
-      const url = `https://www.hadithapi.com/public/api/books?apiKey=${apiKey}`;
-      console.log(`Proxying Books request: ${url.replace(apiKey, 'HIDDEN')}`);
-      
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
-
-      const response = await fetch(url, { signal: controller.signal });
-      clearTimeout(timeoutId);
-
-      const data = await response.json();
-      res.json(data);
-    } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') {
-        console.error("Proxy timeout (books)");
-        res.status(504).json({ error: "Books API request timed out" });
-      } else {
-        console.error("Proxy error (books):", error);
-        res.status(500).json({ error: "Failed to fetch books from Hadith API" });
-      }
-    }
-  });
-
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({

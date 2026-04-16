@@ -17,7 +17,6 @@ import {
   Volume2, 
   VolumeX,
   Music,
-  Languages,
   ScrollText,
   Loader2,
   CheckCircle2,
@@ -30,14 +29,12 @@ import {
   Home,
   Compass,
   MapPin,
-  Bot,
   Sparkles,
   BarChart3,
   Calculator,
   Download,
   Heart,
   Bookmark,
-  Send,
   RefreshCw,
   Quote,
   Flame,
@@ -48,7 +45,6 @@ import {
   Sunset,
   Moon,
   X,
-  MessageSquare,
   Mail,
   Video,
   Book,
@@ -74,8 +70,6 @@ import {
   DashboardStats
 } from './types';
 import { cn } from './lib/utils';
-import ReactMarkdown from 'react-markdown';
-import { GoogleGenAI } from "@google/genai";
 
 const SALAH_REQUIREMENTS: PrayerRequirement[] = [
   {
@@ -1290,16 +1284,10 @@ const NamesOfAllah = () => {
 
 const HadithSection = ({ 
   selectedBook, 
-  setSelectedBook,
-  translateHadith,
-  translatingId,
-  setTranslatingId
+  setSelectedBook
 }: { 
   selectedBook: string | null, 
-  setSelectedBook: (id: string | null) => void,
-  translateHadith: (hadith: Hadith) => Promise<string | null>,
-  translatingId: number | null,
-  setTranslatingId: (id: number | null) => void
+  setSelectedBook: (id: string | null) => void
 }) => {
   const [hadiths, setHadiths] = useState<Hadith[]>([]);
   const [loading, setLoading] = useState(false);
@@ -1311,23 +1299,6 @@ const HadithSection = ({
   });
   const [showBookmarks, setShowBookmarks] = useState(false);
   const [books, setBooks] = useState<HadithBook[]>(hadithService.getBooks());
-
-  const handleTranslate = async (hadith: Hadith) => {
-    setTranslatingId(hadith.id);
-    const translatedText = await translateHadith(hadith);
-    if (translatedText) {
-      setHadiths(prev => prev.map(h => h.id === hadith.id ? { ...h, hadithEnglish: translatedText } : h));
-      // Also update bookmarks if needed
-      setBookmarkedHadiths(prev => {
-        const updated = prev.map(h => h.id === hadith.id ? { ...h, hadithEnglish: translatedText } : h);
-        if (JSON.stringify(prev) !== JSON.stringify(updated)) {
-          localStorage.setItem('bookmarked_hadiths', JSON.stringify(updated));
-        }
-        return updated;
-      });
-    }
-    setTranslatingId(null);
-  };
 
   useEffect(() => {
     const loadBooks = async () => {
@@ -1562,18 +1533,6 @@ const HadithSection = ({
                             )}
                             <div className="flex items-center justify-between gap-4">
                               <p className="text-sm text-slate-400 italic leading-relaxed">English translation not available.</p>
-                              <button 
-                                onClick={() => handleTranslate(hadith)}
-                                disabled={translatingId === hadith.id}
-                                className="flex items-center gap-2 px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-lg text-xs font-bold hover:bg-indigo-100 transition-all disabled:opacity-50"
-                              >
-                                {translatingId === hadith.id ? (
-                                  <Loader2 size={12} className="animate-spin" />
-                                ) : (
-                                  <Languages size={12} />
-                                )}
-                                Translate to English
-                              </button>
                             </div>
                           </div>
                         )}
@@ -1621,18 +1580,6 @@ const HadithSection = ({
                       )}
                       <div className="flex items-center justify-between gap-4">
                         <p className="text-sm text-slate-400 italic leading-relaxed">English translation not available.</p>
-                        <button 
-                          onClick={() => handleTranslate(hadith)}
-                          disabled={translatingId === hadith.id}
-                          className="flex items-center gap-2 px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-lg text-xs font-bold hover:bg-indigo-100 transition-all disabled:opacity-50"
-                        >
-                          {translatingId === hadith.id ? (
-                            <Loader2 size={12} className="animate-spin" />
-                          ) : (
-                            <Languages size={12} />
-                          )}
-                          Translate to English
-                        </button>
                       </div>
                     </div>
                   )}
@@ -1833,40 +1780,10 @@ const StreakCalendar = ({ visitedDates }: { visitedDates: string[] }) => {
 };
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'home' | 'deen' | 'ai' | 'amal' | 'dashboard'>('home');
+  const [activeTab, setActiveTab] = useState<'home' | 'deen' | 'amal' | 'dashboard'>('home');
   const [deenSubTab, setDeenSubTab] = useState<'grid' | 'quran' | 'names' | 'hadith' | 'prayer' | 'saved' | 'zakat' | 'events' | 'documentary' | 'ramadan' | 'hajj' | 'qibla' | 'calendar' | 'milad' | 'dua_deen' | 'kalima' | 'pillars' | 'festivals'>('grid');
   const [prayerSubTab, setPrayerSubTab] = useState<'menu' | 'wudu' | 'salah' | 'surah' | 'steps'>('menu');
   const [amalSubTab, setAmalSubTab] = useState<'quran' | 'hadith' | 'dua'>('quran');
-  const [translatingId, setTranslatingId] = useState<number | null>(null);
-
-  const translateHadith = React.useCallback(async (hadith: Hadith): Promise<string | null> => {
-    if (!process.env.GEMINI_API_KEY) return null;
-    try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-      const response = await ai.models.generateContent({
-        model: "gemini-3.1-pro-preview",
-        contents: [
-          { 
-            role: 'user', 
-            parts: [{ 
-              text: `Translate the following Hadith to English. 
-              Arabic: ${hadith.hadithArabic}
-              ${hadith.hadithUrdu ? `Urdu Translation: ${hadith.hadithUrdu}` : ""}
-              
-              Provide only the English translation text, nothing else.` 
-            }] 
-          }
-        ],
-        config: {
-          systemInstruction: "You are a professional translator specializing in Islamic texts. Translate Hadiths accurately into clear, modern English while preserving the original meaning and reverence.",
-        }
-      });
-      return response.text || null;
-    } catch (error) {
-      console.error("Translation error:", error);
-      return null;
-    }
-  }, []);
   const [selectedSalahDua, setSelectedSalahDua] = useState<string | null>(null);
   const [selectedBook, setSelectedBook] = useState<string | null>(null);
   const [selectedEssentialSurah, setSelectedEssentialSurah] = useState<number | null>(null);
@@ -2072,9 +1989,6 @@ export default function App() {
   };
 
   // AI Assistant
-  const [aiMessages, setAiMessages] = useState<{ role: 'user' | 'model', text: string }[]>([]);
-  const [aiInput, setAiInput] = useState('');
-  const [isAiLoading, setIsAiLoading] = useState(false);
 
   // Daily Amal
   const [randomHadith, setRandomHadith] = useState<Hadith | null>(null);
@@ -2261,42 +2175,6 @@ export default function App() {
     fetchHijri();
   }, []);
 
-  const handleAiChat = async () => {
-    if (!aiInput.trim()) return;
-    const userMsg = aiInput;
-    setAiInput('');
-    setAiMessages(prev => [...prev, { role: 'user', text: userMsg }]);
-    setIsAiLoading(true);
-
-    try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-      const response = await ai.models.generateContent({
-        model: "gemini-3.1-pro-preview",
-        contents: [
-          ...aiMessages.map((m: any) => ({
-            role: m.role === 'user' ? 'user' : 'model',
-            parts: [{ text: m.text }]
-          })),
-          { role: 'user', parts: [{ text: userMsg }] }
-        ],
-        config: {
-          systemInstruction: "You are a highly advanced Islamic AI Assistant. Answer questions about Islam, Quran, Hadith, and general knowledge with deep wisdom, accuracy, and kindness. Always provide authentic references (Surah:Verse or Hadith collection) where possible. If you are unsure, advise the user to consult a qualified scholar.",
-        }
-      });
-
-      if (!response.text) {
-        throw new Error("No response text generated");
-      }
-
-      setAiMessages(prev => [...prev, { role: 'model', text: response.text }]);
-    } catch (err) {
-      console.error("AI Error:", err);
-      setAiMessages(prev => [...prev, { role: 'model', text: "I apologize, but I'm having trouble connecting right now. Please ensure your internet is stable and try again. (Error: " + (err instanceof Error ? err.message : "Unknown") + ")" }]);
-    } finally {
-      setIsAiLoading(false);
-    }
-  };
-
   const DUAS: Dua[] = [
     { id: '1', category: 'After Salah', title: 'Ayatul Kursi', arabic: 'اللَّهُ لَا إِلَهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ...', translation: 'Allah! There is no god but He, the Living, the Self-subsisting...' },
     { id: '2', category: 'Daily Life', title: 'Before Eating', arabic: 'بِسْمِ اللَّهِ', translation: 'In the name of Allah' },
@@ -2341,10 +2219,6 @@ export default function App() {
       }
       
       if (foundHadith) {
-        if (!foundHadith.hadithEnglish && foundHadith.hadithArabic) {
-          const translated = await translateHadith(foundHadith);
-          if (translated) foundHadith.hadithEnglish = translated;
-        }
         setRandomHadith(foundHadith);
       } else {
         // Fallback: if no long hadith found, just get any hadith from the first page
@@ -2352,10 +2226,6 @@ export default function App() {
           const hadiths = await hadithService.getHadiths(randomBook.id, 1);
           if (hadiths.length > 0) {
             const fallbackHadith = hadiths[Math.floor(Math.random() * hadiths.length)];
-            if (!fallbackHadith.hadithEnglish && fallbackHadith.hadithArabic) {
-              const translated = await translateHadith(fallbackHadith);
-              if (translated) fallbackHadith.hadithEnglish = translated;
-            }
             setRandomHadith(fallbackHadith);
           }
         } catch (err) {
@@ -2367,7 +2237,7 @@ export default function App() {
     } finally {
       setIsHadithLoading(false);
     }
-  }, [translateHadith]);
+  }, []);
 
   useEffect(() => {
     if (activeTab === 'amal') {
@@ -2781,7 +2651,6 @@ export default function App() {
               {[
                 { id: 'home', icon: Home, label: 'Home' },
                 { id: 'deen', icon: Compass, label: 'Deen' },
-                { id: 'ai', icon: MessageSquare, label: 'AI Assistant' },
                 { id: 'amal', icon: Sparkles, label: 'Daily Amal' },
                 { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' }
               ].map((tab) => (
@@ -3619,9 +3488,6 @@ export default function App() {
                         <HadithSection 
                           selectedBook={selectedBook} 
                           setSelectedBook={setSelectedBook} 
-                          translateHadith={translateHadith}
-                          translatingId={translatingId}
-                          setTranslatingId={setTranslatingId}
                         />
                       )}
 
@@ -5243,77 +5109,6 @@ export default function App() {
             </motion.div>
           )}
 
-          {activeTab === 'ai' && (
-            <motion.div
-              key="ai"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-x-0 top-[73px] bottom-[73px] md:bottom-0 z-30 bg-slate-50"
-            >
-              <div className="max-w-3xl mx-auto h-full flex flex-col p-4">
-                <div className="bg-white rounded-2xl border border-slate-200 shadow-lg flex-1 flex flex-col overflow-hidden">
-                <div className="p-4 border-b border-slate-100 flex items-center gap-3">
-                  <div className="w-10 h-10 bg-emerald-100 text-emerald-700 rounded-xl flex items-center justify-center">
-                    <Bot size={24} />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-slate-900">Islamic AI Assistant</h3>
-                    <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">Powered by Gemini 3.1 Pro</p>
-                  </div>
-                </div>
-
-                <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                  {aiMessages.length === 0 && (
-                    <div className="h-full flex flex-col items-center justify-center text-center p-8">
-                      <Sparkles className="text-emerald-200 mb-4" size={48} />
-                      <h4 className="text-lg font-bold text-slate-800 mb-2">As-Salamu Alaykum</h4>
-                      <p className="text-sm text-slate-500 max-w-xs">How can I help you today?</p>
-                    </div>
-                  )}
-                  {aiMessages.map((msg, i) => (
-                    <div key={i} className={cn("flex", msg.role === 'user' ? "justify-end" : "justify-start")}>
-                      <div className={cn(
-                        "max-w-[80%] p-4 rounded-2xl text-sm leading-relaxed",
-                        msg.role === 'user' ? "bg-emerald-600 text-white rounded-tr-none" : "bg-slate-100 text-slate-800 rounded-tl-none"
-                      )}>
-                        <ReactMarkdown>{msg.text}</ReactMarkdown>
-                      </div>
-                    </div>
-                  ))}
-                  {isAiLoading && (
-                    <div className="flex justify-start">
-                      <div className="bg-slate-100 p-4 rounded-2xl rounded-tl-none">
-                        <Loader2 size={16} className="animate-spin text-emerald-600" />
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div className="p-4 border-t border-slate-100">
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      placeholder="Type your question..."
-                      className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
-                      value={aiInput}
-                      onChange={(e) => setAiInput(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && handleAiChat()}
-                    />
-                    <button 
-                      onClick={handleAiChat}
-                      disabled={isAiLoading || !aiInput.trim()}
-                      className="bg-emerald-600 text-white p-2.5 rounded-xl hover:bg-emerald-700 transition-colors disabled:opacity-50"
-                    >
-                      <Send size={20} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-
           {activeTab === 'amal' && (
             <motion.div
               key="amal"
@@ -5474,23 +5269,6 @@ export default function App() {
                                 )}
                                 <div className="flex flex-col items-center gap-3">
                                   <p className="text-sm text-slate-400 italic">English translation not available.</p>
-                                  <button 
-                                    onClick={async () => {
-                                      const translated = await translateHadith(randomHadith);
-                                      if (translated) {
-                                        setRandomHadith({ ...randomHadith, hadithEnglish: translated });
-                                      }
-                                    }}
-                                    disabled={translatingId === randomHadith.id}
-                                    className="flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-600 rounded-xl text-xs font-bold hover:bg-emerald-100 transition-all disabled:opacity-50"
-                                  >
-                                    {translatingId === randomHadith.id ? (
-                                      <Loader2 size={14} className="animate-spin" />
-                                    ) : (
-                                      <Languages size={14} />
-                                    )}
-                                    Translate to English
-                                  </button>
                                 </div>
                               </div>
                             )}
@@ -5671,7 +5449,6 @@ export default function App() {
           {[
             { id: 'home', icon: Home, label: 'Home' },
             { id: 'deen', icon: Compass, label: 'Deen' },
-            { id: 'ai', icon: MessageSquare, label: 'AI Assistant' },
             { id: 'amal', icon: Sparkles, label: 'Daily Amal' },
             { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' }
           ].map((tab) => (

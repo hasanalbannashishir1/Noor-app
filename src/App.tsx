@@ -1783,7 +1783,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<'home' | 'deen' | 'amal' | 'dashboard'>('home');
   const [deenSubTab, setDeenSubTab] = useState<'grid' | 'quran' | 'names' | 'hadith' | 'prayer' | 'saved' | 'zakat' | 'events' | 'documentary' | 'ramadan' | 'hajj' | 'qibla' | 'calendar' | 'milad' | 'dua_deen' | 'kalima' | 'pillars' | 'festivals'>('grid');
   const [prayerSubTab, setPrayerSubTab] = useState<'menu' | 'wudu' | 'salah' | 'surah' | 'steps'>('menu');
-  const [amalSubTab, setAmalSubTab] = useState<'quran' | 'hadith' | 'dua'>('quran');
+  const [amalSubTab, setAmalSubTab] = useState<'quran' | 'dua'>('quran');
   const [selectedSalahDua, setSelectedSalahDua] = useState<string | null>(null);
   const [selectedBook, setSelectedBook] = useState<string | null>(null);
   const [selectedEssentialSurah, setSelectedEssentialSurah] = useState<number | null>(null);
@@ -1991,8 +1991,6 @@ export default function App() {
   // AI Assistant
 
   // Daily Amal
-  const [randomHadith, setRandomHadith] = useState<Hadith | null>(null);
-  const [isHadithLoading, setIsHadithLoading] = useState(false);
   const [amalBookmarks, setAmalBookmarks] = useState<BookmarkType[]>([]);
   const [selectedDuaCategory, setSelectedDuaCategory] = useState<string | null>(null);
 
@@ -2188,62 +2186,6 @@ export default function App() {
     'After Salah', 'Daily Life', 'Personal', 'Knowledge', 'Family', 'Special', 
     'Rabbana Dua', 'Allahumma', 'Morning and Evening', 'Purity', 'Illness', 'Good News - Bad News'
   ];
-
-  const fetchRandomAmal = React.useCallback(async () => {
-    setIsHadithLoading(true);
-    try {
-      const books = hadithService.getBooks();
-      const randomBook = books[Math.floor(Math.random() * books.length)];
-      
-      // Try to find a long hadith (mid to long size for 1-2 min reading)
-      let foundHadith: Hadith | null = null;
-      let attempts = 0;
-      
-      // We'll try up to 3 different random pages to find a substantial hadith
-      while (!foundHadith && attempts < 3) {
-        try {
-          const randomPage = Math.floor(Math.random() * 20) + 1; 
-          const hadiths = await hadithService.getHadiths(randomBook.id, randomPage);
-          
-          // Filter for hadiths with at least 500 characters (roughly 80-100 words)
-          // This usually takes about 1-2 minutes to read carefully.
-          const substantialHadiths = hadiths.filter(h => h.hadithEnglish.length > 500);
-          
-          if (substantialHadiths.length > 0) {
-            foundHadith = substantialHadiths[Math.floor(Math.random() * substantialHadiths.length)];
-          }
-        } catch (err) {
-          console.warn(`Attempt ${attempts + 1} failed for ${randomBook.id}:`, err);
-        }
-        attempts++;
-      }
-      
-      if (foundHadith) {
-        setRandomHadith(foundHadith);
-      } else {
-        // Fallback: if no long hadith found, just get any hadith from the first page
-        try {
-          const hadiths = await hadithService.getHadiths(randomBook.id, 1);
-          if (hadiths.length > 0) {
-            const fallbackHadith = hadiths[Math.floor(Math.random() * hadiths.length)];
-            setRandomHadith(fallbackHadith);
-          }
-        } catch (err) {
-          console.error(`Fallback failed for ${randomBook.id}:`, err);
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching random hadith:', error);
-    } finally {
-      setIsHadithLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (activeTab === 'amal') {
-      fetchRandomAmal();
-    }
-  }, [activeTab]);
 
   useEffect(() => {
     const fetchSurahs = async () => {
@@ -5130,16 +5072,6 @@ export default function App() {
                   Quran
                 </button>
                 <button
-                  onClick={() => setAmalSubTab('hadith')}
-                  className={cn(
-                    "flex-1 py-3 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2",
-                    amalSubTab === 'hadith' ? "bg-emerald-600 text-white shadow-lg shadow-emerald-100" : "text-slate-500 hover:bg-slate-50"
-                  )}
-                >
-                  <ScrollText size={16} />
-                  Hadith
-                </button>
-                <button
                   onClick={() => setAmalSubTab('dua')}
                   className={cn(
                     "flex-1 py-3 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2",
@@ -5226,66 +5158,6 @@ export default function App() {
                           </div>
                         )}
                       </div>
-                    </div>
-                  </motion.div>
-                )}
-
-                {amalSubTab === 'hadith' && (
-                  <motion.div
-                    key="hadith-tab"
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    className="space-y-6"
-                  >
-                    {/* Daily Reminder */}
-                    <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
-                      <h4 className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-2">Daily Reminder</h4>
-                      <p className="text-slate-700 font-medium italic">"I have left among you two things; you will never go astray as long as you hold fast to them; the book of Allah and my Sunnah."</p>
-                      <p className="text-[10px] text-slate-400 mt-2">— Prophet Muhammad (PBUH) (Al-Muwatta, Imam Malik)</p>
-                    </div>
-
-                    {/* Hadith Section */}
-                    <div className="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm text-center min-h-[300px] flex flex-col justify-center">
-                      {isHadithLoading ? (
-                        <div className="py-12">
-                          <Loader2 className="w-8 h-8 text-emerald-600 animate-spin mx-auto mb-4" />
-                          <p className="text-slate-400 text-sm font-medium">Fetching a meaningful Hadith for you...</p>
-                        </div>
-                      ) : randomHadith ? (
-                        <>
-                          <Heart className="text-red-500 mx-auto mb-4" size={32} />
-                          <h3 className="text-lg font-bold text-slate-900 mb-4">Daily Hadith</h3>
-                          <div className="max-h-[400px] overflow-y-auto pr-2 custom-scrollbar mb-6">
-                            {randomHadith.hadithEnglish ? (
-                              <p className="text-slate-600 italic leading-relaxed text-sm md:text-base">"{randomHadith.hadithEnglish}"</p>
-                            ) : (
-                              <div className="space-y-4">
-                                {randomHadith.hadithUrdu && (
-                                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Urdu Translation</p>
-                                    <p className="text-sm md:text-base text-slate-600 leading-relaxed font-arabic text-right">{randomHadith.hadithUrdu}</p>
-                                  </div>
-                                )}
-                                <div className="flex flex-col items-center gap-3">
-                                  <p className="text-sm text-slate-400 italic">English translation not available.</p>
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                          <p className="text-xs font-bold text-emerald-600 uppercase tracking-widest">— {randomHadith.bookSlug.replace(/-/g, ' ')}</p>
-                        </>
-                      ) : (
-                        <div className="py-12">
-                          <p className="text-slate-400 text-sm">Could not load Hadith. Please try again.</p>
-                          <button 
-                            onClick={fetchRandomAmal}
-                            className="mt-4 text-emerald-600 font-bold text-sm hover:underline"
-                          >
-                            Retry
-                          </button>
-                        </div>
-                      )}
                     </div>
                   </motion.div>
                 )}

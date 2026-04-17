@@ -48,6 +48,8 @@ import {
   Mail,
   Video,
   Book,
+  Building2,
+  ClipboardList,
   Headphones,
   AlertCircle,
   XCircle,
@@ -220,162 +222,454 @@ const HAJJ_GUIDES = [
     title: "1. Description of Hajj, types and conditions",
     desc: "Understanding the pilgrimage types and when it becomes mandatory.",
     content: (
-      <div className="space-y-4">
+      <div className="space-y-6">
         <section>
-          <h5 className="font-bold text-slate-900 border-b pb-1 mb-2">Conditions (Shurut) for Hajj</h5>
-          <ul className="list-disc list-inside text-sm text-slate-600 space-y-1">
-            <li><strong>Islam:</strong> Must be a Muslim.</li>
-            <li><strong>Sanity:</strong> Mentally capable of making intention.</li>
-            <li><strong>Puberty:</strong> Reached the age of maturity.</li>
-            <li><strong>Financial Capability:</strong> Sufficient funds for the journey and family back home.</li>
-            <li><strong>Physical Capability:</strong> Health and safety of travel.</li>
-          </ul>
+          <h5 className="font-bold text-slate-900 border-b pb-1 mb-2">Description of Hajj</h5>
+          <p className="text-sm text-slate-600 leading-relaxed italic border-l-2 border-emerald-500 pl-3">
+            Hajj is the annual pilgrimage to the holy city of Mecca in Islam. It is the fifth pillar of Islam and an act of worship that must be performed at a specific time (8th–12th of Dhul-Hijjah). It involves a series of rituals including Ihram (sacral state), Tawaf (circling the Kaaba), Sa’i (walking between Safa and Marwah), standing at Arafat, and stoning the Jamarat.
+          </p>
         </section>
+
         <section>
           <h5 className="font-bold text-slate-900 border-b pb-1 mb-2">Types of Hajj</h5>
           <div className="space-y-3">
-            <div className="bg-emerald-50 p-3 rounded-xl">
-              <p className="font-bold text-emerald-800 text-sm italic">Hajj al-Ifrad</p>
-              <p className="text-xs text-emerald-700">Performing Hajj only, without Umrah in the same journey.</p>
+            <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+              <p className="font-bold text-slate-800 text-sm">1. Ifrad (Single)</p>
+              <p className="text-xs text-slate-600 mt-1">Performing Hajj alone without Umrah. The pilgrim enters Ihram for Hajj only.</p>
             </div>
-            <div className="bg-amber-50 p-3 rounded-xl">
-              <p className="font-bold text-amber-800 text-sm italic">Hajj al-Qiran</p>
-              <p className="text-xs text-amber-700">Performing both Umrah and Hajj together in one Ihram state.</p>
+            <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-100">
+              <p className="font-bold text-emerald-800 text-sm">2. Qiran (Combined)</p>
+              <p className="text-xs text-emerald-700 mt-1">Performing Hajj and Umrah together in a single Ihram with no break between them.</p>
             </div>
-            <div className="bg-indigo-50 p-3 rounded-xl">
-              <p className="font-bold text-indigo-800 text-sm italic">Hajj al-Tamattu</p>
-              <p className="text-xs text-indigo-700">Performing Umrah first, exiting Ihram, then entering Ihram again for Hajj.</p>
+            <div className="bg-indigo-50 p-4 rounded-xl border border-indigo-100 shadow-sm ring-1 ring-indigo-200">
+              <div className="flex justify-between items-start">
+                <p className="font-bold text-indigo-800 text-sm">3. Tamattu’ (Enjoyment)</p>
+                <span className="text-[8px] font-black uppercase tracking-widest bg-indigo-600 text-white px-2 py-0.5 rounded-full">Recommended</span>
+              </div>
+              <p className="text-xs text-indigo-700 mt-1">Performing Umrah during the Hajj season, then exiting Ihram, and finally re-entering Ihram for Hajj on the 8th of Dhul-Hijjah. This is the most recommended type for most pilgrims.</p>
             </div>
+          </div>
+        </section>
+
+        <section>
+          <h5 className="font-bold text-slate-900 border-b pb-1 mb-2">Conditions Making Hajj Obligatory</h5>
+          <div className="grid grid-cols-1 gap-2">
+            {[
+              { t: "Islam", d: "Only Muslims are required to perform Hajj." },
+              { t: "Sanity (Reason)", d: "The person must be of sound mind." },
+              { t: "Adulthood (Buloogh)", d: "The person must have reached puberty." },
+              { t: "Freedom", d: "Only a free person is obligated (not a slave)." },
+              { t: "Ability (Istita’ah)", d: "Includes Physical, Financial, Safe travel, and Transportation/Provisions." }
+            ].map((item, i) => (
+              <div key={i} className="flex gap-3 text-sm">
+                <span className="font-black text-emerald-600 shrink-0">{i + 1}.</span>
+                <div>
+                  <p className="font-bold text-slate-800 leading-none mb-1">{item.t}</p>
+                  <p className="text-xs text-slate-500">{item.d}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </section>
       </div>
     )
   },
   {
-    title: "2. Obligatory and Sunnah acts of Hajj",
-    desc: "Distinguishing between Pillars, Requirements, and Sunnahs.",
+    title: "2. The obligatory, obligatory, and sunnah acts of Hajj",
+    desc: "Distinguishing between Fard, Wajib, and Sunnah rituals.",
     content: (
-      <div className="space-y-4 text-sm text-slate-600">
+      <div className="space-y-6">
         <section>
-          <h5 className="font-bold text-slate-900 border-b pb-1 mb-2">Pillars (Arkan) - Hajj is invalid without these</h5>
-          <ol className="list-decimal list-inside space-y-1">
-            <li>Ihram (Intention)</li>
-            <li>Standing at Arafat</li>
-            <li>Tawaf al-Ifadah</li>
-            <li>Sa'i between Safa & Marwa</li>
-          </ol>
-        </section>
-        <section>
-          <h5 className="font-bold text-slate-900 border-b pb-1 mb-2">Compulsory (Wajib) - Sacrifice required if missed</h5>
-          <ul className="list-disc list-inside space-y-1">
-            <li>Ihram from the Miqat</li>
-            <li>Staying at Muzdalifah</li>
-            <li>Stoning the Jamarat</li>
-            <li>Shaving or cutting hair (Halq/Taqsir)</li>
-            <li>Farewell Tawaf (Tawaf al-Wada)</li>
+          <div className="flex items-center gap-2 mb-3">
+            <div className="bg-rose-600 text-white text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-widest">Pillars</div>
+            <h5 className="font-bold text-slate-900">1. Obligatory (Fard) Acts</h5>
+          </div>
+          <p className="text-[10px] text-rose-500 font-bold uppercase mb-2 italic">If missed, Hajj is invalid and must be repeated.</p>
+          <ul className="space-y-2">
+            <li className="text-sm bg-rose-50/50 p-2 rounded-lg border border-rose-100 flex items-start gap-2 text-slate-700">
+              <span className="text-rose-600 font-black mt-0.5">•</span>
+              <span><strong>Ihram:</strong> Entering the sacred state with the intention of Hajj.</span>
+            </li>
+            <li className="text-sm bg-rose-50/50 p-2 rounded-lg border border-rose-100 flex items-start gap-2 text-slate-700">
+              <span className="text-rose-600 font-black mt-0.5">•</span>
+              <span><strong>Standing at Arafat (Wuquf):</strong> Presence at Arafat between 9th-10th Dhul-Hijjah.</span>
+            </li>
+            <li className="text-sm bg-rose-50/50 p-2 rounded-lg border border-rose-100 flex items-start gap-2 text-slate-700">
+              <span className="text-rose-600 font-black mt-0.5">•</span>
+              <span><strong>Tawaf al-Ifadah:</strong> The main circumambulation around the Kaaba.</span>
+            </li>
+            <li className="text-sm bg-rose-50/50 p-2 rounded-lg border border-rose-100 flex items-start gap-2 text-slate-700">
+              <span className="text-rose-600 font-black mt-0.5">•</span>
+              <span><strong>Sa’i:</strong> Completing seven laps between Safa and Marwah.</span>
+            </li>
           </ul>
         </section>
+
+        <section>
+          <div className="flex items-center gap-2 mb-3">
+            <div className="bg-amber-500 text-white text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-widest">Required</div>
+            <h5 className="font-bold text-slate-900">2. Necessary (Wajib) Acts</h5>
+          </div>
+          <p className="text-[10px] text-amber-600 font-bold uppercase mb-2 italic">If missed, Hajj is valid but requires a penalty (Damm).</p>
+          <ul className="grid grid-cols-1 gap-2">
+            {[
+              "Ihram from the Miqat",
+              "Staying at Muzdalifah after Arafat",
+              "Ramy al-Jamarat (Stoning the pillars)",
+              "Shaving or trimming hair (Halq/Taqsir)",
+              "Tawaf al-Wada (Farewell Tawaf)",
+              "Praying two rak’ahs after Tawaf"
+            ].map((item, i) => (
+              <li key={i} className="text-xs flex items-center gap-2 text-slate-600 bg-slate-50 p-2 rounded-lg border border-slate-100">
+                <div className="w-1 h-1 bg-amber-400 rounded-full" />
+                {item}
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section>
+          <div className="flex items-center gap-2 mb-3">
+            <div className="bg-emerald-600 text-white text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-widest">Recommended</div>
+            <h5 className="font-bold text-slate-900">3. Sunnah Acts</h5>
+          </div>
+          <p className="text-[10px] text-emerald-600 font-bold uppercase mb-2 italic">If missed, no penalty. Doing them brings reward.</p>
+          <div className="bg-emerald-50 rounded-2xl p-4 border border-emerald-100">
+            <ul className="text-xs text-emerald-900 space-y-2">
+              <li>• Reciting the <strong>Talbiyah</strong> loudly.</li>
+              <li>• Wearing white <strong>Ihram cloth</strong> (Izār and Ridā’).</li>
+              <li>• Performing <strong>Tawaf al-Qudum</strong> (Arrival).</li>
+              <li>• Kissing or pointing to the <strong>Black Stone</strong>.</li>
+              <li>• Performing <strong>Idtiba’</strong> and <strong>Ramal</strong> (for men).</li>
+              <li>• Spending nights in <strong>Mina</strong> and <strong>Muzdalifah</strong>.</li>
+              <li>• Abundant <strong>Supplicating (Du’a)</strong> during rituals.</li>
+            </ul>
+          </div>
+        </section>
       </div>
     )
   },
   {
-    title: "3. Prohibited acts (Mahdurat al-Ihram)",
-    desc: "Actions to avoid while in the state of Ihram.",
+    title: "3. Prohibited Acts for Men & Women (Common)",
+    desc: "Actions to avoid while in the state of Ihram and their penalties.",
     content: (
-      <div className="bg-rose-50 p-4 rounded-2xl border border-rose-100">
-        <ul className="grid grid-cols-1 gap-3">
-          {[
-            "Trimming hair or nails",
-            "Using scented products or perfume",
-            "Hunting or killing wild animals",
-            "Marriage contracts or proposals",
-            "Marital relations (nullifies Hajj)",
-            "Men: Wearing stitched clothes (tailored to body)",
-            "Men: Covering the head with a hat or turban"
-          ].map((item, i) => (
-            <li key={i} className="flex items-center gap-2 text-sm text-rose-800 font-medium">
-              <div className="w-1.5 h-1.5 bg-rose-400 rounded-full shrink-0" />
-              {item}
-            </li>
-          ))}
-        </ul>
-      </div>
-    )
-  },
-  {
-    title: "4. Description and Rules of Umrah",
-    desc: "The 'Minor Pilgrimage' guide and its steps.",
-    content: (
-      <div className="space-y-4">
-        <div className="relative border-l-2 border-emerald-200 ml-4 pl-6 space-y-6 py-2">
-          <div className="relative">
-            <div className="absolute -left-8 top-0 w-4 h-4 rounded-full bg-emerald-500 border-4 border-white shadow-sm" />
-            <h6 className="font-bold text-slate-900 text-sm">1. Ihram</h6>
-            <p className="text-xs text-slate-500">Purify, put on garments, and make intention at the Miqat.</p>
+      <div className="space-y-6">
+        <section>
+          <h5 className="font-bold text-slate-900 border-b pb-1 mb-3 text-sm uppercase tracking-tight">Common Prohibited Acts</h5>
+          <div className="bg-rose-50 p-4 rounded-2xl border border-rose-100 shadow-sm">
+            <ul className="grid grid-cols-1 gap-2 text-xs text-rose-900 leading-tight">
+              {[
+                "Removing hair (from armpits, pubic area, or anywhere on the body).",
+                "Clipping nails (fingernails or toenails).",
+                "Applying perfume (includes scented soaps, oils, and deodorants).",
+                "Wearing stitched clothing (for men only).",
+                "Covering the head (for men only).",
+                "Wearing a face veil (Niqab) or burqa (for women only).",
+                "Wearing gloves (for women only).",
+                "Sexual intercourse (invalidates Hajj/Umrah if before Tawaf al-Ifadah).",
+                "Sexual touching, kissing, or lustful foreplay (major sin).",
+                "Marriage contract (cannot propose, marry, or officiate).",
+                "Hunting or killing land animals (including lice, excluding harmful pests).",
+                "Cutting or uprooting plants/trees within the Haram sanctuary.",
+                "Using foul, abusive, or vain speech (arguing, fighting, lying)."
+              ].map((item, i) => (
+                <li key={i} className="flex gap-2">
+                  <span className="font-black text-rose-400 shrink-0">{i + 1}.</span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
           </div>
-          <div className="relative">
-            <div className="absolute -left-8 top-0 w-4 h-4 rounded-full bg-emerald-500 border-4 border-white shadow-sm" />
-            <h6 className="font-bold text-slate-900 text-sm">2. Tawaf</h6>
-            <p className="text-xs text-slate-500">Circle the Kaaba seven times starting from the Black Stone.</p>
-          </div>
-          <div className="relative">
-            <div className="absolute -left-8 top-0 w-4 h-4 rounded-full bg-emerald-500 border-4 border-white shadow-sm" />
-            <h6 className="font-bold text-slate-900 text-sm">3. Sa'i</h6>
-            <p className="text-xs text-slate-500">Walk seven times between the hills of Safa and Marwa.</p>
-          </div>
-          <div className="relative">
-            <div className="absolute -left-8 top-0 w-4 h-4 rounded-full bg-emerald-500 border-4 border-white shadow-sm" />
-            <h6 className="font-bold text-slate-900 text-sm">4. Release (Taqsir)</h6>
-            <p className="text-xs text-slate-500">Men shorten or shave hair; women cut a finger-tip length.</p>
-          </div>
-        </div>
-      </div>
-    )
-  },
-  {
-    title: "5. Rules for Hajj Clothes and Ihram",
-    desc: "Correct attire for the state of pilgrimage.",
-    content: (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200">
-          <h6 className="font-black text-slate-900 text-xs uppercase mb-3 text-center">For Men</h6>
-          <div className="space-y-2">
-            <div className="aspect-[3/4] bg-white rounded-xl border border-slate-200 flex items-center justify-center p-4">
-              <p className="text-[10px] text-slate-400 text-center">Two white unstitched sheets (Rida & Izar). No underwear, hats, or socks.</p>
+        </section>
+
+        <section>
+          <h5 className="font-bold text-slate-900 border-b pb-1 mb-3 text-sm uppercase tracking-tight">Specific Prohibitions by Gender</h5>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+              <h6 className="font-black text-slate-900 text-[10px] uppercase mb-2 text-center bg-slate-200 rounded py-1">For Men Only</h6>
+              <ul className="text-[10px] text-slate-600 space-y-2 list-disc list-inside mt-2">
+                <li>Sewn/stitched clothing (shirts, pants, socks, etc.)</li>
+                <li>Covering head (cap, turban, hood, pillow)</li>
+                <li>Shoes/boots covering ankle bone/top of foot</li>
+              </ul>
             </div>
-            <p className="text-[10px] text-slate-500 italic">Shoulders should be covered except during Tawaf (Idtiba).</p>
-          </div>
-        </div>
-        <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200">
-          <h6 className="font-black text-slate-900 text-xs uppercase mb-3 text-center">For Women</h6>
-          <div className="space-y-2">
-            <div className="aspect-[3/4] bg-white rounded-xl border border-slate-200 flex items-center justify-center p-4">
-              <p className="text-[10px] text-slate-400 text-center">Standard loose Islamic clothing. Must not cover face (Niqab) or hands (Gloves).</p>
+            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+              <h6 className="font-black text-slate-900 text-[10px] uppercase mb-2 text-center bg-slate-200 rounded py-1">For Women Only</h6>
+              <ul className="text-[10px] text-slate-600 space-y-2 list-disc list-inside mt-2">
+                <li>Covering face (Niqab, burqa, or veil)</li>
+                <li>Wearing gloves</li>
+                <li>Face and hands must remain exposed</li>
+              </ul>
             </div>
-            <p className="text-[10px] text-slate-500 italic">Modesty and simplicity are the keys.</p>
           </div>
-        </div>
+        </section>
+
+        <section>
+          <div className="bg-slate-900 rounded-3xl p-6 text-white shadow-xl">
+            <h5 className="font-black text-sm mb-4 uppercase tracking-tighter flex items-center gap-2">
+              <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+              Summary of Penalties (Fidyah)
+            </h5>
+            <div className="space-y-3">
+              {[
+                { t: "Sacrifice", d: "Slaughter a sheep/goat and distribute meat to poor in Mecca." },
+                { t: "Feed the poor", d: "Feed 6 poor people (approx. 1.5-2 kg of food each)." },
+                { t: "Fast", d: "Fast 3 days (anywhere, anytime)." }
+              ].map((p, i) => (
+                <div key={i} className="bg-white/5 border border-white/10 rounded-2xl p-3 flex gap-4 items-center">
+                  <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center font-black text-xs shrink-0">{i + 1}</div>
+                  <div>
+                    <h6 className="font-bold text-xs">{p.t}</h6>
+                    <p className="text-[10px] text-slate-400">{p.d}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      </div>
+    )
+  },
+  {
+    title: "4. Description of Umrah and the rules for performing Umrah",
+    desc: "A spiritual journey to Makkah. Understanding the minor pilgrimage.",
+    content: (
+      <div className="space-y-6">
+        <section>
+          <h5 className="font-bold text-slate-900 border-b pb-1 mb-2">Description of Umrah</h5>
+          <p className="text-sm text-slate-600 leading-relaxed italic border-l-2 border-emerald-500 pl-3">
+            Umrah is the minor pilgrimage to Mecca, often called the "lesser Hajj." Unlike Hajj, it is not time-specific and has fewer rituals. While not usually obligatory, it is a confirmed, highly recommended practice (Sunnah Mu’akkadah).
+          </p>
+        </section>
+
+        <section>
+          <h5 className="font-bold text-slate-900 border-b pb-1 mb-3 text-sm uppercase tracking-tight">The 4 Pillars (Essential Acts)</h5>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {[
+              { t: "1. Ihram", d: "Entrance with intention and Talbiyah." },
+              { t: "2. Tawaf", d: "Circling Kaaba 7 times counter-clockwise." },
+              { t: "3. Sa’i", d: "Walking 7 laps between Safa and Marwah." },
+              { t: "4. Halq/Taqsir", d: "Shaving or trimming the hair." }
+            ].map((p, i) => (
+              <div key={i} className="bg-emerald-50 p-4 rounded-2xl border border-emerald-100 flex flex-col gap-1">
+                <p className="font-black text-emerald-800 text-xs">{p.t}</p>
+                <p className="text-[10px] text-emerald-600 font-medium">{p.d}</p>
+              </div>
+            ))}
+          </div>
+          <p className="text-[10px] text-rose-500 font-bold mt-2 italic px-2">If any of these is missed, the Umrah is invalid.</p>
+        </section>
+
+        <section>
+          <h5 className="font-bold text-slate-900 border-b pb-1 mb-3 text-sm uppercase tracking-tight">Rules & Conditions</h5>
+          <div className="space-y-4">
+            <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+              <h6 className="font-bold text-slate-900 text-xs mb-2">Entering Ihram – Key Rules</h6>
+              <ul className="text-[10px] text-slate-500 space-y-1 list-disc list-inside">
+                <li>Miqat: Must enter Ihram before boundary points.</li>
+                <li>Remove stitched clothing (men only).</li>
+                <li>No perfume once in the state of Ihram.</li>
+                <li>Recit Talbiyah frequently until Tawaf starts.</li>
+              </ul>
+            </div>
+            <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+              <h6 className="font-bold text-slate-900 text-xs mb-2">During Tawaf & Sa’i – Rules</h6>
+              <ul className="text-[10px] text-slate-500 space-y-1 list-disc list-inside">
+                <li>Ritual Purity (Wudu): Required for Tawaf.</li>
+                <li>Order: Must begin at Safa and end at Marwah.</li>
+                <li>Properly covering Awrah is mandatory.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-amber-50 p-4 rounded-2xl border border-amber-100">
+          <h5 className="font-bold text-amber-900 text-[10px] uppercase mb-2 flex items-center gap-2">
+            <Info size={14} />
+            Important Note
+          </h5>
+          <p className="text-[10px] text-amber-800 leading-relaxed font-medium">
+            Unlike Hajj, there is no Tawaf al-Wada (Farewell Tawaf) for Umrah, though it is highly recommended to perform one before leaving Mecca.
+          </p>
+        </section>
+      </div>
+    )
+  },
+  {
+    title: "5. Rules for wearing clothes for Hajj and Ihram",
+    desc: "Correct attire and state rules for both men and women.",
+    content: (
+      <div className="space-y-6">
+        <section>
+          <h5 className="font-bold text-slate-900 border-b pb-1 mb-3 text-sm uppercase tracking-tight">Before Ihram (Normal State)</h5>
+          <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-[10px] text-slate-600 space-y-2">
+            <p>• <strong>Men & Women:</strong> May wear any lawful, clean clothing. No restrictions on stitched garments or face veils.</p>
+            <p>• <strong>Recommended:</strong> Perform Ghusl (bath), trim nails, remove pubic/armpit hair, and apply perfume (non-alcoholic) <strong>before</strong> entering Ihram.</p>
+          </div>
+        </section>
+
+        <section>
+          <h5 className="font-bold text-slate-900 border-b pb-1 mb-3 text-sm uppercase tracking-tight">During Ihram (Sacred State)</h5>
+          
+          <div className="space-y-4">
+            <div className="border border-emerald-100 rounded-2xl overflow-hidden shadow-sm">
+              <div className="bg-emerald-600 px-4 py-2 text-white font-black text-[10px] uppercase tracking-widest text-center">For Men</div>
+              <div className="grid grid-cols-2 text-[10px]">
+                <div className="p-3 bg-emerald-50/50 border-r border-emerald-100">
+                  <h6 className="font-bold text-emerald-800 mb-2 uppercase text-[8px]">Allowed</h6>
+                  <ul className="space-y-1 text-emerald-700">
+                    <li>Two white unstitched cloths (Izār & Ridā’)</li>
+                    <li>Sandals/Flip-flops (ankles exposed)</li>
+                    <li>Belt or money pouch</li>
+                    <li>Plain ring or watch</li>
+                  </ul>
+                </div>
+                <div className="p-3 bg-rose-50/50">
+                  <h6 className="font-bold text-rose-800 mb-2 uppercase text-[8px]">Not Allowed</h6>
+                  <ul className="space-y-1 text-rose-700">
+                    <li>Stitched clothing (shirts, underwear, socks)</li>
+                    <li>Head coverings (caps, turbans, hoods)</li>
+                    <li>Tying a knot in the Ihram cloth</li>
+                    <li>Covering nose/mouth with cloth</li>
+                  </ul>
+                </div>
+              </div>
+              <div className="p-3 bg-slate-50 border-t border-emerald-100 text-[9px] italic text-slate-500 text-center font-medium">
+                Note: Head must remain uncovered. Umbrellas are allowed as long as they don't touch the head.
+              </div>
+            </div>
+
+            <div className="border border-indigo-100 rounded-2xl overflow-hidden shadow-sm">
+              <div className="bg-indigo-600 px-4 py-2 text-white font-black text-[10px] uppercase tracking-widest text-center">For Women</div>
+              <div className="grid grid-cols-2 text-[10px]">
+                <div className="p-3 bg-indigo-50/50 border-r border-indigo-100">
+                  <h6 className="font-bold text-indigo-800 mb-2 uppercase text-[8px]">Allowed</h6>
+                  <ul className="space-y-1 text-indigo-700">
+                    <li>Regular sewn clothing (modest & dark)</li>
+                    <li>Headscarf (Hijab)</li>
+                    <li>Socks and shoes (any kind)</li>
+                    <li>Loose abaya or jilbab</li>
+                  </ul>
+                </div>
+                <div className="p-3 bg-rose-50/50">
+                  <h6 className="font-bold text-rose-800 mb-2 uppercase text-[8px]">Not Allowed</h6>
+                  <ul className="space-y-1 text-rose-700">
+                    <li>Face veil (Niqab)</li>
+                    <li>Gloves (separate hand coverings)</li>
+                    <li>Revealing or tight clothing</li>
+                    <li>Perfume on body or clothes</li>
+                  </ul>
+                </div>
+              </div>
+              <div className="p-3 bg-slate-50 border-t border-indigo-100 text-[9px] italic text-slate-500 text-center font-medium">
+                Note: Face and hands must be uncovered. Draw a loose cloth over face near non-mahrams if it doesn't touch skin.
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
     )
   },
   {
     title: "6. Pilgrimage to Madinah",
-    desc: "Visiting Masjid an-Nabawi and the Prophet (PBUH).",
+    desc: "A spiritual visit to the Masjid an-Nabawi.",
     content: (
-      <div className="space-y-4">
-        <div className="bg-emerald-900 rounded-2xl p-6 text-white text-center">
-          <h5 className="font-black text-lg mb-2">City of the Prophet</h5>
-          <p className="text-emerald-200 text-xs leading-relaxed italic">"Whoever visits my grave after my death, it is as if he visited me while I was alive." (Hadith)</p>
-        </div>
-        <div className="space-y-3 text-sm text-slate-600">
-          <p>Visiting Madinah is not a pillar of Hajj, but is highly recommended for every pilgrim.</p>
-          <ul className="list-disc list-inside space-y-1">
-            <li>Praying in the Rawdah (Garden from Paradise).</li>
-            <li>Offering greetings (Salam) to the Prophet (PBUH) and his companions.</li>
-            <li>Visiting Masjid Quba (the first mosque).</li>
-            <li>Reflecting on the Seerah in the streets of Madinah.</li>
-          </ul>
-        </div>
+      <div className="space-y-6">
+        <section>
+          <div className="bg-emerald-900 rounded-2xl p-6 text-white text-center shadow-lg relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-2 opacity-10">
+              <Sparkles size={40} />
+            </div>
+            <h5 className="font-black text-sm uppercase tracking-tighter mb-2">Importance of Visiting Madinah</h5>
+            <div className="space-y-3 text-[10px] text-emerald-100 text-left leading-relaxed">
+              <p>• Not obligatory but highly recommended (Sunnah) for spiritual growth.</p>
+              <p>• One prayer in the Prophet's Mosque is better than 1,000 elsewhere (except Makkah).</p>
+              <p>• Visiting the Prophet (ﷺ) is a means of his intercession.</p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h5 className="font-bold text-slate-900 border-b pb-1 mb-3 text-sm uppercase tracking-tight font-sans">What to Do in Madinah</h5>
+          <div className="space-y-4">
+            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+              <h6 className="font-black text-slate-900 text-[10px] uppercase mb-2">1. Visit the Prophet's Mosque</h6>
+              <ul className="text-[10px] text-slate-500 space-y-1 list-disc list-inside">
+                <li>Enter with humility (right foot first).</li>
+                <li>Pray 2 rak'ahs of Tahiyyat al-Masjid.</li>
+                <li>Pray in the <strong>Rawdah</strong> (indicated by green carpet).</li>
+              </ul>
+            </div>
+            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+              <h6 className="font-black text-slate-900 text-[10px] uppercase mb-2">2. Visit the Prophet's Grave (ﷺ)</h6>
+              <ul className="text-[10px] text-slate-500 space-y-1 list-disc list-inside">
+                <li>Say: <em>"Assalamu 'alayka ayyuhan-Nabiyyu..."</em></li>
+                <li>Greet Abu Bakr (RA) and Umar (RA) to the right.</li>
+                <li>Do not raise voice or touch the walls.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h5 className="font-bold text-slate-900 border-b pb-1 mb-3 text-sm uppercase tracking-tight">Historical Sites Table</h5>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-[9px] border-collapse">
+              <thead>
+                <tr className="bg-slate-100">
+                  <th className="p-2 border border-slate-200 font-black uppercase">Site</th>
+                  <th className="p-2 border border-slate-200 font-black uppercase">Description</th>
+                </tr>
+              </thead>
+              <tbody className="text-slate-600">
+                <tr>
+                  <td className="p-2 border border-slate-200 font-bold text-emerald-700">Jannat al-Baqi'</td>
+                  <td className="p-2 border border-slate-200">Main cemetery of Madinah where Sahabah and Ahl al-Bayt rest.</td>
+                </tr>
+                <tr>
+                  <td className="p-2 border border-slate-200 font-bold text-emerald-700">Masjid Quba</td>
+                  <td className="p-2 border border-slate-200">First mosque in Islam. Reward for praying here is like an Umrah.</td>
+                </tr>
+                <tr>
+                  <td className="p-2 border border-slate-200 font-bold text-emerald-700">Mount Uhud</td>
+                  <td className="p-2 border border-slate-200">Site of the martyrs of Uhud, including Hamza ibn Abdul-Muttalib (RA).</td>
+                </tr>
+                <tr>
+                  <td className="p-2 border border-slate-200 font-bold text-emerald-700">Masjid al-Qiblatayn</td>
+                  <td className="p-2 border border-slate-200">Where the Qiblah was changed from Jerusalem to Makkah.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section>
+          <h5 className="font-bold text-rose-900 border-b border-rose-100 pb-1 mb-3 text-sm uppercase tracking-tight">Common Mistakes</h5>
+          <div className="bg-rose-50 rounded-2xl p-4 border border-rose-100 space-y-3">
+            {[
+              { m: "Making Du'a directly to the Prophet", c: "Du'a is only to Allah. Ask Allah for the Prophet's intercession." },
+              { m: "Touching or kissing the grave walls", c: "Not allowed. Blessings come from Sunnah, not physical contact." },
+              { m: "Believing it is part of Hajj", c: "Hajj is complete without Madinah, but visiting is highly recommended." }
+            ].map((err, i) => (
+              <div key={i} className="flex gap-3">
+                <X size={14} className="text-rose-500 shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-bold text-rose-900 text-[10px]">{err.m}</p>
+                  <p className="text-[9px] text-rose-700 italic">Correct: {err.c}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="bg-slate-900 rounded-3xl p-6 text-white">
+          <h5 className="font-black text-xs uppercase mb-4 text-emerald-400">Farewell Du'a</h5>
+          <div className="bg-white/5 p-4 rounded-2xl border border-white/10 space-y-3">
+            <p className="text-right text-lg font-arabic leading-loose uppercase tracking-tight">اللَّهُمَّ لَا تَجْعَلْهُ آخِرَ الْعَهْدِ مِنْ مَسْجِدِ نَبِيِّكَ، وَارْزُقْنِي زِيَارَةً أُخْرَى فِي حَيَاتِي</p>
+            <p className="text-[10px] text-slate-300 italic">"Allahumma la taj'alhu aakhiral 'ahdi min masjidi nabiyyika, warzuqni ziyaratan ukhra fi hayati."</p>
+            <p className="text-[10px] text-slate-400">(O Allah, do not make this the last time I visit the mosque of Your Prophet, and grant me another visit during my lifetime.)</p>
+          </div>
+        </section>
       </div>
     )
   }
@@ -512,59 +806,636 @@ const KALIMAS = [
   }
 ];
 
-const PILLARS_OF_ISLAM = [
+const PILLAR_GUIDES = [
   {
-    title: "Shahada (Faith)",
-    description: "The declaration of faith in the oneness of Allah and the prophethood of Muhammad (PBUH).",
-    details: "The Shahada is the most fundamental pillar. It is the sincere recitation of the statement: 'There is no god but Allah, and Muhammad is the messenger of Allah.' This declaration is the entry point into Islam."
+    title: "Shahadah",
+    desc: "The Testimony of Faith",
+    icon: "☝️",
+    content: (
+      <div className="space-y-6 text-slate-700">
+        <section className="bg-emerald-50 p-6 rounded-3xl border border-emerald-100">
+          <h4 className="text-xl font-black text-emerald-900 mb-3 flex items-center gap-2">
+            <span className="text-2xl">☝️</span> Shahadah
+          </h4>
+          <p className="text-sm text-emerald-800 leading-relaxed font-bold">
+            The Declaration of Faith. The testimony that makes a person a Muslim.
+          </p>
+        </section>
+
+        <section className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm text-center">
+          <h5 className="font-bold text-slate-400 text-[10px] uppercase tracking-widest mb-4">Arabic Testimony</h5>
+          <div className="text-2xl font-arabic leading-relaxed mb-4 text-slate-900">
+            أَشْهَدُ أَنْ لَا إِلَـٰــهَ إِلَّا اللهُ وَحْدَهُ لَا شَرِيكَ لَهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ
+          </div>
+          <p className="text-xs text-slate-500 italic mb-4">
+            "Ash-hadu an la ilaha illallah, wa ash-hadu anna Muhammadan abduhu wa rasuluhu"
+          </p>
+          <div className="p-4 bg-emerald-50 rounded-2xl text-[10px] text-emerald-900 font-medium leading-relaxed">
+            "I bear witness that there is no god worthy of worship except Allah, and I bear witness that Muhammad is His servant and messenger."
+          </div>
+        </section>
+
+        <section>
+          <h5 className="font-bold text-slate-900 border-b pb-1 mb-4 text-sm uppercase tracking-tight flex items-center gap-2">
+            <CheckCircle2 size={16} className="text-emerald-500" />
+            Conditions for Validity
+          </h5>
+          <div className="grid grid-cols-1 gap-2">
+            {[
+              "Said with full knowledge and understanding",
+              "Said with certainty and sincerity (no doubt)",
+              "Said from the heart, not just the tongue",
+              "Rejecting all false gods"
+            ].map((text, i) => (
+              <div key={i} className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl text-[11px] text-slate-600 font-medium">
+                <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full shrink-0" />
+                {text}
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="bg-slate-900 rounded-3xl p-6 text-white overflow-hidden relative">
+          <div className="absolute top-0 right-0 p-4 opacity-10">
+            <Sparkles size={40} />
+          </div>
+          <h5 className="font-black text-xs uppercase tracking-widest text-emerald-400 mb-2">The Effect</h5>
+          <p className="text-xs text-slate-300 leading-relaxed">
+            Entering Islam. All previous sins are forgiven, and a new life begins. It is the foundation upon which all other pillars are built.
+          </p>
+        </section>
+      </div>
+    )
   },
   {
-    title: "Salah (Prayer)",
-    description: "The performance of five daily prayers at specific times.",
-    details: "Muslims perform five prayers a day: Fajr (dawn), Dhuhr (noon), Asr (afternoon), Maghrib (sunset), and Isha (night). Prayer establishes a direct connection between the believer and Allah."
+    title: "Salah",
+    desc: "The Five Daily Prayers",
+    icon: "🧎",
+    content: (
+      <div className="space-y-6">
+        <section className="bg-indigo-50 p-6 rounded-3xl border border-indigo-100">
+          <h4 className="text-xl font-black text-indigo-900 mb-3 flex items-center gap-2">
+            <span className="text-2xl">🧎</span> Salah
+          </h4>
+          <p className="text-sm text-indigo-800 leading-relaxed">
+            The second pillar and the most important act of worship after Shahadah. A direct link between the Creator and the created.
+          </p>
+        </section>
+
+        <section>
+          <div className="flex justify-between items-end mb-4">
+            <h5 className="font-bold text-slate-900 text-sm uppercase tracking-tight">Prayer Schedule</h5>
+            <div className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">17 Units (Rak'ah) Daily</div>
+          </div>
+          <div className="overflow-hidden rounded-2xl border border-slate-200">
+            <table className="w-full text-left text-[10px]">
+              <thead className="bg-slate-50 border-b border-slate-200">
+                <tr>
+                  <th className="px-4 py-3 font-bold text-slate-400 uppercase">Prayer</th>
+                  <th className="px-4 py-3 font-bold text-slate-400 uppercase">Time Window</th>
+                  <th className="px-4 py-3 font-bold text-slate-400 uppercase text-center">Rak'ah</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {[
+                  { n: "Fajr", t: "Dawn until before sunrise", r: 2 },
+                  { n: "Dhuhr", t: "After noon until afternoon", r: 4 },
+                  { n: "Asr", t: "Late afternoon until sunset", r: 4 },
+                  { n: "Maghrib", t: "Just after sunset until twilight", r: 3 },
+                  { n: "Isha", t: "Night until dawn", r: 4 }
+                ].map((p, i) => (
+                  <tr key={i} className="bg-white">
+                    <td className="px-4 py-3 font-black text-slate-900">{p.n}</td>
+                    <td className="px-4 py-3 text-slate-500">{p.t}</td>
+                    <td className="px-4 py-3 font-bold text-indigo-600 text-center">{p.r}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="bg-white p-5 rounded-2xl border border-slate-200">
+              <h6 className="font-black text-slate-900 text-[10px] uppercase mb-3 flex items-center gap-2">
+                <Check size={14} className="text-emerald-500" /> Prerequisites
+              </h6>
+              <ul className="space-y-2 text-[10px] text-slate-500">
+                <li>• Ritual purity (Wudu)</li>
+                <li>• Clean body, clothes, and place</li>
+                <li>• Covering the Awrah</li>
+                <li>• Facing the Qiblah</li>
+                <li>• Intention (Niyyah) in heart</li>
+              </ul>
+            </div>
+            <div className="bg-white p-5 rounded-2xl border border-slate-200">
+              <h6 className="font-black text-slate-900 text-[10px] uppercase mb-3 flex items-center gap-2">
+                <AlertCircle size={14} className="text-rose-500" /> Invalidators
+              </h6>
+              <ul className="space-y-2 text-[10px] text-slate-500">
+                <li>• Breaking Wudu (gas, toilet)</li>
+                <li>• Talking intentionally</li>
+                <li>• Laughing out loud</li>
+                <li>• Eating or drinking</li>
+                <li>• Turning away from Qiblah</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-slate-50 p-6 rounded-3xl border border-slate-200">
+          <h5 className="font-black text-slate-900 text-[10px] uppercase mb-4">Who is Exempt?</h5>
+          <div className="grid grid-cols-1 gap-3">
+            {[
+              "Menstruating or postpartum women",
+              "The unconscious or insane",
+              "Children below puberty (encouraged but not obligated)"
+            ].map((t, i) => (
+              <div key={i} className="flex items-center gap-3 text-[10px] text-slate-600">
+                <div className="w-1 h-1 bg-slate-300 rounded-full" />
+                {t}
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+    )
   },
   {
-    title: "Zakat (Almsgiving)",
-    description: "The giving of a portion of one's wealth to those in need.",
-    details: "Zakat is a mandatory charitable contribution, typically 2.5% of a Muslim's accumulated wealth. It is intended to purify wealth and provide social support for the poor and needy."
+    title: "Zakat",
+    desc: "The Obligatory Charity",
+    icon: "💰",
+    content: (
+      <div className="space-y-6">
+        <section className="bg-amber-50 p-6 rounded-3xl border border-amber-100">
+          <h4 className="text-xl font-black text-amber-900 mb-3 flex items-center gap-2">
+            <span className="text-2xl">💰</span> Zakat
+          </h4>
+          <p className="text-sm text-amber-800 leading-relaxed font-bold">
+            2.5% of saved wealth given annually to the poor. Purifies wealth and soul.
+          </p>
+        </section>
+
+        <section className="grid grid-cols-2 gap-4">
+          <div className="bg-white p-5 rounded-2xl border border-amber-100 text-center">
+            <p className="text-2xl font-black text-amber-600 mb-1">2.5%</p>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Rate of Zakat</p>
+          </div>
+          <div className="bg-white p-5 rounded-2xl border border-amber-100 text-center">
+            <p className="text-[10px] font-black text-amber-600 mb-1">Nisab Threshold</p>
+            <p className="text-[9px] text-slate-500 leading-tight">85g Gold / 595g Silver value</p>
+          </div>
+        </section>
+
+        <section>
+          <h5 className="font-bold text-slate-900 border-b pb-1 mb-4 text-sm uppercase tracking-tight">Assets Subject to Zakat</h5>
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              "Gold & Silver Jewelry",
+              "Cash & Bank Savings",
+              "Business Inventory",
+              "Agricultural Produce",
+              "Livestock",
+              "Rental Income"
+            ].map((t, i) => (
+              <div key={i} className="p-3 bg-slate-50 rounded-xl border border-slate-100 text-[10px] font-bold text-slate-600 flex items-center gap-2">
+                <div className="w-1.5 h-1.5 bg-amber-400 rounded-full" />
+                {t}
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section>
+          <h5 className="font-bold text-slate-900 border-b pb-1 mb-4 text-sm uppercase tracking-tight">The 8 Eligible Recipients</h5>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {[
+              "The Poor (little/nothing)",
+              "The Needy (insufficient)",
+              "Zakat Collectors",
+              "New Muslims (hearts reconciled)",
+              "Freeing Slaves/Captives",
+              "Those in Debt",
+              "In the Path of Allah (students, etc)",
+              "Stranded Travelers (Wayfarers)"
+            ].map((t, i) => (
+              <div key={i} className="p-3 bg-indigo-50/50 rounded-xl text-[10px] text-indigo-900 font-medium flex items-center gap-3">
+                <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center text-[9px] font-black shadow-sm shrink-0">{i+1}</div>
+                {t}
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="bg-slate-900 rounded-3xl p-6 text-white text-center shadow-xl">
+          <h5 className="font-black text-xs uppercase tracking-widest text-amber-400 mb-3">Benefits</h5>
+          <p className="text-[10px] text-slate-400 leading-relaxed mb-4">
+            "Purifies wealth, removes greed, helps society, and increases blessings."
+          </p>
+          <div className="flex justify-center gap-4">
+            <Heart size={20} className="text-rose-400" />
+            <Sparkles size={20} className="text-amber-400" />
+            <Calculator size={20} className="text-emerald-400" />
+          </div>
+        </section>
+      </div>
+    )
   },
   {
-    title: "Sawm (Fasting)",
-    description: "Fasting during the month of Ramadan from dawn to sunset.",
-    details: "During Ramadan, Muslims abstain from food, drink, and other physical needs during daylight hours. Fasting teaches self-discipline, patience, and empathy for the less fortunate."
+    title: "Sawm",
+    desc: "Fasting in Ramadan",
+    icon: "🌙",
+    content: (
+      <div className="space-y-6">
+        <section className="bg-emerald-50 p-6 rounded-3xl border border-emerald-100">
+          <h4 className="text-xl font-black text-emerald-900 mb-3 flex items-center gap-2">
+            <span className="text-2xl">🌙</span> Sawm
+          </h4>
+          <p className="text-sm text-emerald-800 leading-relaxed">
+            Complete abstinence from food, drink, and marital relations from dawn to sunset during the holy month of Ramadan.
+          </p>
+        </section>
+
+        <section className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
+          <div className="p-4 bg-white rounded-2xl border border-slate-200">
+            <h6 className="text-[8px] uppercase font-black text-slate-400 mb-1">Suhoor</h6>
+            <p className="text-[10px] font-bold text-slate-700">Pre-dawn Meal</p>
+          </div>
+          <div className="p-4 bg-emerald-900 text-white rounded-2xl shadow-lg">
+            <h6 className="text-[8px] uppercase font-black text-emerald-400 mb-1">Duration</h6>
+            <p className="text-[10px] font-bold">29-30 Days</p>
+          </div>
+          <div className="p-4 bg-white rounded-2xl border border-slate-200">
+            <h6 className="text-[8px] uppercase font-black text-slate-400 mb-1">Iftar</h6>
+            <p className="text-[10px] font-bold text-slate-700">Break at Sunset</p>
+          </div>
+        </section>
+
+        <section>
+          <h5 className="font-bold text-slate-900 border-b pb-1 mb-4 text-sm uppercase tracking-tight">What Breaks the Fast?</h5>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {[
+              "Eating or drinking intentionally",
+              "Vomiting deliberately",
+              "Menstruation or postpartum bleeding",
+              "Marital relations during day",
+              "Nutritional injections"
+            ].map((t, i) => (
+              <div key={i} className="flex items-center gap-3 p-3 bg-rose-50 rounded-xl text-[10px] text-rose-900 font-bold">
+                <XCircle size={14} className="text-rose-400 shrink-0" />
+                {t}
+              </div>
+            ))}
+          </div>
+          <p className="mt-3 text-[9px] text-slate-400 leading-relaxed italic">
+            Note: Forgetting and eating/drinking does NOT break the fast. You should complete it.
+          </p>
+        </section>
+
+        <section>
+          <h5 className="font-bold text-slate-900 border-b pb-1 mb-4 text-sm uppercase tracking-tight">Exemptions</h5>
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { l: "Sick", d: "Make up later" },
+              { l: "Traveler", d: "Make up later" },
+              { l: "Pregnant", d: "Make up later" },
+              { l: "Elderly", d: "Pay Fidyah" }
+            ].map((item, i) => (
+              <div key={i} className="p-3 bg-white border border-slate-200 rounded-xl">
+                <p className="text-[10px] font-black text-slate-900">{item.l}</p>
+                <p className="text-[8px] text-emerald-600 font-bold uppercase">{item.d}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="bg-slate-900 rounded-3xl p-6 text-white text-center">
+          <h5 className="font-black text-xs uppercase text-emerald-400 mb-4">Expiation (Kaffarah)</h5>
+          <p className="text-[10px] text-slate-400 leading-relaxed mb-4 px-4">
+            For intentionally breaking fast without excuse: Fast 60 consecutive days OR feed 60 poor people.
+          </p>
+        </section>
+      </div>
+    )
   },
   {
-    title: "Hajj (Pilgrimage)",
-    description: "The pilgrimage to the holy city of Mecca at least once in a lifetime.",
-    details: "Hajj is required for every adult Muslim who is physically and financially able to make the journey. It takes place during the Islamic month of Dhu al-Hijjah and brings together millions of Muslims from around the world."
+    title: "Hajj",
+    desc: "The Pilgrimage to Makkah",
+    icon: "🕋",
+    content: (
+      <div className="space-y-6">
+        <section className="bg-amber-50 p-6 rounded-3xl border border-amber-100">
+          <h4 className="text-xl font-black text-amber-900 mb-3 flex items-center gap-2">
+            <span className="text-2xl">🕋</span> Hajj
+          </h4>
+          <p className="text-sm text-amber-800 leading-relaxed font-bold">
+            Journey to the holy city of Makkah performed once in a lifetime by those who are able.
+          </p>
+        </section>
+
+        <section>
+          <h5 className="font-bold text-slate-900 border-b pb-1 mb-4 text-sm uppercase tracking-tight">Conditions for Obligation</h5>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
+            {["Muslim", "Adult", "Sane", "Physically Able", "Financially Able", "Safe Route", "Mahram (Women)"].map((t, i) => (
+              <div key={i} className="p-2 bg-white border border-slate-100 rounded-xl text-[8px] font-bold text-slate-500 flex items-center justify-center uppercase">{t}</div>
+            ))}
+          </div>
+        </section>
+
+        <section>
+          <h5 className="font-bold text-slate-900 text-sm uppercase mb-4">Core Rituals (Pillars)</h5>
+          <div className="grid grid-cols-1 gap-3">
+            {[
+              { t: "1. Ihram", d: "Sacred state with intention and special clothing" },
+              { t: "2. Wuquf", d: "Standing at Arafat on 9th Dhul-Hijjah" },
+              { t: "3. Tawaf al-Ifadah", d: "Circling the Kaaba 7 times" },
+              { t: "4. Sa'i", d: "Walking between Safa and Marwah 7 times" }
+            ].map((item, i) => (
+              <div key={i} className="p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                <h6 className="font-bold text-amber-900 text-[10px] uppercase mb-1">{item.t}</h6>
+                <p className="text-[10px] text-slate-500 leading-relaxed">{item.d}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section>
+          <h5 className="font-bold text-slate-900 text-sm uppercase mb-4">Hajj Timeline</h5>
+          <div className="space-y-3">
+            {[
+              { d: "8th Dhul-Hijjah", a: "Enter Ihram, go to Mina" },
+              { d: "9th Dhul-Hijjah", a: "Arafat (Noon-Sunset), then Muzdalifah" },
+              { d: "10th Dhul-Hijjah", a: "Stoning, Sacrifice, Shave, Tawaf" },
+              { d: "11-13th", a: "Stone all Jamarat, Farewell Tawaf" }
+            ].map((step, i) => (
+              <div key={i} className="flex gap-4 p-4 bg-white border border-slate-100 rounded-2xl">
+                <div className="w-16 shrink-0">
+                  <p className="text-[8px] font-black text-amber-600 uppercase leading-tight">{step.d}</p>
+                </div>
+                <div className="border-l border-slate-100 pl-4">
+                  <p className="text-[10px] font-bold text-slate-700 leading-relaxed">{step.a}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="bg-emerald-900 rounded-3xl p-6 text-white text-center shadow-xl">
+          <h5 className="font-black text-xs uppercase tracking-widest text-emerald-400 mb-3">Virtues</h5>
+          <p className="text-[10px] text-emerald-100/70 leading-relaxed italic">
+            "All past sins forgiven, guaranteed Paradise (if accepted), and unity of Muslims worldwide."
+          </p>
+        </section>
+      </div>
+    )
   }
 ];
 
-const ISLAMIC_FESTIVALS = [
+const FESTIVAL_GUIDES = [
   {
-    title: "Eid-ul-Fitr",
-    description: "The 'Festival of Breaking the Fast' celebrated at the end of Ramadan.",
-    details: "Eid-ul-Fitr is a day of joy and thanksgiving. Muslims perform a special prayer in the morning, give charity (Zakat al-Fitr), visit family and friends, and enjoy festive meals."
+    title: "Eid ul-Fitr",
+    desc: "The festival of breaking the fast. Joy after Ramadan.",
+    icon: "🌙",
+    content: (
+      <div className="space-y-6 text-slate-700">
+        <section className="bg-emerald-50 p-6 rounded-3xl border border-emerald-100">
+          <h4 className="text-xl font-black text-emerald-900 mb-3 flex items-center gap-2">
+            <span className="text-2xl">🌙</span> Eid al-Fitr
+          </h4>
+          <p className="text-sm text-emerald-800 leading-relaxed italic">
+            Eid ul Fitr is one of the most important and joyful festivals in Islam. It marks the end of the holy month of Ramadan, during which Muslims fast from dawn to sunset.
+          </p>
+        </section>
+
+        <section>
+          <h5 className="font-bold text-slate-900 border-b pb-1 mb-4 text-sm uppercase tracking-tight flex items-center gap-2">
+            <Sparkles size={16} className="text-amber-500" />
+            Meaning & Significance
+          </h5>
+          <div className="grid grid-cols-1 gap-3">
+            {[
+              { t: "“Eid” means festival and “Fitr” means breaking the fast", i: "✨" },
+              { t: "It is a day of gratitude to Allah for giving strength to complete Ramadan", i: "🤲" },
+              { t: "A time for forgiveness, unity, and generosity", i: "🤝" }
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-white border border-slate-100 shadow-sm">
+                <span className="text-xl shrink-0">{item.i}</span>
+                <span className="text-sm font-medium text-slate-600">{item.t}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section>
+          <h5 className="font-bold text-slate-900 border-b pb-1 mb-4 text-sm uppercase tracking-tight flex items-center gap-2">
+            <Building2 size={16} className="text-emerald-600" />
+            Key Practices
+          </h5>
+          <div className="space-y-4">
+            <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200">
+              <h6 className="font-bold text-emerald-900 text-xs mb-2 uppercase">1. Eid Prayer (Salah)</h6>
+              <p className="text-[10px] text-slate-500 leading-relaxed">Performed in congregation, usually in open grounds or mosques. Offered shortly after sunrise.</p>
+            </div>
+            <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200">
+              <h6 className="font-bold text-emerald-900 text-xs mb-2 uppercase">2. Zakat al-Fitr</h6>
+              <p className="text-[10px] text-slate-500 leading-relaxed">A special charity given before the Eid prayer. Ensures that even the poor can celebrate Eid.</p>
+            </div>
+            <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200">
+              <h6 className="font-bold text-emerald-900 text-xs mb-2 uppercase">3. Takbir</h6>
+              <p className="text-[10px] text-slate-500 mb-2 italic">"Allahu Akbar, Allahu Akbar, La ilaha illallah..."</p>
+              <p className="text-[10px] text-slate-500 leading-relaxed">Recited from the night before Eid until the prayer.</p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h5 className="font-bold text-slate-900 border-b pb-1 mb-4 text-sm uppercase tracking-tight flex items-center gap-2">
+            <Heart size={16} className="text-rose-500" />
+            How Muslims Celebrate
+          </h5>
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              "Wear new or clean clothes",
+              "Greet with 'Eid Mubarak'",
+              "Visit family & friends",
+              "Share sweets (semai, dates)",
+              "Give gifts (Eidi) to children"
+            ].map((item, i) => (
+              <div key={i} className="p-3 bg-white rounded-xl border border-rose-100 text-[10px] font-bold text-rose-900 flex items-center gap-2">
+                <div className="w-1.5 h-1.5 bg-rose-400 rounded-full" />
+                {item}
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="bg-slate-900 rounded-3xl p-6 text-white text-center">
+          <h5 className="font-black text-xs uppercase tracking-widest text-emerald-400 mb-4">Spiritual Message</h5>
+          <p className="text-[10px] text-slate-300 leading-relaxed italic mb-4">
+            "Eid ul Fitr is not just a celebration—it’s a reminder to continue good habits built in Ramadan, stay connected to prayer, and care for the needy."
+          </p>
+          <div className="grid grid-cols-3 gap-2">
+            {["Continue Rituals", "Stay Connected", "Show Care"].map((t, i) => (
+              <div key={i} className="py-2 px-1 bg-white/10 rounded-lg text-[8px] font-bold uppercase">{t}</div>
+            ))}
+          </div>
+        </section>
+      </div>
+    )
   },
   {
-    title: "Eid-ul-Adha",
-    description: "The 'Festival of Sacrifice' commemorating Prophet Ibrahim's (AS) willingness to sacrifice his son.",
-    details: "Eid-ul-Adha coincides with the completion of Hajj. Muslims sacrifice an animal (usually a sheep, goat, or cow) and distribute the meat among family, friends, and the poor."
+    title: "Eid ul-Adha",
+    desc: "The festival of sacrifice. Commemorating devotion.",
+    icon: "🐐",
+    content: (
+      <div className="space-y-6">
+        <section className="bg-amber-50 p-6 rounded-3xl border border-amber-100">
+          <h4 className="text-xl font-black text-amber-900 mb-3 flex items-center gap-2">
+            <span className="text-2xl">🐐</span> Eid al-Adha
+          </h4>
+          <p className="text-sm text-amber-800 leading-relaxed italic">
+            Eid ul Adha is the second major festival in Islam, celebrated on the 10th day of Dhul-Hijjah. It commemorates the devotion of Prophet Ibrahim (AS).
+          </p>
+        </section>
+
+        <section>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="bg-white p-4 rounded-2xl border border-slate-200">
+              <h6 className="font-black text-slate-900 text-[10px] uppercase mb-2">Meaning & Importance</h6>
+              <ul className="text-[10px] text-slate-500 space-y-2">
+                <li>• “Eid” = festival, “Adha” = sacrifice</li>
+                <li>• Symbolizes complete submission to Allah</li>
+                <li>• Reminds us to let go of ego and selfishness</li>
+              </ul>
+            </div>
+            <div className="bg-white p-4 rounded-2xl border border-slate-200">
+              <h6 className="font-black text-slate-900 text-[10px] uppercase mb-2">Sunnah Acts</h6>
+              <ul className="text-[10px] text-slate-500 space-y-2">
+                <li>• Take Ghusl (bath) before prayer</li>
+                <li>• Wear clean or best clothes</li>
+                <li>• Avoid eating before Eid prayer</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h5 className="font-bold text-slate-900 border-b pb-1 mb-4 text-sm uppercase tracking-tight flex items-center gap-2">
+            <ClipboardList size={16} className="text-amber-600" />
+            Key Religious Practices
+          </h5>
+          <div className="space-y-4">
+            <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200">
+              <h6 className="font-bold text-amber-900 text-xs mb-1 uppercase">1. Eid Prayer (Salah)</h6>
+              <p className="text-[10px] text-slate-500">Performed after sunrise, followed by a khutbah (sermon).</p>
+            </div>
+            <div className="p-4 bg-amber-50 rounded-2xl border border-amber-200">
+              <h6 className="font-bold text-amber-900 text-xs mb-3 uppercase">2. Qurbani (Sacrifice)</h6>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { l: "Family", v: "1/3" },
+                  { l: "Relatives", v: "1/3" },
+                  { l: "The Poor", v: "1/3" }
+                ].map((item, i) => (
+                  <div key={i} className="bg-white p-2 rounded-xl text-center border border-amber-100 shadow-sm">
+                    <p className="text-[12px] font-black text-amber-600 mb-1">{item.v}</p>
+                    <p className="text-[8px] uppercase font-bold text-slate-400">{item.l}</p>
+                  </div>
+                ))}
+              </div>
+              <p className="text-[9px] text-amber-700 mt-3 italic font-medium">Animals: Goat, sheep, cow, or camel. Done after prayer.</p>
+            </div>
+            <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200">
+              <h6 className="font-bold text-amber-900 text-xs mb-1 uppercase">3. Takbir (Glorification)</h6>
+              <p className="text-[10px] text-slate-500 mb-1 font-arabic text-right">اللَّهُ أَكْبَرُ، اللَّهُ أَكْبَرُ، لَا إِلَهَ إِلَّا اللَّهُ</p>
+              <p className="text-[9px] text-slate-400 leading-relaxed italic">Recited from 9th to 13th Dhul-Hijjah after every prayer.</p>
+            </div>
+          </div>
+        </section>
+
+        <section className="p-6 bg-slate-900 rounded-3xl text-white relative overflow-hidden">
+          <div className="absolute bottom-0 right-0 p-4 opacity-5">
+            <Compass size={60} />
+          </div>
+          <h5 className="font-black text-xs uppercase mb-3 text-emerald-400">Connection with Hajj</h5>
+          <p className="text-[10px] text-slate-400 leading-relaxed px-1">
+            Eid ul Adha occurs during Hajj. Pilgrims in Makkah perform special rites while Muslims worldwide join in spirit via sacrifice.
+          </p>
+        </section>
+      </div>
+    )
   },
   {
-    title: "Laylat al-Qadr",
-    description: "The 'Night of Power' when the first verses of the Quran were revealed.",
-    details: "This night falls within the last ten days of Ramadan. It is considered the holiest night of the year, and worship performed on this night is better than a thousand months of worship."
-  },
-  {
-    title: "Ashura",
-    description: "The 10th day of Muharram, observed with fasting and remembrance.",
-    details: "Ashura marks several historical events, including the day Prophet Musa (AS) and the Israelites were saved from Pharaoh. For Shia Muslims, it is a day of mourning for the martyrdom of Imam Hussain (RA)."
-  },
-  {
-    title: "Mawlid al-Nabi",
-    description: "The celebration of the birth of Prophet Muhammad (PBUH).",
-    details: "Observed on the 12th of Rabi' al-Awwal, this day is marked by gatherings where stories of the Prophet's life and character are shared, and poems are recited in his honor."
+    title: "Eid e Miladunnabi",
+    desc: "Commemorating the birth of Prophet Muhammad ﷺ.",
+    icon: "📜",
+    content: (
+      <div className="space-y-6">
+        <section className="bg-indigo-50 p-6 rounded-3xl border border-indigo-100">
+          <h4 className="text-xl font-black text-indigo-900 mb-3 flex items-center gap-2">
+            <span className="text-2xl">📜</span> Mawlid al-Nabi
+          </h4>
+          <p className="text-sm text-indigo-800 leading-relaxed italic">
+            Observed to commemorate the birth of Prophet Muhammad ﷺ. It is usually marked on the 12th of Rabi' al-Awwal.
+          </p>
+        </section>
+
+        <section>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+              <h6 className="font-black text-slate-900 text-[10px] uppercase mb-3">Common Practices</h6>
+              <ul className="text-[10px] text-slate-500 space-y-3">
+                <li className="flex gap-2">
+                  <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full shrink-0 mt-1" />
+                  <span>Sending Salawat upon the Prophet ﷺ</span>
+                </li>
+                <li className="flex gap-2">
+                  <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full shrink-0 mt-1" />
+                  <span>Reciting Seerah (Life Stories)</span>
+                </li>
+                <li className="flex gap-2">
+                  <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full shrink-0 mt-1" />
+                  <span>Gathering for Nasheeds & Lectures</span>
+                </li>
+                <li className="flex gap-2">
+                  <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full shrink-0 mt-1" />
+                  <span>Giving charity to the needy</span>
+                </li>
+              </ul>
+            </div>
+            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+              <h6 className="font-black text-indigo-900 text-[10px] uppercase mb-3">Note in Islam</h6>
+              <p className="text-[10px] text-slate-500 leading-relaxed mb-3">Scholars have different opinions about celebrating it:</p>
+              <div className="space-y-2">
+                <div className="p-2 bg-emerald-50 rounded-lg text-[9px] text-emerald-800 font-medium">
+                  Some allow it to remember the Prophet ﷺ.
+                </div>
+                <div className="p-2 bg-rose-50 rounded-lg text-[9px] text-rose-800 font-medium">
+                  Others discourage it as it wasn't practiced in early Islam.
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="p-6 bg-slate-900 rounded-3xl text-white">
+          <h5 className="font-black text-xs uppercase mb-4 text-emerald-400">Cultural Aspects</h5>
+          <div className="grid grid-cols-3 gap-3">
+            {[
+              { t: "Decorations", d: "Streets and mosques brightly lit." },
+              { t: "Processions", d: "Large gatherings in some countries." },
+              { t: "Sharing", d: "People share food and sweets." }
+            ].map((item, i) => (
+              <div key={i} className="p-2 bg-white/5 rounded-xl border border-white/10 text-center">
+                <p className="text-[9px] font-black mb-1">{item.t}</p>
+                <p className="text-[7px] text-slate-400">{item.d}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+    )
   }
 ];
 
@@ -1751,7 +2622,7 @@ const StreakCalendar = ({ visitedDates }: { visitedDates: string[] }) => {
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'home' | 'deen' | 'amal' | 'dashboard'>('home');
-  const [deenSubTab, setDeenSubTab] = useState<'grid' | 'quran' | 'names' | 'hadith' | 'prayer' | 'saved' | 'zakat' | 'events' | 'documentary' | 'ramadan' | 'hajj' | 'qibla' | 'calendar' | 'milad' | 'dua_deen' | 'kalima' | 'pillars' | 'festivals'>('grid');
+  const [deenSubTab, setDeenSubTab] = useState<'grid' | 'quran' | 'names' | 'hadith' | 'prayer' | 'saved' | 'zakat' | 'events' | 'documentary' | 'ramadan' | 'hajj' | 'qibla' | 'calendar' | 'dua_deen' | 'kalima' | 'pillars' | 'festivals'>('grid');
   const [prayerSubTab, setPrayerSubTab] = useState<'menu' | 'wudu' | 'salah' | 'surah' | 'steps'>('menu');
   const [amalSubTab, setAmalSubTab] = useState<'quran' | 'dua'>('quran');
   const [selectedSalahDua, setSelectedSalahDua] = useState<string | null>(null);
@@ -1813,9 +2684,11 @@ export default function App() {
 
   const [selectedDashboardDate, setSelectedDashboardDate] = useState<string>(new Date().toDateString());
   const [selectedRamadanGuide, setSelectedRamadanGuide] = useState<number | null>(null);
+  const [selectedFestival, setSelectedFestival] = useState<number | null>(null);
+  const [selectedPillar, setSelectedPillar] = useState<number | null>(null);
 
   const salahProgress = salahHistory[new Date().toDateString()] || [];
-  
+
   const setSalahProgress = (update: string[] | ((prev: string[]) => string[])) => {
     setSalahHistory(prevHistory => {
       const today = new Date().toDateString();
@@ -2581,7 +3454,7 @@ export default function App() {
                   }}
                   className={cn(
                     "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all",
-                    activeTab === tab.id ? "bg-white text-emerald-700 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                    activeTab === tab.id ? "bg-white text-black shadow-sm border border-emerald-500" : "text-black/60 hover:text-black border border-transparent"
                   )}
                 >
                   <tab.icon size={14} />
@@ -3166,22 +4039,6 @@ export default function App() {
                           <h3 className="text-[10px] font-bold uppercase tracking-tight">Qibla</h3>
                         </button>
 
-                        {/* 11. Eid e Milladunnabi Option */}
-                        <button 
-                          onClick={() => setDeenSubTab('milad')}
-                          className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
-                        >
-                          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm overflow-hidden border border-slate-100">
-                            <img 
-                              src="https://i.postimg.cc/WD0V8ZN2/milad.png" 
-                              alt="Eid e Milladunnabi" 
-                              className="w-full h-full object-cover"
-                              referrerPolicy="no-referrer"
-                            />
-                          </div>
-                          <h3 className="text-[10px] font-bold uppercase tracking-tight">Eid e Milladunnabi</h3>
-                        </button>
-
                         {/* 12. Documentary Option */}
                         <button 
                           onClick={() => setDeenSubTab('documentary')}
@@ -3295,8 +4152,7 @@ export default function App() {
                         (deenSubTab === 'ramadan' && selectedRamadanGuide === null) ||
                         (deenSubTab === 'hajj' && selectedHajjGuide === null) ||
                         (deenSubTab === 'qibla') ||
-                        (deenSubTab === 'calendar') ||
-                        (deenSubTab === 'milad')) && (
+                        (deenSubTab === 'calendar')) && (
                         <button 
                           onClick={() => {
                             setDeenSubTab('grid');
@@ -4744,17 +5600,43 @@ export default function App() {
                               "Muharram", "Safar", "Rabi' al-Awwal", "Rabi' al-Thani",
                               "Jumada al-Ula", "Jumada al-Akhirah", "Rajab", "Sha'ban",
                               "Ramadan", "Shawwal", "Dhu al-Qi'dah", "Dhu al-Hijjah"
-                            ].map((month, i) => (
-                              <div key={i} className="bg-white p-3 rounded-xl border border-slate-200 flex flex-col items-center gap-2 text-center relative overflow-hidden">
-                                <span className="w-6 h-6 bg-slate-50 text-slate-400 rounded-lg flex items-center justify-center text-[10px] font-bold">{i + 1}</span>
-                                <span className="text-[10px] font-bold text-slate-800 leading-tight">{month}</span>
-                                {hijriCalendar[0]?.hijri.month.en === month && (
-                                  <div className="absolute top-0 right-0">
-                                    <div className="bg-emerald-500 text-white text-[6px] font-black px-1.5 py-0.5 rounded-bl-lg uppercase">Current</div>
-                                  </div>
-                                )}
-                              </div>
-                            ))}
+                            ].map((month, i) => {
+                              const currentMonthFromApi = hijriCalendar[0]?.hijri.month.en;
+                              const isCurrentMonth = currentMonthFromApi && currentMonthFromApi.toLowerCase().includes(month.toLowerCase().replace(/['\s]/g, ''));
+                              
+                              // Special case for Rabi' al-Awwal / Rabi' al-Thani formatting differences
+                              const isMonthMatch = isCurrentMonth || (currentMonthFromApi === month);
+
+                              return (
+                                <div 
+                                  key={i} 
+                                  className={cn(
+                                    "bg-white p-3 rounded-xl border flex flex-col items-center gap-2 text-center relative overflow-hidden transition-all",
+                                    isMonthMatch 
+                                      ? "border-2 border-emerald-600 bg-emerald-50/50 shadow-md transform scale-[1.02] ring-4 ring-emerald-500/10" 
+                                      : "border-slate-200"
+                                  )}
+                                >
+                                  <span className={cn(
+                                    "w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-bold transition-colors",
+                                    isCurrentMonth ? "bg-emerald-600 text-white" : "bg-slate-50 text-slate-400"
+                                  )}>
+                                    {i + 1}
+                                  </span>
+                                  <span className={cn(
+                                    "text-[10px] leading-tight transition-all",
+                                    isCurrentMonth ? "font-black text-emerald-800" : "font-bold text-slate-800"
+                                  )}>
+                                    {month}
+                                  </span>
+                                  {isCurrentMonth && (
+                                    <div className="absolute top-0 right-0">
+                                      <div className="bg-emerald-500 text-white text-[6px] font-black px-1.5 py-0.5 rounded-bl-lg uppercase">Current</div>
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
                           </div>
 
                           <div className="space-y-4">
@@ -4775,34 +5657,6 @@ export default function App() {
                                   </div>
                                 </div>
                               ))}
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {deenSubTab === 'milad' && (
-                        <div className="space-y-6">
-                          <div className="bg-emerald-900 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
-                            <div className="relative z-10">
-                              <h3 className="text-3xl font-black mb-2">Eid e Miladunnabi</h3>
-                              <p className="text-emerald-200/80 text-sm max-w-md">Celebrating the birth of the Prophet Muhammad (PBUH), the mercy to all worlds.</p>
-                            </div>
-                            <div className="absolute top-0 right-0 p-4 opacity-10">
-                              <img src="https://i.postimg.cc/WD0V8ZN2/milad.png" alt="" className="w-32 h-32 object-contain" />
-                            </div>
-                          </div>
-
-                          <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
-                            <h4 className="text-xl font-bold text-slate-900 mb-4">Significance</h4>
-                            <p className="text-slate-600 text-sm leading-relaxed mb-6">
-                              Eid-e-Milad-un-Nabi, also known as Mawlid, is the observance of the birthday of the Islamic prophet Muhammad which is commemorated in Rabi' al-awwal, the third month in the Islamic calendar.
-                            </p>
-                            <div className="bg-emerald-50 p-6 rounded-2xl border border-emerald-100">
-                              <p className="text-lg font-arabic text-emerald-800 leading-loose text-center mb-4">
-                                وَمَا أَرْسَلْنَاكَ إِلَّا رَحْمَةً لِّلْعَالَمِينَ
-                              </p>
-                              <p className="text-xs text-emerald-600 italic text-center">"And We have not sent you, [O Muhammad], except as a mercy to the worlds."</p>
-                              <p className="text-[10px] text-emerald-400 font-bold uppercase tracking-widest mt-2 text-center">— Surah Al-Anbiya [21:107]</p>
                             </div>
                           </div>
                         </div>
@@ -4867,54 +5721,144 @@ export default function App() {
 
                       {deenSubTab === 'pillars' && (
                         <div className="space-y-6">
-                          <div className="bg-emerald-800 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
-                            <div className="relative z-10">
-                              <h3 className="text-3xl font-black mb-2">Pillars of Islam</h3>
-                              <p className="text-emerald-100 text-sm max-w-md">The five basic acts in Islam, considered mandatory by believers and are the foundation of Muslim life.</p>
-                            </div>
-                            <div className="absolute top-0 right-0 p-4 opacity-10">
-                              <img src="https://i.postimg.cc/rRtnMckw/window.png" alt="" className="w-32 h-32 object-contain" />
-                            </div>
-                          </div>
-
-                          <div className="grid grid-cols-1 gap-4">
-                            {PILLARS_OF_ISLAM.map((pillar, i) => (
-                              <div key={i} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex gap-6">
-                                <div className="w-12 h-12 bg-emerald-50 text-emerald-700 rounded-2xl flex items-center justify-center font-black text-xl flex-shrink-0">
-                                  {i + 1}
+                          {selectedPillar === null ? (
+                            <>
+                              <div className="bg-emerald-800 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
+                                <div className="relative z-10">
+                                  <h3 className="text-3xl font-black mb-2">Pillars of Islam</h3>
+                                  <p className="text-emerald-100 text-sm max-w-md">The five basic acts in Islam, considered mandatory by believers and are the foundation of Muslim life.</p>
                                 </div>
-                                <div>
-                                  <h4 className="font-bold text-slate-900 text-lg mb-1">{pillar.title}</h4>
-                                  <p className="text-sm text-emerald-600 font-medium mb-2">{pillar.description}</p>
-                                  <p className="text-sm text-slate-500 leading-relaxed">{pillar.details}</p>
+                                <div className="absolute top-0 right-0 p-4 opacity-10">
+                                  <img src="https://i.postimg.cc/rRtnMckw/window.png" alt="" className="w-32 h-32 object-contain" />
                                 </div>
                               </div>
-                            ))}
-                          </div>
+
+                              <div className="grid grid-cols-1 gap-4">
+                                {PILLAR_GUIDES.map((pillar, i) => (
+                                  <button
+                                    key={i}
+                                    onClick={() => setSelectedPillar(i)}
+                                    className="group relative bg-white p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-emerald-500 transition-all duration-300 text-left overflow-hidden flex gap-6"
+                                  >
+                                    <div className="w-14 h-14 bg-emerald-50 text-emerald-700 rounded-2xl flex items-center justify-center font-black text-2xl group-hover:bg-emerald-100 transition-colors shrink-0">
+                                      {i + 1}
+                                    </div>
+                                    <div className="relative z-10 flex-1">
+                                      <h4 className="font-black text-slate-900 text-lg mb-1 group-hover:text-emerald-600 transition-colors flex items-center gap-2">
+                                        {pillar.title}
+                                        <span className="text-lg opacity-40">{pillar.icon}</span>
+                                      </h4>
+                                      <p className="text-sm text-slate-500 font-medium leading-relaxed">{pillar.desc}</p>
+                                      <div className="mt-4 inline-flex items-center gap-2 text-[10px] font-black text-emerald-600 uppercase tracking-widest">
+                                        Learn More <ChevronRight size={14} />
+                                      </div>
+                                    </div>
+                                  </button>
+                                ))}
+                              </div>
+                            </>
+                          ) : (
+                            <motion.div
+                              initial={{ opacity: 0, y: 20 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              className="space-y-8"
+                            >
+                              <div className="flex items-center justify-between sticky top-0 bg-white/80 backdrop-blur-md py-4 z-20 border-b border-slate-100">
+                                <button 
+                                  onClick={() => setSelectedPillar(null)}
+                                  className="flex items-center gap-2 text-slate-500 hover:text-emerald-600 transition-colors font-black text-[10px] uppercase tracking-widest"
+                                >
+                                  <ChevronLeft size={16} />
+                                  Back to Pillars
+                                </button>
+                                <div className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">Pillar Details</div>
+                              </div>
+
+                              <div>
+                                {PILLAR_GUIDES[selectedPillar].content}
+                              </div>
+
+                              <button 
+                                onClick={() => {
+                                  setSelectedPillar(null);
+                                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                                }}
+                                className="w-full py-4 bg-slate-100 rounded-2xl text-[10px] font-black text-slate-500 uppercase tracking-widest hover:bg-slate-200 transition-colors"
+                              >
+                                Back to Top
+                              </button>
+                            </motion.div>
+                          )}
                         </div>
                       )}
 
                       {deenSubTab === 'festivals' && (
                         <div className="space-y-6">
-                          <div className="bg-amber-600 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
-                            <div className="relative z-10">
-                              <h3 className="text-3xl font-black mb-2">Islamic Festivals</h3>
-                              <p className="text-amber-100 text-sm max-w-md">Key religious observances and celebrations in the Islamic calendar that bring the community together.</p>
-                            </div>
-                            <div className="absolute top-0 right-0 p-4 opacity-10">
-                              <img src="https://i.postimg.cc/LgZC2Rp4/eid-al-fitr.png" alt="" className="w-32 h-32 object-contain" />
-                            </div>
-                          </div>
-
-                          <div className="space-y-4">
-                            {ISLAMIC_FESTIVALS.map((festival, i) => (
-                              <div key={i} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                                <h4 className="font-bold text-slate-900 text-lg mb-1">{festival.title}</h4>
-                                <p className="text-sm text-amber-600 font-medium mb-3">{festival.description}</p>
-                                <p className="text-sm text-slate-500 leading-relaxed">{festival.details}</p>
+                          {selectedFestival === null ? (
+                            <>
+                              <div className="bg-amber-600 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
+                                <div className="relative z-10">
+                                  <h3 className="text-3xl font-black mb-2">Islamic Festivals</h3>
+                                  <p className="text-amber-100 text-sm max-w-md">Key religious observances and celebrations in the Islamic calendar that bring the community together.</p>
+                                </div>
+                                <div className="absolute top-0 right-0 p-4 opacity-10">
+                                  <img src="https://i.postimg.cc/LgZC2Rp4/eid-al-fitr.png" alt="" className="w-32 h-32 object-contain" />
+                                </div>
                               </div>
-                            ))}
-                          </div>
+
+                              <div className="grid grid-cols-1 gap-4">
+                                {FESTIVAL_GUIDES.map((festival, i) => (
+                                  <button
+                                    key={i}
+                                    onClick={() => setSelectedFestival(i)}
+                                    className="group relative bg-white p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-amber-500 transition-all duration-300 text-left overflow-hidden"
+                                  >
+                                    <div className="absolute top-0 right-0 p-4 text-4xl opacity-20 group-hover:opacity-40 transition-opacity">
+                                      {festival.icon}
+                                    </div>
+                                    <div className="relative z-10">
+                                      <h4 className="font-black text-slate-900 text-lg mb-1 group-hover:text-amber-600 transition-colors">{festival.title}</h4>
+                                      <p className="text-sm text-slate-500 font-medium leading-relaxed max-w-[80%]">{festival.desc}</p>
+                                      <div className="mt-4 inline-flex items-center gap-2 text-[10px] font-black text-amber-600 uppercase tracking-widest">
+                                        View Details <ChevronRight size={14} />
+                                      </div>
+                                    </div>
+                                  </button>
+                                ))}
+                              </div>
+                            </>
+                          ) : (
+                            <motion.div
+                              initial={{ opacity: 0, y: 20 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              className="space-y-8"
+                            >
+                              <div className="flex items-center justify-between sticky top-0 bg-white/80 backdrop-blur-md py-4 z-20 border-b border-slate-100">
+                                <button 
+                                  onClick={() => setSelectedFestival(null)}
+                                  className="flex items-center gap-2 text-slate-500 hover:text-amber-600 transition-colors font-black text-[10px] uppercase tracking-widest"
+                                >
+                                  <ChevronLeft size={16} />
+                                  Back to Festivals
+                                </button>
+                                <div className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">Festival Details</div>
+                              </div>
+
+                              <div>
+                                {FESTIVAL_GUIDES[selectedFestival].content}
+                              </div>
+
+                              <button 
+                                onClick={() => {
+                                  setSelectedFestival(null);
+                                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                                }}
+                                className="w-full py-4 bg-slate-100 rounded-2xl text-[10px] font-black text-slate-500 uppercase tracking-widest hover:bg-slate-200 transition-colors"
+                              >
+                                Back to Top
+                              </button>
+                            </motion.div>
+                          )}
                         </div>
                       )}
 
@@ -5326,8 +6270,8 @@ export default function App() {
                 setActiveTab(tab.id as any);
               }}
               className={cn(
-                "flex flex-col items-center gap-1 transition-all min-w-[60px]",
-                activeTab === tab.id ? "text-emerald-600" : "text-slate-400"
+                "flex flex-col items-center gap-1 transition-all min-w-[64px] p-1.5 rounded-xl border-2",
+                activeTab === tab.id ? "text-black border-emerald-500 bg-emerald-50/50" : "text-black/40 border-transparent hover:text-black"
               )}
             >
               <tab.icon size={24} className={cn(activeTab === tab.id && "scale-110")} />

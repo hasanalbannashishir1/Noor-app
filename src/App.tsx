@@ -46,7 +46,6 @@ import {
   Moon,
   X,
   Mail,
-  Video,
   Book,
   Building2,
   ClipboardList,
@@ -755,12 +754,6 @@ const SALAH_DUAS = [
   }
 ];
 
-const DOCUMENTARIES = [
-  { title: "The Message (1976)", description: "The story of the birth of Islam.", link: "https://www.youtube.com/results?search_query=the+message+full+movie+islam" },
-  { title: "Omar Series", description: "Historical drama about the second Caliph of Islam.", link: "https://www.youtube.com/results?search_query=omar+series+english+subtitles" },
-  { title: "The Sultan and the Saint", description: "The story of St. Francis of Assisi and the Sultan of Egypt.", link: "https://www.youtube.com/results?search_query=the+sultan+and+the+saint+documentary" }
-];
-
 const KALIMAS = [
   {
     id: 1,
@@ -1362,77 +1355,6 @@ const FESTIVAL_GUIDES = [
           <p className="text-[10px] text-slate-400 leading-relaxed px-1">
             Eid ul Adha occurs during Hajj. Pilgrims in Makkah perform special rites while Muslims worldwide join in spirit via sacrifice.
           </p>
-        </section>
-      </div>
-    )
-  },
-  {
-    title: "Eid e Miladunnabi",
-    desc: "Commemorating the birth of Prophet Muhammad ﷺ.",
-    icon: "📜",
-    content: (
-      <div className="space-y-6">
-        <section className="bg-indigo-50 p-6 rounded-3xl border border-indigo-100">
-          <h4 className="text-xl font-black text-indigo-900 mb-3 flex items-center gap-2">
-            <span className="text-2xl">📜</span> Mawlid al-Nabi
-          </h4>
-          <p className="text-sm text-indigo-800 leading-relaxed italic">
-            Observed to commemorate the birth of Prophet Muhammad ﷺ. It is usually marked on the 12th of Rabi' al-Awwal.
-          </p>
-        </section>
-
-        <section>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-              <h6 className="font-black text-slate-900 text-[10px] uppercase mb-3">Common Practices</h6>
-              <ul className="text-[10px] text-slate-500 space-y-3">
-                <li className="flex gap-2">
-                  <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full shrink-0 mt-1" />
-                  <span>Sending Salawat upon the Prophet ﷺ</span>
-                </li>
-                <li className="flex gap-2">
-                  <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full shrink-0 mt-1" />
-                  <span>Reciting Seerah (Life Stories)</span>
-                </li>
-                <li className="flex gap-2">
-                  <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full shrink-0 mt-1" />
-                  <span>Gathering for Nasheeds & Lectures</span>
-                </li>
-                <li className="flex gap-2">
-                  <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full shrink-0 mt-1" />
-                  <span>Giving charity to the needy</span>
-                </li>
-              </ul>
-            </div>
-            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
-              <h6 className="font-black text-indigo-900 text-[10px] uppercase mb-3">Note in Islam</h6>
-              <p className="text-[10px] text-slate-500 leading-relaxed mb-3">Scholars have different opinions about celebrating it:</p>
-              <div className="space-y-2">
-                <div className="p-2 bg-emerald-50 rounded-lg text-[9px] text-emerald-800 font-medium">
-                  Some allow it to remember the Prophet ﷺ.
-                </div>
-                <div className="p-2 bg-rose-50 rounded-lg text-[9px] text-rose-800 font-medium">
-                  Others discourage it as it wasn't practiced in early Islam.
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="p-6 bg-slate-900 rounded-3xl text-white">
-          <h5 className="font-black text-xs uppercase mb-4 text-emerald-400">Cultural Aspects</h5>
-          <div className="grid grid-cols-3 gap-3">
-            {[
-              { t: "Decorations", d: "Streets and mosques brightly lit." },
-              { t: "Processions", d: "Large gatherings in some countries." },
-              { t: "Sharing", d: "People share food and sweets." }
-            ].map((item, i) => (
-              <div key={i} className="p-2 bg-white/5 rounded-xl border border-white/10 text-center">
-                <p className="text-[9px] font-black mb-1">{item.t}</p>
-                <p className="text-[7px] text-slate-400">{item.d}</p>
-              </div>
-            ))}
-          </div>
         </section>
       </div>
     )
@@ -2062,8 +1984,8 @@ const SalahDashboard = ({
     <div className="bg-white border-2 border-black rounded-xl overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-8">
       <div className="p-2 sm:p-3 border-b-2 border-black bg-black text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <h3 className="font-normal uppercase text-[10px] sm:text-[11px] flex items-center gap-1.5 sm:gap-2">
-            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+          <h3 className="font-black uppercase text-lg sm:text-2xl flex items-center gap-1.5 sm:gap-2">
+            <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse" />
             Salah Performance
           </h3>
           <div className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-500/20 rounded-md border border-emerald-500/30">
@@ -2148,12 +2070,52 @@ const SalahDashboard = ({
   );
 };
 
+const DailyAmalIcon = ({ size, className }: { size?: number, className?: string }) => (
+  <img 
+    src="https://i.postimg.cc/ft7nmt83/koran-1.png" 
+    alt="Daily Amal" 
+    style={{ width: size, height: size }} 
+    className={cn("object-contain", className)}
+    referrerPolicy="no-referrer"
+  />
+);
+
+const HomeNavIcon = ({ size, className }: { size?: number, className?: string }) => (
+  <img 
+    src="https://i.postimg.cc/5XZ2mzS8/moon-1.png" 
+    alt="Home" 
+    style={{ width: size, height: size }} 
+    className={cn("object-contain", className)}
+    referrerPolicy="no-referrer"
+  />
+);
+
+const DeenNavIcon = ({ size, className }: { size?: number, className?: string }) => (
+  <img 
+    src="https://i.postimg.cc/QKptBdT0/islamic-pattern.png" 
+    alt="Deen" 
+    style={{ width: size, height: size }} 
+    className={cn("object-contain", className)}
+    referrerPolicy="no-referrer"
+  />
+);
+
+const DashboardNavIcon = ({ size, className }: { size?: number, className?: string }) => (
+  <img 
+    src="https://i.postimg.cc/0z6NmnDt/koran-2.png" 
+    alt="Dashboard" 
+    style={{ width: size, height: size }} 
+    className={cn("object-contain", className)}
+    referrerPolicy="no-referrer"
+  />
+);
+
 const TasbihDashboard = ({ stats }: { stats: { daily: { [key: string]: number }, lifetime: { [key: string]: number } } }) => {
   return (
     <div className="bg-white border-2 border-black rounded-xl overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-8">
       <div className="p-2 sm:p-3 border-b-2 border-black bg-black text-white flex items-center justify-between">
-        <h3 className="font-normal uppercase text-[10px] sm:text-[11px] flex items-center gap-1.5 sm:gap-2">
-          <div className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse" />
+        <h3 className="font-black uppercase text-lg sm:text-2xl flex items-center gap-1.5 sm:gap-2">
+          <div className="w-2.5 h-2.5 bg-amber-500 rounded-full animate-pulse" />
           Tasbih Counter Dashboard
         </h3>
         <span className="text-[8px] sm:text-[9px] font-normal text-black uppercase">Read Only</span>
@@ -2622,7 +2584,7 @@ const StreakCalendar = ({ visitedDates }: { visitedDates: string[] }) => {
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'home' | 'deen' | 'amal' | 'dashboard'>('home');
-  const [deenSubTab, setDeenSubTab] = useState<'grid' | 'quran' | 'names' | 'hadith' | 'prayer' | 'saved' | 'zakat' | 'events' | 'documentary' | 'ramadan' | 'hajj' | 'qibla' | 'calendar' | 'dua_deen' | 'kalima' | 'pillars' | 'festivals'>('grid');
+  const [deenSubTab, setDeenSubTab] = useState<'grid' | 'quran' | 'names' | 'hadith' | 'prayer' | 'saved' | 'zakat' | 'events' | 'ramadan' | 'hajj' | 'qibla' | 'calendar' | 'dua_deen' | 'kalima' | 'pillars' | 'festivals'>('grid');
   const [prayerSubTab, setPrayerSubTab] = useState<'menu' | 'wudu' | 'salah' | 'surah' | 'steps'>('menu');
   const [amalSubTab, setAmalSubTab] = useState<'quran' | 'dua'>('quran');
   const [selectedSalahDua, setSelectedSalahDua] = useState<string | null>(null);
@@ -2868,6 +2830,11 @@ export default function App() {
     const saved = localStorage.getItem('visited_dates');
     return saved ? JSON.parse(saved) : [];
   });
+
+  // Scroll to top on navigation changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [deenSubTab, selectedRamadanGuide, selectedHajjGuide, selectedFestival, selectedPillar, selectedSurah]);
 
   useEffect(() => {
     const updateStreak = () => {
@@ -3434,10 +3401,10 @@ export default function App() {
 
             <div className="hidden lg:flex items-center gap-2 bg-slate-100 p-1 rounded-xl">
               {[
-                { id: 'home', icon: Home, label: 'Home' },
-                { id: 'deen', icon: Compass, label: 'Deen' },
-                { id: 'amal', icon: Sparkles, label: 'Daily Amal' },
-                { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' }
+                { id: 'home', icon: HomeNavIcon, label: 'Home' },
+                { id: 'deen', icon: DeenNavIcon, label: 'Deen' },
+                { id: 'amal', icon: DailyAmalIcon, label: 'Daily Amal' },
+                { id: 'dashboard', icon: DashboardNavIcon, label: 'Dashboard' }
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -3515,31 +3482,13 @@ export default function App() {
 
                 <div className="space-y-6">
                   <div className="space-y-2">
-                    <button
-                      onClick={() => setShowEmail(!showEmail)}
+                    <a
+                      href="mailto:hasanalbannashishir@gmail.com"
                       className="w-full flex items-center gap-4 p-4 rounded-2xl transition-all font-bold text-slate-600 hover:bg-slate-50"
                     >
                       <Mail size={20} />
                       Contact
-                    </button>
-                    
-                    <AnimatePresence>
-                      {showEmail && (
-                        <motion.div
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: 'auto' }}
-                          exit={{ opacity: 0, height: 0 }}
-                          className="px-4 pb-2"
-                        >
-                          <a 
-                            href="mailto:hasanalbannashishir@gmail.com" 
-                            className="text-sm text-emerald-600 font-bold break-all hover:underline"
-                          >
-                            hasanalbannashishir@gmail.com
-                          </a>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
+                    </a>
                   </div>
 
                   <div className="pt-4 space-y-4 px-2">
@@ -4039,22 +3988,6 @@ export default function App() {
                           <h3 className="text-[10px] font-bold uppercase tracking-tight">Qibla</h3>
                         </button>
 
-                        {/* 12. Documentary Option */}
-                        <button 
-                          onClick={() => setDeenSubTab('documentary')}
-                          className="group bg-white p-3 rounded-xl border border-slate-200 text-slate-900 text-center transition-all hover:border-slate-400 hover:shadow-md"
-                        >
-                          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-sm overflow-hidden border border-slate-100">
-                            <img 
-                              src="https://i.postimg.cc/HVppbK46/documentary.png" 
-                              alt="Documentary" 
-                              className="w-full h-full object-cover"
-                              referrerPolicy="no-referrer"
-                            />
-                          </div>
-                          <h3 className="text-[10px] font-bold uppercase tracking-tight">Documentary</h3>
-                        </button>
-
                         {/* 14. Dua Option */}
                         <button 
                           onClick={() => setDeenSubTab('dua_deen')}
@@ -4144,7 +4077,6 @@ export default function App() {
                         (deenSubTab === 'names') ||
                         (deenSubTab === 'saved') ||
                         (deenSubTab === 'zakat') ||
-                        (deenSubTab === 'documentary') ||
                         (deenSubTab === 'dua_deen') ||
                         (deenSubTab === 'kalima') ||
                         (deenSubTab === 'pillars') ||
@@ -4734,33 +4666,6 @@ export default function App() {
                                 )}
                             </div>
                           )}
-                        </div>
-                      )}
-
-                      {deenSubTab === 'documentary' && (
-                        <div className="space-y-6">
-                          <h3 className="text-2xl font-black text-slate-900">Islamic Documentaries</h3>
-                          <div className="grid grid-cols-1 gap-4">
-                            {DOCUMENTARIES.map((doc, i) => (
-                              <div key={i} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm group hover:border-emerald-500 transition-all">
-                                <div className="flex items-start justify-between mb-4">
-                                  <div className="w-12 h-12 bg-slate-900 text-white rounded-xl flex items-center justify-center group-hover:bg-emerald-600 transition-colors">
-                                    <Video size={24} />
-                                  </div>
-                                  <a 
-                                    href={doc.link} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer"
-                                    className="p-2 bg-slate-50 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all"
-                                  >
-                                    <ExternalLink size={18} />
-                                  </a>
-                                </div>
-                                <h4 className="font-bold text-slate-900 mb-2">{doc.title}</h4>
-                                <p className="text-sm text-slate-500 leading-relaxed">{doc.description}</p>
-                              </div>
-                            ))}
-                          </div>
                         </div>
                       )}
 
@@ -6090,6 +5995,12 @@ export default function App() {
                         )}
                       </div>
                     </div>
+
+                    <div className="mt-8 text-center space-y-2 max-w-sm mx-auto">
+                      <p className="text-emerald-800 font-medium text-sm leading-relaxed">"Continue your Quran journey with ease.</p>
+                      <p className="text-slate-500 text-xs italic leading-relaxed">Resume from where you last paused and stay consistent.</p>
+                      <p className="text-emerald-900 font-bold text-sm leading-relaxed">Complete your Khatam with peace and dedication."</p>
+                    </div>
                   </motion.div>
                 )}
 
@@ -6250,10 +6161,10 @@ export default function App() {
       <nav className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-t border-slate-200 px-6 py-3 z-40 md:hidden">
         <div className="flex items-center justify-between max-w-md mx-auto">
           {[
-            { id: 'home', icon: Home, label: 'Home' },
-            { id: 'deen', icon: Compass, label: 'Deen' },
-            { id: 'amal', icon: Sparkles, label: 'Daily Amal' },
-            { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' }
+            { id: 'home', icon: HomeNavIcon, label: 'Home' },
+            { id: 'deen', icon: DeenNavIcon, label: 'Deen' },
+            { id: 'amal', icon: DailyAmalIcon, label: 'Daily Amal' },
+            { id: 'dashboard', icon: DashboardNavIcon, label: 'Dashboard' }
           ].map((tab) => (
             <button
               key={tab.id}
@@ -6287,7 +6198,7 @@ export default function App() {
           <div className="flex items-center justify-center gap-6">
             <a href="#" className="text-slate-400 hover:text-emerald-600 transition-colors text-xs font-medium">Privacy Policy</a>
             <a href="#" className="text-slate-400 hover:text-emerald-600 transition-colors text-xs font-medium">Terms of Service</a>
-            <a href="#" className="text-slate-400 hover:text-emerald-600 transition-colors text-xs font-medium">Contact Us</a>
+            <a href="mailto:hasanalbannashishir@gmail.com" className="text-slate-400 hover:text-emerald-600 transition-colors text-xs font-medium">Contact Us</a>
           </div>
         </div>
       </footer>

@@ -97,6 +97,7 @@ export interface Dua {
   title: string;
   arabic: string;
   translation: string;
+  transliteration?: string;
   category: string;
 }
 

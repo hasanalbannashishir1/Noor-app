@@ -69,6 +69,7 @@ import {
   DashboardStats
 } from './types';
 import { cn } from './lib/utils';
+import { DUAS, DUA_CATEGORIES } from './constants/duas';
 
 const SALAH_REQUIREMENTS: PrayerRequirement[] = [
   {
@@ -2644,35 +2645,10 @@ export default function App() {
     return {};
   });
 
-  const [selectedDashboardDate, setSelectedDashboardDate] = useState<string>(new Date().toDateString());
-  const [selectedRamadanGuide, setSelectedRamadanGuide] = useState<number | null>(null);
-  const [selectedFestival, setSelectedFestival] = useState<number | null>(null);
-  const [selectedPillar, setSelectedPillar] = useState<number | null>(null);
-
-  const salahProgress = salahHistory[new Date().toDateString()] || [];
-
-  const setSalahProgress = (update: string[] | ((prev: string[]) => string[])) => {
-    setSalahHistory(prevHistory => {
-      const today = new Date().toDateString();
-      const current = prevHistory[today] || [];
-      const next = typeof update === 'function' ? update(current) : update;
-      
-      // Check if actually changed to prevent unnecessary re-renders
-      if (current.length === next.length && current.every((val, index) => next.includes(val))) {
-        return prevHistory;
-      }
-      
-      return {
-        ...prevHistory,
-        [today]: next
-      };
-    });
-  };
-
   // Tasbih Stats
   const [tasbihStats, setTasbihStats] = useState<{
-    daily: { [key: string]: number },
-    lifetime: { [key: string]: number },
+    daily: { [phrase: string]: number },
+    lifetime: { [phrase: string]: number },
     lastUpdate: string
   }>(() => {
     const saved = localStorage.getItem('tasbih_stats');
@@ -2793,8 +2769,6 @@ export default function App() {
     }
   };
 
-  // AI Assistant
-
   // Daily Amal
   const [amalBookmarks, setAmalBookmarks] = useState<BookmarkType[]>([]);
   const [selectedDuaCategory, setSelectedDuaCategory] = useState<string | null>(null);
@@ -2814,6 +2788,31 @@ export default function App() {
     const saved = localStorage.getItem('bookmarked_duas');
     return saved ? JSON.parse(saved) : [];
   });
+
+  const [selectedDashboardDate, setSelectedDashboardDate] = useState<string>(new Date().toDateString());
+  const [selectedRamadanGuide, setSelectedRamadanGuide] = useState<number | null>(null);
+  const [selectedFestival, setSelectedFestival] = useState<number | null>(null);
+  const [selectedPillar, setSelectedPillar] = useState<number | null>(null);
+
+  const salahProgress = salahHistory[new Date().toDateString()] || [];
+
+  const setSalahProgress = (update: string[] | ((prev: string[]) => string[])) => {
+    setSalahHistory(prevHistory => {
+      const today = new Date().toDateString();
+      const current = prevHistory[today] || [];
+      const next = typeof update === 'function' ? update(current) : update;
+      
+      // Check if actually changed to prevent unnecessary re-renders
+      if (current.length === next.length && current.every((val, index) => next.includes(val))) {
+        return prevHistory;
+      }
+      
+      return {
+        ...prevHistory,
+        [today]: next
+      };
+    });
+  };
 
   const [bookmarkedSurahs, setBookmarkedSurahs] = useState<number[]>(() => {
     const saved = localStorage.getItem('bookmarked_surahs');
@@ -2983,19 +2982,6 @@ export default function App() {
     fetchHijri();
   }, []);
 
-  const DUAS: Dua[] = [
-    { id: '1', category: 'After Salah', title: 'Ayatul Kursi', arabic: 'اللَّهُ لَا إِلَهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ...', translation: 'Allah! There is no god but He, the Living, the Self-subsisting...' },
-    { id: '2', category: 'Daily Life', title: 'Before Eating', arabic: 'بِسْمِ اللَّهِ', translation: 'In the name of Allah' },
-    { id: '3', category: 'Personal', title: 'For Forgiveness', arabic: 'رَبِّ اغْفِرْ لِي', translation: 'My Lord, forgive me' },
-    { id: '4', category: 'Knowledge', title: 'Increase Knowledge', arabic: 'رَّبِّ زِدْنِي عِلْمًا', translation: 'My Lord, increase me in knowledge' },
-    { id: '5', category: 'Family', title: 'For Parents', arabic: 'رَّبِّ ارْحَمْهُمَا كَمَا رَبَّيَانِي صَغِيرًا', translation: 'My Lord, have mercy upon them as they brought me up [when I was] small' },
-    { id: '6', category: 'Rabbana Dua', title: 'Good in both worlds', arabic: 'رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ', translation: 'Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire' },
-  ];
-
-  const DUA_CATEGORIES = [
-    'After Salah', 'Daily Life', 'Personal', 'Knowledge', 'Family', 'Special', 
-    'Rabbana Dua', 'Allahumma', 'Morning and Evening', 'Purity', 'Illness', 'Good News - Bad News'
-  ];
 
   useEffect(() => {
     const fetchSurahs = async () => {
@@ -5579,17 +5565,68 @@ export default function App() {
                             </div>
                           </div>
 
-                          <div className="grid grid-cols-1 gap-4">
-                            {DUAS.map((dua) => (
-                              <div key={dua.id} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-                                <div className="flex items-center justify-between">
-                                  <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest bg-emerald-50 px-2 py-1 rounded-md">{dua.category}</span>
-                                  <h4 className="font-bold text-slate-900">{dua.title}</h4>
-                                </div>
-                                <p className="text-xl font-arabic text-right leading-loose text-slate-800">{dua.arabic}</p>
-                                <p className="text-sm text-slate-600 leading-relaxed italic">{dua.translation}</p>
+                          <div className="space-y-6">
+                            <div className="flex items-center justify-between">
+                              <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                                <Bookmark className="text-emerald-600" size={24} />
+                                {selectedDuaCategory ? selectedDuaCategory : 'Dua Categories'}
+                              </h3>
+                              {selectedDuaCategory && (
+                                <button 
+                                  onClick={() => setSelectedDuaCategory(null)}
+                                  className="text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1"
+                                >
+                                  <ChevronLeft size={14} />
+                                  Back to Categories
+                                </button>
+                              )}
+                            </div>
+
+                            {!selectedDuaCategory ? (
+                              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                {DUA_CATEGORIES.map(cat => {
+                                  const count = DUAS.filter(d => d.category === cat).length;
+                                  return (
+                                    <button
+                                      key={cat}
+                                      onClick={() => setSelectedDuaCategory(cat)}
+                                      className="bg-white p-4 rounded-2xl border border-slate-200 text-center hover:border-emerald-500 hover:shadow-md transition-all group"
+                                    >
+                                      <div className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                                        <Bookmark size={20} />
+                                      </div>
+                                      <span className="block text-xs font-bold text-slate-800 mb-1">{cat}</span>
+                                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{count} Duas</span>
+                                    </button>
+                                  );
+                                })}
                               </div>
-                            ))}
+                            ) : (
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {DUAS.filter(d => d.category === selectedDuaCategory).map(dua => (
+                                  <div key={dua.id} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all relative group">
+                                    <div className="flex items-center justify-between mb-4">
+                                      <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">{dua.category}</span>
+                                      <button 
+                                        onClick={() => toggleDuaBookmark(dua.id)}
+                                        className={cn(
+                                          "p-2 rounded-lg transition-all",
+                                          bookmarkedDuas.includes(dua.id) ? "bg-emerald-50 text-emerald-600" : "text-slate-300 hover:text-emerald-600 hover:bg-emerald-50"
+                                        )}
+                                      >
+                                        <Bookmark size={18} fill={bookmarkedDuas.includes(dua.id) ? "currentColor" : "none"} />
+                                      </button>
+                                    </div>
+                                    <h4 className="font-bold text-slate-900 mb-2">{dua.title}</h4>
+                                    <p className="text-right text-lg font-arabic mb-4 leading-relaxed">{dua.arabic}</p>
+                                    {dua.transliteration && (
+                                      <p className="text-sm font-medium text-emerald-700/80 italic mb-2 leading-relaxed">{dua.transliteration}</p>
+                                    )}
+                                    <p className="text-xs text-slate-500 leading-relaxed">{dua.translation}</p>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
                           </div>
                         </div>
                       )}
@@ -6039,7 +6076,7 @@ export default function App() {
                       </div>
 
                       {!selectedDuaCategory ? (
-                        <div className="grid grid-cols-4 gap-3">
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                           {DUA_CATEGORIES.map(cat => {
                             const count = DUAS.filter(d => d.category === cat).length;
                             return (
@@ -6075,6 +6112,9 @@ export default function App() {
                               </div>
                               <h4 className="font-bold text-slate-900 mb-2">{dua.title}</h4>
                               <p className="text-right text-lg font-arabic mb-4 leading-relaxed">{dua.arabic}</p>
+                              {dua.transliteration && (
+                                <p className="text-sm font-medium text-emerald-700/80 italic mb-2 leading-relaxed">{dua.transliteration}</p>
+                              )}
                               <p className="text-xs text-slate-500 leading-relaxed">{dua.translation}</p>
                             </div>
                           ))}

@@ -1905,10 +1905,7 @@ const DailySurahReminder = ({
             />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <h3 className="text-lg font-black text-sepia-900">Surah of the Moment</h3>
-              <div className="px-2 py-0.5 bg-amber-100 text-amber-700 text-[8px] font-black uppercase rounded-full tracking-widest">Recommended</div>
-            </div>
+            <h3 className="text-lg font-black text-sepia-900">Surah of the Moment</h3>
             <p className="text-xs text-emerald-700 font-bold tracking-tight">
               {dailySurah.name_simple} <span className="opacity-40 mx-1">•</span> {dailySurah.translated_name.name}
             </p>

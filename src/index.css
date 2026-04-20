@@ -4,6 +4,16 @@
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-arabic: "Amiri", serif;
+
+  --color-sepia-50: #fdfaf3;
+  --color-sepia-100: #f4ecd8;
+  --color-sepia-200: #e8dbc0;
+  --color-sepia-300: #d4c3a3;
+  --color-sepia-400: #b8a078;
+  --color-sepia-600: #8e633d;
+  --color-sepia-700: #704d2f;
+  --color-sepia-800: #5b3f26;
+  --color-sepia-900: #332d24;
 }
 
 @layer base {
@@ -11,14 +21,43 @@
     font-family: var(--font-arabic);
     direction: rtl;
   }
+
+  /* Global Sepia Overrides */
+  body {
+    @apply bg-sepia-100 text-sepia-900;
+  }
+
+  .bg-white {
+    @apply bg-sepia-50;
+  }
+
+  .bg-slate-50 {
+    @apply bg-sepia-100;
+  }
+
+  .bg-slate-100 {
+    @apply bg-sepia-200;
+  }
+
+  .text-slate-900 {
+    @apply text-sepia-900;
+  }
+
+  .text-slate-600, .text-slate-500 {
+    @apply text-sepia-600;
+  }
+
+  .border-slate-200, .border-slate-100 {
+    @apply border-sepia-200;
+  }
 }
 
 .markdown-body {
-  @apply text-slate-600 leading-relaxed;
+  @apply text-sepia-600 leading-relaxed;
 }
 
 .markdown-body h1, .markdown-body h2, .markdown-body h3 {
-  @apply text-slate-800 font-bold mt-6 mb-4;
+  @apply text-sepia-800 font-bold mt-6 mb-4;
 }
 
 .markdown-body p {
@@ -26,11 +65,11 @@
 }
 
 .quran-info-content h2 {
-  @apply text-xl font-bold text-emerald-700 mt-8 mb-4 border-b border-emerald-100 pb-2;
+  @apply text-xl font-bold text-sepia-700 mt-8 mb-4 border-b border-sepia-200 pb-2;
 }
 
 .quran-info-content p {
-  @apply text-slate-600 leading-relaxed mb-4;
+  @apply text-sepia-600 leading-relaxed mb-4;
 }
 
 .quran-info-content ul {
@@ -38,5 +77,5 @@
 }
 
 .quran-info-content strong {
-  @apply text-slate-800 font-semibold;
+  @apply text-sepia-800 font-semibold;
 }

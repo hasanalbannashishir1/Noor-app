@@ -47,6 +47,7 @@ import {
   X,
   Mail,
   Book,
+  List,
   Building2,
   ClipboardList,
   Headphones,
@@ -57,6 +58,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { quranService } from './services/quranService';
+import { quranUserService } from './services/quranUserService';
 import { 
   Surah, 
   Recitation, 
@@ -1856,30 +1858,45 @@ const TasbihCounter = ({ onIncrement }: { onIncrement: (phrase: string) => void 
   );
 };
 
-const DailySurahReminder = () => {
-  const [listened, setListened] = useState(() => {
-    const saved = localStorage.getItem('dailySurahListened');
-    const lastDate = localStorage.getItem('dailySurahDate');
-    const today = new Date().toDateString();
-    
-    if (lastDate === today) {
-      return saved === 'true';
-    }
-    return false;
-  });
+const DailySurahReminder = ({ 
+  surahs, 
+  onPlay, 
+  playingId, 
+  isPlaying, 
+  isLoading 
+}: { 
+  surahs: Surah[], 
+  onPlay: (e: React.MouseEvent, surah: Surah) => void,
+  playingId: number | null,
+  isPlaying: boolean,
+  isLoading: number | null
+}) => {
+  const [offset, setOffset] = useState(0);
 
-  const toggleListened = () => {
-    const newState = !listened;
-    setListened(newState);
-    localStorage.setItem('dailySurahListened', String(newState));
-    localStorage.setItem('dailySurahDate', new Date().toDateString());
+  if (!surahs || surahs.length === 0) return null;
+
+  // Select "Surah of the Moment" based on today's date + local offset
+  const today = new Date();
+  const dayOfYear = Math.floor((today.getTime() - new Date(today.getFullYear(), 0, 0).getTime()) / 86400000);
+  const dailySurahIndex = (dayOfYear + offset) % surahs.length;
+  const dailySurah = surahs[dailySurahIndex];
+
+  const isCurrentPlaying = playingId === dailySurah.id;
+
+  const handleNext = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const nextOffset = offset + 1;
+    setOffset(nextOffset);
+    const nextSurahIndex = (dayOfYear + nextOffset) % surahs.length;
+    const nextSurah = surahs[nextSurahIndex];
+    onPlay(e, nextSurah);
   };
 
   return (
-    <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm mb-4">
+    <div className="bg-sepia-50 rounded-2xl p-6 border border-sepia-200 shadow-sm mb-4 group hover:shadow-md transition-all">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm overflow-hidden border border-slate-100">
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center shadow-inner border border-emerald-100 group-hover:scale-105 transition-transform overflow-hidden relative">
             <img 
               src="https://i.postimg.cc/gnnhbNnm/quran-3.png" 
               alt="Surah Listening" 
@@ -1888,27 +1905,66 @@ const DailySurahReminder = () => {
             />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-slate-900">Daily Surah</h3>
-            <p className="text-xs text-slate-500">Listen to one Surah today</p>
+            <div className="flex items-center gap-2">
+              <h3 className="text-lg font-black text-sepia-900">Surah of the Moment</h3>
+              <div className="px-2 py-0.5 bg-amber-100 text-amber-700 text-[8px] font-black uppercase rounded-full tracking-widest">Recommended</div>
+            </div>
+            <p className="text-xs text-emerald-700 font-bold tracking-tight">
+              {dailySurah.name_simple} <span className="opacity-40 mx-1">•</span> {dailySurah.translated_name.name}
+            </p>
+            <div className="flex items-center gap-3 mt-1.5">
+              <span className="text-[10px] font-bold text-sepia-600 flex items-center gap-1">
+                 <List size={12} className="text-sepia-400" /> {dailySurah.verses_count} Verses
+              </span>
+              <span className="text-[10px] font-bold text-sepia-600 flex items-center gap-1">
+                 <MapPin size={12} className="text-sepia-400" /> {dailySurah.revelation_place}
+              </span>
+            </div>
           </div>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="text-right">
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Progress</p>
-            <p className={cn("text-sm font-black transition-colors", listened ? "text-emerald-600" : "text-slate-400")}>
-              {listened ? '1 / 1' : '0 / 1'}
-            </p>
-          </div>
+        
+        <div className="flex items-center gap-2">
+          {/* Play Button */}
           <button 
-            onClick={toggleListened}
+            onClick={(e) => onPlay(e, dailySurah)}
+            disabled={isLoading === dailySurah.id}
             className={cn(
-              "w-10 h-10 rounded-xl flex items-center justify-center transition-all border shadow-sm",
-              listened 
-                ? "bg-emerald-600 text-white border-emerald-500" 
-                : "bg-white text-slate-400 border-slate-100 hover:border-emerald-200 hover:text-emerald-600"
+              "w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300 relative overflow-hidden group/btn",
+              isCurrentPlaying && isPlaying 
+                ? "bg-rose-500 text-white shadow-lg shadow-rose-100" 
+                : "bg-emerald-600 text-white shadow-lg shadow-emerald-100 hover:scale-105 active:scale-95"
             )}
           >
-            <Check size={20} />
+            {isLoading === dailySurah.id ? (
+              <Loader2 size={24} className="animate-spin" />
+            ) : isCurrentPlaying && isPlaying ? (
+              <Pause size={24} fill="currentColor" />
+            ) : (
+              <Play size={24} className="ml-1" fill="currentColor" />
+            )}
+
+            {/* Decorative Wave Design inside button */}
+            <div className="absolute -bottom-2 left-0 right-0 h-1 flex gap-0.5 px-3 items-end opacity-40">
+               {[0.4, 0.7, 0.3, 0.9, 0.5, 0.8, 0.4].map((h, i) => (
+                  <div 
+                    key={i} 
+                    className={cn(
+                      "flex-1 bg-white rounded-t-sm",
+                      isCurrentPlaying && isPlaying && "animate-pulse"
+                    )} 
+                    style={{ height: `${h * 100}%` }} 
+                  />
+               ))}
+            </div>
+          </button>
+
+          {/* Next Button */}
+          <button 
+            onClick={handleNext}
+            className="w-12 h-12 bg-sepia-200/50 text-sepia-600 rounded-2xl flex items-center justify-center hover:bg-sepia-200 hover:text-sepia-900 transition-all active:scale-95 border border-sepia-300 shadow-sm group/next"
+            title="Next Surah"
+          >
+            <ArrowRight size={22} className="group-hover:translate-x-0.5 transition-transform" />
           </button>
         </div>
       </div>
@@ -2584,6 +2640,58 @@ const StreakCalendar = ({ visitedDates }: { visitedDates: string[] }) => {
 };
 
 export default function App() {
+  const [quranAuthToken, setQuranAuthToken] = useState<string | null>(() => {
+    return localStorage.getItem('quran_foundation_token');
+  });
+
+  const handleQuranConnect = async () => {
+    try {
+      const { url } = await quranUserService.getAuthUrl();
+      const width = 600;
+      const height = 700;
+      const left = window.screenX + (window.outerWidth - width) / 2;
+      const top = window.screenY + (window.outerHeight - height) / 2;
+      
+      const authWindow = window.open(
+        url,
+        'quran_foundation_login',
+        `width=${width},height=${height},left=${left},top=${top}`
+      );
+
+      if (!authWindow) {
+        alert('Please allow popups to connect your Quran Foundation account.');
+      }
+    } catch (error) {
+      console.error('Failed to connect:', error);
+    }
+  };
+
+  const syncQuranData = async () => {
+    if (!quranAuthToken) return;
+    try {
+      const data = await quranUserService.syncBookmarks(quranAuthToken);
+      alert(data.message || 'Successfully synchronized with Quran Foundation!');
+      logActivity('quran', 'Synchronized with Quran Foundation');
+    } catch (error) {
+      console.error('Sync failed:', error);
+      alert('Cloud sync failed. Please try again.');
+    }
+  };
+
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      // In production, validate origin
+      if (event.data?.type === 'QURAN_AUTH_SUCCESS') {
+        const token = event.data.token;
+        setQuranAuthToken(token);
+        localStorage.setItem('quran_foundation_token', token);
+        logActivity('quran', 'Connected to Quran Foundation');
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
+
   const [activeTab, setActiveTab] = useState<'home' | 'deen' | 'amal' | 'dashboard'>('home');
   const [deenSubTab, setDeenSubTab] = useState<'grid' | 'quran' | 'names' | 'hadith' | 'prayer' | 'saved' | 'zakat' | 'events' | 'ramadan' | 'hajj' | 'qibla' | 'calendar' | 'dua_deen' | 'kalima' | 'pillars' | 'festivals'>('grid');
   const [prayerSubTab, setPrayerSubTab] = useState<'menu' | 'wudu' | 'salah' | 'surah' | 'steps'>('menu');
@@ -3356,10 +3464,10 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
+    <div className="min-h-screen bg-sepia-100 text-sepia-900 font-sans">
       {/* Header */}
-      <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-200 px-4 py-2">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <header className="sticky top-0 z-30 bg-sepia-50/80 backdrop-blur-md border-b border-sepia-200 px-4 py-2">
+        <div className="max-w-3xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2 md:gap-3">
             <div className="w-8 h-8 md:w-10 md:h-10 bg-white rounded-xl flex items-center justify-center overflow-hidden border border-slate-100">
               <img 
@@ -3385,7 +3493,7 @@ export default function App() {
               </div>
             </div>
 
-            <div className="hidden lg:flex items-center gap-2 bg-slate-100 p-1 rounded-xl">
+            <div className="hidden lg:hidden items-center gap-2 bg-slate-100 p-1 rounded-xl">
               {[
                 { id: 'home', icon: HomeNavIcon, label: 'Home' },
                 { id: 'deen', icon: DeenNavIcon, label: 'Deen' },
@@ -3447,7 +3555,7 @@ export default function App() {
               <div className="flex justify-end mb-8">
                 <button 
                   onClick={() => setIsMenuOpen(false)}
-                  className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-red-50 hover:text-red-500 transition-all"
+                  className="w-10 h-10 rounded-full bg-sepia-100 flex items-center justify-center text-sepia-600 hover:bg-red-50 hover:text-red-500 transition-all"
                 >
                   <X size={20} />
                 </button>
@@ -3455,13 +3563,61 @@ export default function App() {
 
               <div className="space-y-8">
                 <div className="text-center space-y-4">
-                  <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-inner">
+                  <div className="w-20 h-20 bg-sepia-200 text-sepia-600 rounded-full flex items-center justify-center mx-auto shadow-inner">
                     <User size={40} />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-black text-slate-900">Assalamu Alaikum</h2>
-                    <p className="text-emerald-600 font-bold mt-1">Welcome to My Noor App</p>
+                    <h2 className="text-2xl font-black text-sepia-900">Assalamu Alaikum</h2>
+                    <p className="text-emerald-700 font-bold mt-1">Welcome to My Noor App</p>
                   </div>
+                </div>
+
+                {/* Cloud Sync Integration (Quran Foundation User API) */}
+                <div className="bg-sepia-100 rounded-3xl p-5 border border-sepia-200 shadow-sm">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                       <RefreshCw className={cn("text-emerald-500", quranAuthToken && "animate-spin-slow")} size={18} />
+                       <span className="text-xs font-black uppercase tracking-widest text-sepia-900">Cloud Sync</span>
+                    </div>
+                    {quranAuthToken && (
+                      <span className="text-[10px] font-bold text-white bg-emerald-500 px-2 py-0.5 rounded-full ring-2 ring-emerald-100">Linked</span>
+                    )}
+                  </div>
+                  
+                  <p className="text-[10px] text-sepia-600 mb-4 leading-relaxed font-medium">
+                    {quranAuthToken 
+                      ? "Your spiritual journey is linked to the Quran Foundation cloud. Sync your progress and bookmarks across devices."
+                      : "Connect with your Quran Foundation account to save your progress, bookmarks, and journey to the cloud."}
+                  </p>
+
+                  {quranAuthToken ? (
+                    <div className="space-y-2">
+                      <button 
+                        onClick={syncQuranData}
+                        className="w-full py-3 bg-emerald-600 text-white rounded-2xl font-bold flex items-center justify-center gap-2 text-xs shadow-lg shadow-emerald-200 hover:bg-emerald-700 active:scale-95 transition-all"
+                      >
+                        <Download size={16} />
+                        Sync Now
+                      </button>
+                      <button 
+                        onClick={() => {
+                          setQuranAuthToken(null);
+                          localStorage.removeItem('quran_foundation_token');
+                        }}
+                        className="w-full py-2 text-slate-400 hover:text-rose-500 font-bold text-[10px] uppercase tracking-widest transition-all"
+                      >
+                        Disconnect Account
+                      </button>
+                    </div>
+                  ) : (
+                    <button 
+                      onClick={handleQuranConnect}
+                      className="w-full py-3 bg-slate-900 text-white rounded-2xl font-bold flex items-center justify-center gap-2 text-xs shadow-lg shadow-slate-200 hover:bg-black active:scale-95 transition-all"
+                    >
+                      <User size={16} />
+                      Connect to Quran.com
+                    </button>
+                  )}
                 </div>
 
                 <div className="h-px bg-slate-100" />
@@ -3496,7 +3652,7 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      <main className="max-w-7xl mx-auto px-4 py-8 pb-32">
+      <main className="max-w-3xl mx-auto px-4 py-8 pb-32">
         <AnimatePresence mode="wait">
           {activeTab === 'home' && (
             <motion.div
@@ -3623,18 +3779,34 @@ export default function App() {
               </div>
 
               {/* Forbidden Times for Salah */}
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+              <div className="bg-sepia-50 rounded-2xl border border-sepia-200 shadow-sm overflow-hidden group">
                 <button 
                   onClick={() => setShowForbiddenTimes(!showForbiddenTimes)}
-                  className="w-full p-4 flex items-center justify-between hover:bg-slate-50 transition-colors"
+                  className="w-full p-4 flex items-center justify-between hover:bg-sepia-100 transition-all active:scale-[0.99]"
                 >
-                  <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                    <span className="text-lg">🚫</span> Forbidden Times for Salah
-                  </h3>
-                  <ChevronDown 
-                    size={18} 
-                    className={cn("text-slate-400 transition-transform duration-300", showForbiddenTimes && "rotate-180")} 
-                  />
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-rose-50 rounded-xl flex items-center justify-center text-lg border border-rose-100 group-hover:scale-110 transition-transform">
+                      🚫
+                    </div>
+                    <div className="text-left">
+                      <h3 className="text-sm font-bold text-sepia-900">Forbidden Times for Salah</h3>
+                      <p className="text-[10px] text-sepia-600 font-medium">Times when prayer is prohibited</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-sepia-400 hidden sm:block">
+                      {showForbiddenTimes ? 'Collapse' : 'Expand'}
+                    </span>
+                    <div className={cn(
+                      "w-8 h-8 rounded-full flex items-center justify-center transition-all",
+                      showForbiddenTimes ? "bg-sepia-200 text-sepia-900" : "bg-sepia-100 text-sepia-400"
+                    )}>
+                      <ChevronDown 
+                        size={18} 
+                        className={cn("transition-transform duration-500 ease-out", showForbiddenTimes && "rotate-180")} 
+                      />
+                    </div>
+                  </div>
                 </button>
                 
                 <AnimatePresence>
@@ -3646,7 +3818,7 @@ export default function App() {
                       transition={{ duration: 0.3 }}
                       className="overflow-hidden"
                     >
-                      <div className="p-4 pt-0 space-y-4 border-t border-slate-50">
+                      <div className="p-4 pt-0 space-y-4 border-t border-sepia-100">
                         <div className="bg-orange-50/50 p-3 rounded-xl border border-orange-100">
                           <div className="flex items-center gap-2 mb-1">
                             <span className="text-lg">🌅</span>
@@ -3713,8 +3885,8 @@ export default function App() {
               {/* Salah Tracker */}
               <div className="space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                    <div className="w-6 h-6 bg-white rounded-md flex items-center justify-center shadow-sm overflow-hidden border border-slate-100">
+                  <h3 className="text-lg font-bold text-sepia-900 flex items-center gap-2">
+                    <div className="w-6 h-6 bg-sepia-50 rounded-md flex items-center justify-center shadow-sm overflow-hidden border border-sepia-200">
                       <img 
                         src="https://i.postimg.cc/CRGNtSvJ/mosque.png" 
                         alt="Salah Tracker" 
@@ -3724,13 +3896,15 @@ export default function App() {
                     </div>
                     Salah Tracker
                   </h3>
-                  <div className="flex items-center justify-between sm:justify-end gap-4">
+                  <div className="flex items-center justify-between sm:justify-end gap-3">
                     <button 
                       onClick={() => setShowAllSalah(!showAllSalah)}
-                      className="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1.5 bg-emerald-50 px-4 py-2 rounded-xl transition-all border border-emerald-100 shadow-sm"
+                      className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2 bg-emerald-600 text-white px-5 py-2.5 rounded-full transition-all shadow-lg shadow-emerald-200 hover:bg-emerald-700 active:scale-95 group"
                     >
-                      {showAllSalah ? 'Show Current' : 'Show All Prayers'}
-                      <ChevronDown size={14} className={cn("transition-transform duration-300", showAllSalah && "rotate-180")} />
+                      <span>{showAllSalah ? 'View Current' : 'View All Prayers'}</span>
+                      <div className="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center">
+                        <ChevronDown size={14} className={cn("transition-transform duration-500 ease-out", showAllSalah && "rotate-180")} />
+                      </div>
                     </button>
                     <div className="text-right">
                       <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Daily Progress</p>
@@ -3794,7 +3968,13 @@ export default function App() {
                 </div>
               </div>
 
-              <DailySurahReminder />
+              <DailySurahReminder 
+                surahs={surahs}
+                onPlay={handleListPlay}
+                playingId={listPlayingId}
+                isPlaying={isPlaying}
+                isLoading={listAudioLoading}
+              />
               <TasbihCounter onIncrement={updateTasbihCount} />
 
               {/* Daily Home Hadith */}
@@ -6198,8 +6378,8 @@ export default function App() {
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-t border-slate-200 px-6 py-3 z-40 md:hidden">
-        <div className="flex items-center justify-between max-w-md mx-auto">
+      <nav className="fixed bottom-0 left-0 right-0 bg-sepia-50/80 backdrop-blur-lg border-t border-sepia-200 px-6 py-3 z-40">
+        <div className="flex items-center justify-between max-w-sm mx-auto">
           {[
             { id: 'home', icon: HomeNavIcon, label: 'Home' },
             { id: 'deen', icon: DeenNavIcon, label: 'Deen' },
@@ -6221,12 +6401,12 @@ export default function App() {
                 setActiveTab(tab.id as any);
               }}
               className={cn(
-                "flex flex-col items-center gap-1 transition-all min-w-[64px] p-1.5 rounded-xl border-2",
-                activeTab === tab.id ? "text-black border-emerald-500 bg-emerald-50/50" : "text-black/40 border-transparent hover:text-black"
+                "flex flex-col items-center gap-1 transition-all min-w-[64px] md:min-w-[80px] p-1.5 rounded-xl border-2",
+                activeTab === tab.id ? "text-sepia-900 border-emerald-500 bg-sepia-100/50" : "text-sepia-900/40 border-transparent hover:text-sepia-900"
               )}
             >
               <tab.icon size={24} className={cn(activeTab === tab.id && "scale-110")} />
-              <span className="text-[9px] font-bold whitespace-nowrap">{tab.label}</span>
+              <span className="text-[9px] md:text-[10px] font-bold whitespace-nowrap">{tab.label}</span>
             </button>
           ))}
         </div>
@@ -6234,7 +6414,7 @@ export default function App() {
 
       {/* Footer */}
       <footer className="bg-white border-t border-slate-200 py-12 mt-20">
-        <div className="max-w-7xl mx-auto px-4 text-center">
+        <div className="max-w-3xl mx-auto px-4 text-center">
           <div className="flex items-center justify-center gap-6">
             <a href="#" className="text-slate-400 hover:text-emerald-600 transition-colors text-xs font-medium">Privacy Policy</a>
             <a href="#" className="text-slate-400 hover:text-emerald-600 transition-colors text-xs font-medium">Terms of Service</a>

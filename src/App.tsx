@@ -4280,35 +4280,6 @@ export default function App() {
 
                       {deenSubTab === 'quran' && (
                         <div id="surah-list" className="space-y-6">
-                          {/* Daily Quran Khatam Information */}
-                          <div className="bg-sepia-100 rounded-3xl p-6 md:p-8 text-sepia-900 relative overflow-hidden shadow-sm border border-sepia-200 mb-6">
-                            <div className="absolute top-0 right-0 p-4 opacity-[0.05] text-sepia-600">
-                              <Sparkles size={80} />
-                            </div>
-                            <div className="relative z-10 space-y-4">
-                              <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-md overflow-hidden ring-4 ring-white">
-                                  <img 
-                                    src="https://i.postimg.cc/1g0B05R3/quran-6.png" 
-                                    alt="Khatam" 
-                                    className="w-full h-full object-cover scale-110"
-                                    referrerPolicy="no-referrer"
-                                  />
-                                </div>
-                                <h3 className="text-lg md:text-xl font-black uppercase tracking-tight text-sepia-900">Daily Quran Khatam</h3>
-                              </div>
-                              
-                              <p className="text-base leading-relaxed text-sepia-800 font-medium">
-                                Millions reconnect with the Quran during Ramadan, but maintaining that connection afterward can be difficult. 
-                                <span className="text-emerald-700 font-bold ml-1 italic tracking-tight">Daily Khatam</span> helps turn that temporary habit into a lifelong relationship with the Quran.
-                                <br /><br />
-                                <span className="text-sm text-sepia-600 font-semibold italic">
-                                  "Consistent recitation—even a small amount each day—builds discipline, strengthens faith, and keeps the heart connected to Allah. It’s not about finishing quickly, but about showing up daily and staying consistent."
-                                </span>
-                              </p>
-                            </div>
-                          </div>
-
                           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                             <div>
                               <h3 className="text-2xl font-black text-slate-900">The Holy Quran</h3>
@@ -4325,13 +4296,13 @@ export default function App() {
                               />
                             </div>
                           </div>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                          <div className="flex flex-col gap-3">
                             {filteredSurahs.map((surah) => (
                               <motion.div
                                 key={surah.id}
-                                whileHover={{ y: -4 }}
+                                whileHover={{ x: 4 }}
                                 onClick={() => handleSurahClick(surah)}
-                                className="bg-white p-5 rounded-2xl border border-slate-200 hover:border-emerald-200 hover:shadow-lg transition-all cursor-pointer flex items-center justify-between group"
+                                className="bg-white p-4 md:p-5 rounded-2xl border border-slate-200 hover:border-emerald-200 hover:shadow-md transition-all cursor-pointer flex items-center justify-between group"
                               >
                                 <div className="flex items-center gap-4">
                                   <div className="relative w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-xs font-black text-slate-400 group-hover:bg-emerald-50 group-hover:border-emerald-100 group-hover:text-emerald-600 transition-colors">
@@ -4343,34 +4314,37 @@ export default function App() {
                                     <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{surah.translated_name.name}</p>
                                   </div>
                                 </div>
-                                <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-6">
+                                  <div className="text-right hidden sm:block">
+                                    <p className="text-[8px] text-slate-400 font-bold uppercase tracking-widest leading-none mb-1">Verses: {surah.verses_count}</p>
+                                    <p className="text-[10px] text-slate-500 font-medium">{surah.revelation_place === 'makkah' ? 'Meccan' : 'Medinan'}</p>
+                                  </div>
                                   <div className="text-right">
                                     <p className="text-xl font-arabic text-emerald-700">{surah.name_arabic}</p>
-                                    <p className="text-[8px] text-slate-400 font-bold uppercase tracking-widest">{surah.verses_count} Verses</p>
                                   </div>
-                                  <div className="flex flex-col gap-2">
+                                  <div className="flex items-center gap-2">
                                     <button 
                                       onClick={(e) => toggleSurahBookmark(e, surah.id)}
                                       className={cn(
-                                        "w-8 h-8 rounded-full flex items-center justify-center transition-all",
-                                        bookmarkedSurahs.includes(surah.id) ? "bg-amber-50 text-amber-600" : "bg-slate-50 text-slate-300 hover:text-amber-600 hover:bg-amber-50"
+                                        "w-9 h-9 rounded-xl flex items-center justify-center transition-all",
+                                        bookmarkedSurahs.includes(surah.id) ? "bg-amber-50 text-amber-600 shadow-sm" : "bg-slate-50 text-slate-300 hover:text-amber-600 hover:bg-amber-50"
                                       )}
                                     >
-                                      <Bookmark size={14} fill={bookmarkedSurahs.includes(surah.id) ? "currentColor" : "none"} />
+                                      <Bookmark size={16} fill={bookmarkedSurahs.includes(surah.id) ? "currentColor" : "none"} />
                                     </button>
                                     <button 
                                       onClick={(e) => handleListPlay(e, surah)}
                                       className={cn(
-                                        "w-8 h-8 rounded-full flex items-center justify-center transition-all",
-                                        listPlayingId === surah.id ? "bg-emerald-600 text-white" : "bg-slate-100 text-slate-400 hover:bg-emerald-100 hover:text-emerald-600"
+                                        "w-9 h-9 rounded-xl flex items-center justify-center transition-all",
+                                        listPlayingId === surah.id ? "bg-emerald-600 text-white shadow-emerald-200" : "bg-slate-100 text-slate-400 hover:bg-emerald-100 hover:text-emerald-600"
                                       )}
                                     >
                                       {listAudioLoading === surah.id ? (
-                                        <Loader2 size={14} className="animate-spin" />
+                                        <Loader2 size={16} className="animate-spin" />
                                       ) : listPlayingId === surah.id && isPlaying ? (
-                                        <Pause size={14} fill="currentColor" />
+                                        <Pause size={16} fill="currentColor" />
                                       ) : (
-                                        <Play size={14} fill="currentColor" className="ml-0.5" />
+                                        <Play size={16} fill="currentColor" className="ml-0.5" />
                                       )}
                                     </button>
                                   </div>

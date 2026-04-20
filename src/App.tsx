@@ -1929,22 +1929,22 @@ const DailySurahReminder = ({
             onClick={(e) => onPlay(e, dailySurah)}
             disabled={isLoading === dailySurah.id}
             className={cn(
-              "w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300 relative overflow-hidden group/btn",
+              "w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 relative overflow-hidden group/btn",
               isCurrentPlaying && isPlaying 
                 ? "bg-rose-500 text-white shadow-lg shadow-rose-100" 
                 : "bg-emerald-600 text-white shadow-lg shadow-emerald-100 hover:scale-105 active:scale-95"
             )}
           >
             {isLoading === dailySurah.id ? (
-              <Loader2 size={24} className="animate-spin" />
+              <Loader2 size={20} className="animate-spin" />
             ) : isCurrentPlaying && isPlaying ? (
-              <Pause size={24} fill="currentColor" />
+              <Pause size={20} fill="currentColor" />
             ) : (
-              <Play size={24} className="ml-1" fill="currentColor" />
+              <Play size={20} className="ml-0.5" fill="currentColor" />
             )}
 
             {/* Decorative Wave Design inside button */}
-            <div className="absolute -bottom-2 left-0 right-0 h-1 flex gap-0.5 px-3 items-end opacity-40">
+            <div className="absolute -bottom-1.5 left-0 right-0 h-1 flex gap-0.5 px-3 items-end opacity-40">
                {[0.4, 0.7, 0.3, 0.9, 0.5, 0.8, 0.4].map((h, i) => (
                   <div 
                     key={i} 
@@ -1961,10 +1961,10 @@ const DailySurahReminder = ({
           {/* Next Button */}
           <button 
             onClick={handleNext}
-            className="w-12 h-12 bg-sepia-200/50 text-sepia-600 rounded-2xl flex items-center justify-center hover:bg-sepia-200 hover:text-sepia-900 transition-all active:scale-95 border border-sepia-300 shadow-sm group/next"
+            className="w-10 h-10 bg-sepia-200/50 text-sepia-600 rounded-2xl flex items-center justify-center hover:bg-sepia-200 hover:text-sepia-900 transition-all active:scale-95 border border-sepia-300 shadow-sm group/next"
             title="Next Surah"
           >
-            <ArrowRight size={22} className="group-hover:translate-x-0.5 transition-transform" />
+            <ArrowRight size={18} className="group-hover:translate-x-0.5 transition-transform" />
           </button>
         </div>
       </div>

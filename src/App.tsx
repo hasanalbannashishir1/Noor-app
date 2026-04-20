@@ -4280,11 +4280,33 @@ export default function App() {
 
                       {deenSubTab === 'quran' && (
                         <div id="surah-list" className="space-y-6">
-                          {/* Daily Reminder */}
-                          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center mb-6">
-                            <h4 className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-2">Daily Reminder</h4>
-                            <p className="text-slate-700 font-medium italic">"The best of you are those who learn the Quran and teach it"</p>
-                            <p className="text-[10px] text-slate-400 mt-2">— Prophet Muhammad (PBUH)</p>
+                          {/* Daily Quran Khatam Information */}
+                          <div className="bg-sepia-100 rounded-3xl p-6 md:p-8 text-sepia-900 relative overflow-hidden shadow-sm border border-sepia-200 mb-6">
+                            <div className="absolute top-0 right-0 p-4 opacity-[0.05] text-sepia-600">
+                              <Sparkles size={80} />
+                            </div>
+                            <div className="relative z-10 space-y-4">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-md overflow-hidden ring-4 ring-white">
+                                  <img 
+                                    src="https://i.postimg.cc/1g0B05R3/quran-6.png" 
+                                    alt="Khatam" 
+                                    className="w-full h-full object-cover scale-110"
+                                    referrerPolicy="no-referrer"
+                                  />
+                                </div>
+                                <h3 className="text-lg md:text-xl font-black uppercase tracking-tight text-sepia-900">Daily Quran Khatam</h3>
+                              </div>
+                              
+                              <p className="text-base leading-relaxed text-sepia-800 font-medium">
+                                Millions reconnect with the Quran during Ramadan, but maintaining that connection afterward can be difficult. 
+                                <span className="text-emerald-700 font-bold ml-1 italic tracking-tight">Daily Khatam</span> helps turn that temporary habit into a lifelong relationship with the Quran.
+                                <br /><br />
+                                <span className="text-sm text-sepia-600 font-semibold italic">
+                                  "Consistent recitation—even a small amount each day—builds discipline, strengthens faith, and keeps the heart connected to Allah. It’s not about finishing quickly, but about showing up daily and staying consistent."
+                                </span>
+                              </p>
+                            </div>
                           </div>
 
                           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
@@ -6157,19 +6179,48 @@ export default function App() {
                     exit={{ opacity: 0, x: -20 }}
                     className="space-y-6"
                   >
-                    {/* Daily Reminder */}
-                    <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
-                      <h4 className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-2">Daily Reminder</h4>
-                      <p className="text-slate-700 font-medium italic">"The best of you are those who learn the Quran and teach it"</p>
-                      <p className="text-[10px] text-slate-400 mt-2">— Prophet Muhammad (PBUH)</p>
+                    {/* Daily Quran Khatam Information */}
+                    <div className="bg-sepia-100 rounded-3xl p-6 md:p-8 text-sepia-900 relative overflow-hidden shadow-sm border border-sepia-200">
+                      <div className="absolute top-0 right-0 p-4 opacity-[0.05] text-sepia-600">
+                        <Sparkles size={80} />
+                      </div>
+                      <div className="relative z-10 space-y-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-md overflow-hidden ring-4 ring-white">
+                            <img 
+                              src="https://i.postimg.cc/1g0B05R3/quran-6.png" 
+                              alt="Khatam" 
+                              className="w-full h-full object-cover scale-110"
+                              referrerPolicy="no-referrer"
+                            />
+                          </div>
+                          <h3 className="text-lg md:text-xl font-black uppercase tracking-tight text-sepia-900">Daily Quran Khatam</h3>
+                        </div>
+                        
+                        <p className="text-base leading-relaxed text-sepia-800 font-medium">
+                          Millions reconnect with the Quran during Ramadan, but maintaining that connection afterward can be difficult. 
+                          <span className="text-emerald-700 font-bold ml-1 italic tracking-tight">Daily Khatam</span> helps turn that temporary habit into a lifelong relationship with the Quran.
+                          <br /><br />
+                          <span className="text-sm text-sepia-600 font-semibold italic block">
+                            "Consistent recitation—even a small amount each day—builds discipline, strengthens faith, and keeps the heart connected to Allah. It’s not about finishing quickly, but about showing up daily and staying consistent."
+                          </span>
+                        </p>
+                      </div>
                     </div>
 
                     {/* Quran Khatam Player */}
                     <div className="bg-emerald-700 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
                       <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-10 -mt-10 blur-2xl" />
                       <div className="relative z-10">
-                        <div className="flex items-center gap-2 mb-6">
-                          <Headphones size={20} className="text-emerald-300" />
+                        <div className="flex items-center gap-2 mb-6 text-white">
+                          <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center overflow-hidden border border-white/30">
+                            <img 
+                              src="https://i.postimg.cc/1g0B05R3/quran-6.png" 
+                              alt="Khatam Icon" 
+                              className="w-full h-full object-cover scale-110"
+                              referrerPolicy="no-referrer"
+                            />
+                          </div>
                           <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-200">Quran Khatam Player</span>
                         </div>
                         
@@ -6225,10 +6276,21 @@ export default function App() {
                       </div>
                     </div>
 
-                    <div className="mt-8 text-center space-y-2 max-w-sm mx-auto">
-                      <p className="text-emerald-800 font-medium text-sm leading-relaxed">"Continue your Quran journey with ease.</p>
-                      <p className="text-slate-500 text-xs italic leading-relaxed">Resume from where you last paused and stay consistent.</p>
-                      <p className="text-emerald-900 font-bold text-sm leading-relaxed">Complete your Khatam with peace and dedication."</p>
+                    <div className="mt-10 py-8 border-t border-sepia-200 text-center space-y-4 max-w-md mx-auto">
+                      <div className="flex justify-center gap-1.5 text-amber-500/40">
+                         <Sparkles size={12} />
+                         <Sparkles size={16} />
+                         <Sparkles size={12} />
+                      </div>
+                      <p className="text-sepia-800 font-extrabold text-base leading-snug tracking-tight">
+                        "Continue your Quran journey with ease.
+                      </p>
+                      <p className="text-sepia-600 text-sm font-medium leading-relaxed px-4">
+                        Resume from where you last paused and stay consistent in your relationship with the words of Allah."
+                      </p>
+                      <p className="text-emerald-700 font-black text-base leading-snug">
+                        Complete your Khatam with peace and dedication.
+                      </p>
                     </div>
                   </motion.div>
                 )}
@@ -6349,37 +6411,60 @@ export default function App() {
               />
               <TasbihDashboard stats={tasbihStats} />
 
+              {/* Quran Khatam Progress */}
               <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                 <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-                  <h3 className="font-bold text-slate-900">Progress History</h3>
-                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Last 15 Days</p>
+                  <h3 className="font-bold text-slate-900">Quran Khatam Progress</h3>
+                  <p className="text-[10px] text-emerald-600 font-bold uppercase tracking-widest">Journey through 114 Surahs</p>
                 </div>
-                <div className="p-6">
-                  {dashboardHistory.length === 0 ? (
-                    <div className="py-12 text-center">
-                      <BarChart3 size={48} className="text-slate-100 mx-auto mb-4" />
-                      <p className="text-slate-400 text-sm">Keep using the app to see your trends.</p>
+                <div className="p-8">
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between items-end">
+                      <div>
+                        <p className="text-4xl font-black text-slate-900 leading-none">{khatamSurahIndex}</p>
+                        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Surahs Completed</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-4xl font-black text-emerald-600 leading-none">114</p>
+                        <p className="text-xs font-bold text-emerald-600/40 uppercase tracking-widest mt-1">Total Goal</p>
+                      </div>
                     </div>
-                  ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      {dashboardHistory.map((history) => (
-                        <div key={history.date} className="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-3">
-                          <div className="flex flex-col gap-1">
-                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider truncate">
-                              {history.date === new Date().toDateString() ? 'Today' : history.date}
-                            </span>
-                            <span className="text-xs font-black text-emerald-600">{history.completedRakats}/{history.totalRakats} Rakats</span>
-                          </div>
-                          <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                            <div 
-                              className="h-full bg-emerald-500 rounded-full transition-all"
-                              style={{ width: `${(history.completedRakats / (history.totalRakats || 1)) * 100}%` }}
-                            />
-                          </div>
-                        </div>
-                      ))}
+                    
+                    <div className="relative">
+                      <div className="w-full h-4 bg-slate-100 rounded-full overflow-hidden shadow-inner border border-slate-200/50">
+                        <motion.div 
+                          initial={{ width: 0 }}
+                          animate={{ width: `${(khatamSurahIndex / 114) * 100}%` }}
+                          className="h-full bg-gradient-to-r from-emerald-600 to-emerald-400 relative"
+                        >
+                          <div className="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0.1)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.1)_50%,rgba(255,255,255,0.1)_75%,transparent_75%,transparent)] bg-[length:24px_24px] opacity-20" />
+                        </motion.div>
+                      </div>
+                      <div className="flex justify-between mt-3 text-[10px] font-bold uppercase tracking-wider">
+                        <span className="text-emerald-600">{Math.round((khatamSurahIndex / 114) * 100)}% Completed</span>
+                        <span className="text-slate-400">{114 - khatamSurahIndex} Remaining</span>
+                      </div>
                     </div>
-                  )}
+                    
+                    <div className="bg-emerald-50 rounded-2xl p-4 flex items-center gap-4">
+                      <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-md shrink-0 ring-4 ring-white overflow-hidden">
+                        <img 
+                          src="https://i.postimg.cc/1g0B05R3/quran-6.png" 
+                          alt="Quran" 
+                          className="w-full h-full object-cover scale-110"
+                          referrerPolicy="no-referrer"
+                        />
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-emerald-900">Current Milestone</p>
+                        <p className="text-sm font-black text-emerald-700">
+                          {khatamSurahIndex < 114 
+                            ? `Currently at Surah ${khatamSurahIndex + 1}: ${surahs[khatamSurahIndex]?.name_simple}`
+                            : "Khatam Completed! Alhamdulillah."}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 

@@ -79,3 +79,17 @@
 .quran-info-content strong {
   @apply text-sepia-800 font-semibold;
 }
+
+@keyframes indicator-blink {
+  0%, 100% { 
+    border-color: rgba(16, 185, 129, 0.2);
+  }
+  50% { 
+    border-color: rgba(16, 185, 129, 0.8);
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
+  }
+}
+
+.animate-indicator-blink {
+  animation: indicator-blink 4s infinite;
+}

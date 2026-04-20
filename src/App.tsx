@@ -3885,17 +3885,23 @@ export default function App() {
               {/* Salah Tracker */}
               <div className="space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <h3 className="text-lg font-bold text-sepia-900 flex items-center gap-2">
-                    <div className="w-6 h-6 bg-sepia-50 rounded-md flex items-center justify-center shadow-sm overflow-hidden border border-sepia-200">
-                      <img 
-                        src="https://i.postimg.cc/CRGNtSvJ/mosque.png" 
-                        alt="Salah Tracker" 
-                        className="w-full h-full object-cover"
-                        referrerPolicy="no-referrer"
-                      />
-                    </div>
-                    Salah Tracker
-                  </h3>
+                  <div className="space-y-1">
+                    <h3 className="text-lg font-extrabold text-sepia-900 flex items-center gap-2">
+                      <div className="w-7 h-7 bg-sepia-50 rounded-lg flex items-center justify-center shadow-sm overflow-hidden border border-sepia-200">
+                        <img 
+                          src="https://i.postimg.cc/CRGNtSvJ/mosque.png" 
+                          alt="Salah Tracker" 
+                          className="w-full h-full object-cover"
+                          referrerPolicy="no-referrer"
+                        />
+                      </div>
+                      Salah Tracker
+                    </h3>
+                    <p className="text-[10px] font-bold text-emerald-600 flex items-center gap-1.5 px-1">
+                      <Sparkles size={10} className="animate-pulse" />
+                      Tap the prayers below to make it count!
+                    </p>
+                  </div>
                   <div className="flex items-center justify-between sm:justify-end gap-3">
                     <button 
                       onClick={() => setShowAllSalah(!showAllSalah)}
@@ -3913,7 +3919,7 @@ export default function App() {
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                   {SALAH_REQUIREMENTS.filter(p => showAllSalah || p.name === currentPrayer || (!currentPrayer && p.name === 'Fajr')).map((prayer) => {
                     const stats = getPrayerStats(prayer.name);
                     return (
@@ -3923,44 +3929,53 @@ export default function App() {
                         animate={{ opacity: 1, scale: 1 }}
                         key={prayer.name}
                         className={cn(
-                          "bg-white rounded-2xl p-5 border transition-all",
-                          currentPrayer === prayer.name ? "border-emerald-200 shadow-md ring-1 ring-emerald-100" : "border-slate-200",
-                          stats.isMissed && "border-red-200 bg-red-50/30"
+                          "bg-sepia-50 rounded-xl p-3 border transition-all h-fit",
+                          currentPrayer === prayer.name ? "border-emerald-500 shadow-md ring-2 ring-emerald-500/10" : "border-sepia-200",
+                          stats.isMissed && "border-rose-200 bg-rose-50/50"
                         )}
                       >
-                        <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2">
-                            <h4 className={cn("font-bold", stats.isMissed ? "text-red-700" : "text-slate-800")}>{prayer.name}</h4>
-                            {stats.isMissed && <span className="px-1.5 py-0.5 bg-red-100 text-red-700 text-[8px] font-bold rounded uppercase">Missed</span>}
+                            <h4 className={cn("text-[11px] font-black uppercase tracking-widest", stats.isMissed ? "text-rose-700" : "text-sepia-800")}>
+                               {prayer.name}
+                            </h4>
+                            <span className="text-[12px] font-black text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md border border-emerald-200 leading-none">
+                              {stats.completed}/{stats.total}
+                            </span>
                           </div>
-                          <p className="text-xs font-bold text-slate-500">{stats.completed}/{stats.total}</p>
+                          {stats.isMissed && <span className="text-[8px] font-black text-rose-500 uppercase tracking-tighter">Missed</span>}
                         </div>
-                        <div className="grid grid-cols-1 gap-2">
-                          {prayer.rakats.map((rakat) => (
-                            <button
-                              key={rakat.id}
-                              onClick={() => toggleSalahProgress(rakat.id)}
-                              disabled={currentPrayer !== prayer.name}
-                              className={cn(
-                                "flex items-center justify-between p-2.5 rounded-xl border text-xs transition-all",
-                                salahProgress.includes(rakat.id) ? "bg-emerald-50 border-emerald-200" : "bg-white border-slate-100",
-                                currentPrayer !== prayer.name && "opacity-50 cursor-not-allowed grayscale-[0.5]"
-                              )}
-                            >
-                              <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap gap-1.5">
+                          {prayer.rakats.map((rakat, i) => {
+                            const isCompleted = salahProgress.includes(rakat.id);
+                            const isActive = currentPrayer === prayer.name;
+                            return (
+                              <button
+                                key={rakat.id}
+                                onClick={() => toggleSalahProgress(rakat.id)}
+                                disabled={!isActive}
+                                style={{ animationDelay: isCompleted || !isActive ? '0s' : `${i * 0.5}s` }}
+                                className={cn(
+                                  "flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-[9px] font-black transition-all shrink-0 active:scale-90",
+                                  isCompleted 
+                                    ? "bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-100 ring-2 ring-emerald-500/20" 
+                                    : cn(
+                                        "bg-sepia-100/80 border-sepia-300 text-sepia-700 shadow-sm", 
+                                        isActive && "hover:border-emerald-400 hover:bg-sepia-200/50 animate-indicator-blink"
+                                      ),
+                                  !isActive && "opacity-40 grayscale-[0.3] cursor-not-allowed"
+                                )}
+                              >
                                 <div className={cn(
-                                  "w-4 h-4 rounded flex items-center justify-center",
-                                  salahProgress.includes(rakat.id) ? "bg-emerald-600 text-white" : "bg-slate-100"
+                                  "w-3 h-3 rounded-md flex items-center justify-center transition-all",
+                                  isCompleted ? "bg-white text-emerald-600" : "bg-sepia-300/30 text-sepia-600/30"
                                 )}>
-                                  <Check size={12} />
+                                  <Check size={10} strokeWidth={isCompleted ? 4 : 3} />
                                 </div>
-                                <span className="font-bold">{rakat.count} {rakat.label}</span>
-                              </div>
-                              <span className={cn("text-[8px] px-1.5 py-0.5 rounded-full border uppercase font-bold", getCategoryColor(rakat.category))}>
-                                {rakat.category}
-                              </span>
-                            </button>
-                          ))}
+                                <span className="tracking-tight">{rakat.count} {rakat.label}</span>
+                              </button>
+                            );
+                          })}
                         </div>
                       </motion.div>
                     );
